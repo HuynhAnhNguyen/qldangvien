@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { sendChatMessage } from "../services/apiService";
 
 const ChatBot = () => {
@@ -6,6 +6,15 @@ const ChatBot = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
 
   const sendMessage = async () => {
     if (!message.trim()) return;
@@ -13,6 +22,7 @@ const ChatBot = () => {
     setLoading(true);
     const userMessage = { text: message, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
+    setMessage("");
 
     try {
       const token = localStorage.getItem("token"); // 🛠 Lấy token ngay tại thời điểm gửi
@@ -34,7 +44,7 @@ const ChatBot = () => {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setLoading(false);
-      setMessage("");
+      // setMessage("");
     }
   };
 
@@ -127,6 +137,7 @@ const ChatBot = () => {
                   </div>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
           </div>
           <div className="card-footer">
