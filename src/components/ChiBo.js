@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
-import { fetchChiBo, createChiBo, updateChiBo } from "../services/apiService";
+import { fetchChiBo, createChiBo, updateChiBo, createXepLoai, updateXepLoai, fetchXepLoaiByChiBoId } from "../services/apiService";
 import Swal from "sweetalert2";
 
 const ChiBo = () => {
@@ -16,7 +16,14 @@ const ChiBo = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showXepLoaiModal, setShowXepLoaiModal] = useState(false);
   const [selectedChiBo, setSelectedChiBo] = useState(null);
+  const [xepLoaiList, setXepLoaiList] = useState([]);
+  const [xepLoaiForm, setXepLoaiForm] = useState({
+    nam: "",
+    xeploai: "",
+  });
+  const [editXepLoaiId, setEditXepLoaiId] = useState(null);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -104,6 +111,28 @@ const ChiBo = () => {
     return Object.keys(errors).length === 0;
   };
 
+  // Validate XepLoai form
+  const validateXepLoaiForm = () => {
+    const errors = {};
+
+    if (!xepLoaiForm.nam) {
+      errors.nam = "Năm là bắt buộc";
+    } else if (!/^\d{4}$/.test(xepLoaiForm.nam)) {
+      errors.nam = "Năm phải là số có 4 chữ số";
+    }
+
+    if (!xepLoaiForm.xeploai) {
+      errors.xeploai = "Hình thức xếp loại là bắt buộc";
+    } else if (
+      !["xuatsac", "tot", "hoanthanh", "khonghoanthanh"].includes(xepLoaiForm.xeploai)
+    ) {
+      errors.xeploai = "Hình thức xếp loại không hợp lệ";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   // Fetch chiBo from API
   const loadChiBo = async () => {
     setLoading(true);
@@ -115,7 +144,8 @@ const ChiBo = () => {
       //   setChiBo(Array.isArray(response.data) ? response.data : []);
       //   setError(null);
       if (response.resultCode === 0) {
-        setChiBo(Array.isArray(response.data) ? response.data : []);
+        const chiBoData = Array.isArray(response.data) ? response.data : [];
+        setChiBo(chiBoData);
         setError(null);
       } else {
         throw new Error(response.message || "Không thể tải danh sách chi bộ");
@@ -128,6 +158,83 @@ const ChiBo = () => {
     }
   };
 
+  // Fetch XepLoai by ChiBoId
+  const loadXepLoai = async (chiboId) => {
+    setLoading(true);
+    try {
+      const response = await fetchXepLoaiByChiBoId(token, chiboId);
+      if (response.resultCode === 0) {
+        setXepLoaiList(Array.isArray(response.data) ? response.data : []);
+        setError(null);
+      } else {
+        throw new Error(response.message || "Không thể tải danh sách xếp loại");
+      }
+    } catch (err) {
+      setError("Không thể tải danh sách xếp loại");
+      console.error("Error loading xepLoai:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Create new XepLoai
+  const handleCreateXepLoai = async () => {
+    if (!validateXepLoaiForm()) {
+      Swal.fire("Lỗi!", "Vui lòng điền đầy đủ các trường bắt buộc!", "error");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await createXepLoai(token, selectedChiBo.id, xepLoaiForm.nam, xepLoaiForm.xeploai);
+      if (response.resultCode === 0) {
+        setXepLoaiList([...xepLoaiList, response.data]);
+        setXepLoaiForm({ nam: "", xeploai: "" });
+        setValidationErrors({});
+        Swal.fire("Thành công!", "Xếp loại chi bộ thành công", "success");
+      } else {
+        throw new Error(response.message || "Xếp loại chi bộ thất bại");
+      }
+    } catch (err) {
+      Swal.fire("Lỗi!", "Xếp loại chi bộ thất bại", "error");
+      console.error("Error creating xepLoai:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update XepLoai
+  const handleUpdateXepLoai = async () => {
+    if (!validateXepLoaiForm()) {
+      Swal.fire("Lỗi!", "Vui lòng chọn hình thức xếp loại!", "error");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await updateXepLoai(token, editXepLoaiId, xepLoaiForm.xeploai);
+      if (response.resultCode === 0) {
+        setXepLoaiList(
+          xepLoaiList.map((item) =>
+            item.id === editXepLoaiId ? response.data : item
+          )
+        );
+        
+        setEditXepLoaiId(null);
+        setXepLoaiForm({ nam: "", xeploai: "" });
+        setValidationErrors({});
+        Swal.fire("Thành công!", "Cập nhật xếp loại thành công", "success");
+      } else {
+        throw new Error(response.message || "Cập nhật xếp loại thất bại");
+      }
+    } catch (err) {
+      Swal.fire("Lỗi!", "Cập nhật xếp loại thất bại", "error");
+      console.error("Error updating xepLoai:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   useEffect(() => {
     loadChiBo();
   }, []);
@@ -136,6 +243,16 @@ const ChiBo = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  // Handle XepLoai form input changes
+  const handleXepLoaiInputChange = (e) => {
+    const { name, value } = e.target;
+    setXepLoaiForm((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -242,6 +359,15 @@ const ChiBo = () => {
     });
     setValidationErrors({});
     setShowEditModal(true);
+  };
+
+  // Open XepLoai modal
+  const openXepLoaiModal = (chiBoItem) => {
+    setSelectedChiBo(chiBoItem);
+    setXepLoaiForm({ nam: "", xeploai: "" });
+    setEditXepLoaiId(null);
+    loadXepLoai(chiBoItem.id);
+    setShowXepLoaiModal(true);
   };
 
   const renderForm = () => (
@@ -405,9 +531,6 @@ const ChiBo = () => {
             <button className="btn btn-success custom-sm-btn" onClick={openAddModal}>
               <i className="fas fa-plus me-2"></i>Thêm mới
             </button>
-            <button className="btn btn-outline-secondary custom-sm-btn" onClick={openAddModal}>
-              <i class="fa-solid fa-code-branch"></i> Phân loại chi bộ
-            </button>
           </div>
         </div>
 
@@ -427,10 +550,10 @@ const ChiBo = () => {
             <thead className="table-light">
               <tr>
                 <th style={{ width: "5%" }}>STT</th>
-                <th style={{ width: "15%" }}>Tên chi bộ</th>
+                <th style={{ width: "20%" }}>Tên chi bộ</th>
                 <th style={{ width: "25%" }}>Đảng ủy cấp trên</th>
-                <th style={{ width: "15%" }}>Bí thư</th>
-                <th style={{ width: "30%" }}>Ngày thành lập</th>
+                <th style={{ width: "20%" }}>Bí thư</th>
+                <th style={{ width: "20%" }}>Ngày thành lập</th>
                 <th style={{ width: "10%" }}>Thao tác</th>
               </tr>
             </thead>
@@ -461,6 +584,14 @@ const ChiBo = () => {
                       >
                         <i className="fas fa-edit"></i>
                       </button>
+                      <button
+                        className="btn btn-sm btn-outline-info"
+                        onClick={() => openXepLoaiModal(item)}
+                        title="Xếp loại chi bộ"
+                      >
+                        <i class="fa-solid fa-code-branch"></i>
+                      </button>
+                      
                     </div>
                   </td>
                 </tr>
@@ -618,6 +749,40 @@ const ChiBo = () => {
                   readOnly
                 />
               </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Danh sách xếp loại chi bộ</Form.Label>
+                {xepLoaiList.length === 0 ? (
+                  <div className="text-muted">Chi bộ chưa được xếp loại</div>
+                ) : (
+                  <div className="table-responsive">
+                    <table className="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Năm</th>
+                          <th>Xếp loại</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {xepLoaiList.map((item) => (
+                          <tr key={item.id}>
+                            <td>{item.nam}</td>
+                            <td>
+                              {item.xeploai === "xuatsac" 
+                              ? "Hoàn thành xuất sắc nhiệm vụ"
+                              : item.xeploai === "tot"
+                                ? "Hoàn thành tốt nhiệm vụ"
+                                : item.xeploai === "hoanthanh"
+                                ? "Hoàn thành nhiệm vụ"
+                                : "Không hoàn thành nhiệm vụ"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </Form.Group>
             </div>
           )}
         </Modal.Body>
@@ -628,158 +793,6 @@ const ChiBo = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Add Modal */}
-      {/* <Modal
-        show={showAddModal}
-        onHide={() => setShowAddModal(false)}
-        size="lg"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Thêm chi bộ</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Tên chi bộ</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="tenchibo"
-                    value={formData.tenchibo}
-                    onChange={handleInputChange}
-                    isInvalid={!!validationErrors.tenchibo}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.tenchibo}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Tên Đảng ủy cấp trên</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="danguycaptren"
-                    value={formData.danguycaptren}
-                    onChange={handleInputChange}
-                    isInvalid={!!validationErrors.danguycaptren}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.danguycaptren}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Họ và tên bí thư</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="bithu"
-                    value={formData.bithu}
-                    onChange={handleInputChange}
-                    isInvalid={!!validationErrors.bithu}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.bithu}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Họ và tên phó bí thư</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="phobithu"
-                    value={formData.phobithu}
-                    onChange={handleInputChange}
-                    isInvalid={!!validationErrors.phobithu}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.phobithu}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Địa chỉ</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="diachi"
-                    value={formData.diachi}
-                    onChange={handleInputChange}
-                    isInvalid={!!validationErrors.diachi}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.diachi}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Ngày thành lập chi bộ</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="ngaythanhlap"
-                    value={formData.ngaythanhlap}
-                    onChange={handleInputChange}
-                    isInvalid={!!validationErrors.ngaythanhlap}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {validationErrors.ngaythanhlap}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-            </Row>
-            <Form.Group className="mb-3">
-              <Form.Label>Trạng thái hoạt động của chi bộ</Form.Label>
-              <Form.Select
-                name="trangthai"
-                value={formData.trangthai}
-                onChange={handleInputChange}
-                isInvalid={!!validationErrors.trangthai}
-              >
-                <option value="">Chọn trạng thái</option>
-                <option value="hoatdong">Hoạt động</option>
-                <option value="giaithe">Giải thể</option>
-                <option value="tamdung">Tạm dừng</option>
-              </Form.Select>
-              <Form.Control.Feedback type="invalid">
-                {validationErrors.trangthai}
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Ghi chú</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={4}
-                name="ghichu"
-                value={formData.ghichu}
-                onChange={handleInputChange}
-                isInvalid={!!validationErrors.ghichu}
-              />
-              <Form.Control.Feedback type="invalid">
-                {validationErrors.ghichu}
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowAddModal(false)}>
-            Hủy
-          </Button>
-          <Button variant="primary" onClick={handleAddChiBo} disabled={loading}>
-            {loading ? "Đang xử lý..." : "Thêm mới"}
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
       {/* Add Modal */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)} size="lg">
         <Modal.Header closeButton>
@@ -797,127 +810,6 @@ const ChiBo = () => {
       </Modal>
 
       {/* Edit Modal */}
-      {/* <Modal
-        show={showEditModal}
-        onHide={() => setShowEditModal(false)}
-        size="lg"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Cập nhật chi bộ</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Tên chi bộ</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="tenchibo"
-                    value={formData.tenchibo}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Tên Đảng ủy cấp trên</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="danguycaptren"
-                    value={formData.danguycaptren}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Họ và tên bí thư</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="bithu"
-                    value={formData.bithu}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Họ và tên phó bí thư</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="phobithu"
-                    value={formData.phobithu}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Địa chỉ</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="diachi"
-                    value={formData.diachi}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Ngày thành lập chi bộ</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="ngaythanhlap"
-                    value={formData.ngaythanhlap}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Form.Group className="mb-3">
-              <Form.Label>Trạng thái hoạt động của chi bộ</Form.Label>
-              <Form.Select
-                name="trangthai"
-                value={formData.trangthai}
-                onChange={handleInputChange}
-              >
-                <option value="">Chọn trạng thái</option>
-                <option value="hoatdong">Hoạt động</option>
-                <option value="giaithe">Giải thể</option>
-                <option value="tamdung">Tạm dừng</option>
-              </Form.Select>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Ghi chú</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={4}
-                name="ghichu"
-                value={formData.ghichu}
-                onChange={handleInputChange}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-            Hủy
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleUpdateChiBo}
-            disabled={loading}
-          >
-            {loading ? "Đang xử lý..." : "Lưu thay đổi"}
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
-      {/* Edit Modal */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Cập nhật chi bộ</Modal.Title>
@@ -929,6 +821,125 @@ const ChiBo = () => {
           </Button>
           <Button variant="primary" onClick={handleUpdateChiBo} disabled={loading}>
             {loading ? "Đang xử lý..." : "Lưu thay đổi"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* XepLoai Modal */}
+      <Modal
+        show={showXepLoaiModal}
+        onHide={() => setShowXepLoaiModal(false)}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Xếp loại chi bộ</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Năm</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="nam"
+                    value={xepLoaiForm.nam}
+                    onChange={handleXepLoaiInputChange}
+                    isInvalid={!!validationErrors.nam}
+                    disabled={editXepLoaiId !== null}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.nam}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Hình thức xếp loại</Form.Label>
+                  <Form.Select
+                    name="xeploai"
+                    value={xepLoaiForm.xeploai}
+                    onChange={handleXepLoaiInputChange}
+                    isInvalid={!!validationErrors.xeploai}
+                  >
+                    <option value="">Chọn xếp loại</option>
+                    <option value="xuatsac">Hoàn thành xuất sắc nhiệm vụ</option>
+                    <option value="tot">Hoàn thành tốt nhiệm vụ</option>
+                    <option value="hoanthanh">Hoàn thành nhiệm vụ</option>
+                    <option value="khonghoanthanh">Không hoàn thành nhiệm vụ</option>
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {validationErrors.xeploai}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
+          </Form>
+          <Button
+            variant="primary"
+            onClick={editXepLoaiId ? handleUpdateXepLoai : handleCreateXepLoai}
+            disabled={loading}
+            className="mb-3"
+          >
+            {loading
+              ? "Đang xử lý..."
+              : editXepLoaiId
+              ? "Cập nhật xếp loại"
+              : "Xếp loại chi bộ"}
+          </Button>
+          {xepLoaiList.length === 0 ? (
+            <div className="text-muted">Chi bộ chưa được xếp loại</div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Năm</th>
+                    <th>Xếp loại</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {xepLoaiList.map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.nam}</td>
+                      <td>
+                        {item.xeploai === "tot"
+                          ? "Hoàn thành xuất sắc nhiệm vụ"
+                          : item.xeploai === "tot"
+                          ? "Hoàn thành tốt nhiệm vụ"
+                          : item.xeploai === "hoanthanh"
+                          ? "Hoàn thành nhiệm vụ"
+                          : "Không hoàn thành nhiệm vụ"}
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-outline-warning"
+                          onClick={() => {
+                            setEditXepLoaiId(item.id);
+                            setXepLoaiForm({
+                              nam: item.nam,
+                              xeploai: item.xeploai,
+                            });
+                          }}
+                          title="Chỉnh sửa xếp loại"
+                        >
+                          <i className="fas fa-edit"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowXepLoaiModal(false)}
+          >
+            Đóng
           </Button>
         </Modal.Footer>
       </Modal>

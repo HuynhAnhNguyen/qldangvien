@@ -132,7 +132,41 @@ export const updateChiBo = async (token, chiboId, formData) => {
   return response.data;
 };
 
+ // Fetch XepLoai by ChiBoId
+export const fetchXepLoaiByChiBoId = async (token, chiboId) => {
+  const response = await fetch(
+    `${REACT_APP_API_URL}/xeploai/findByChiBoId?chiboId=${chiboId}`,
+    {
+      headers: { Authorization: `${token}` },
+      'Content-Type': 'application/json'
+    }
+  );
+  return await response.json();
+};
 
+// Create new XepLoai
+export const createXepLoai = async (token, chiboId, nam,  xeploai) => {
+  const response = await fetch(
+    `${REACT_APP_API_URL}/xeploai/create?chiboId=${chiboId}&nam=${nam}&xeploai=${xeploai}`,
+    {
+      method: "POST",
+      headers: { Authorization: `${token}` },
+    }
+  );
+  return await response.json();
+};
+
+// Update XepLoai
+export const updateXepLoai = async (token, xeploaiId, xeploai) => {
+  const response = await fetch(
+    `${REACT_APP_API_URL}/xeploai/update?xeploaiId=${xeploaiId}&xeploai=${xeploai}`,
+    {
+      method: "PUT",
+      headers: { Authorization: `${token}` },
+    }
+  );
+  return await response.json();
+};
 
 
 
