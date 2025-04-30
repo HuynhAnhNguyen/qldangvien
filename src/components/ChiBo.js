@@ -370,6 +370,14 @@ const ChiBo = () => {
     setShowXepLoaiModal(true);
   };
 
+  // Open detail modal and load XepLoai
+  const openDetailModal = (chiBoItem) => {
+    setSelectedChiBo(chiBoItem);
+    setXepLoaiList([]); // Reset xepLoaiList để tránh hiển thị dữ liệu cũ
+    loadXepLoai(chiBoItem.id); // Tải danh sách xếp loại cho chi bộ được chọn
+    setShowDetailModal(true);
+  };
+
   const renderForm = () => (
     <Form>
       <Row className="mb-3">
@@ -570,8 +578,7 @@ const ChiBo = () => {
                       <button
                         className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
                         onClick={() => {
-                          setSelectedChiBo(item);
-                          setShowDetailModal(true);
+                          openDetailModal(item);
                         }}
                         title="Xem chi tiết"
                       >
