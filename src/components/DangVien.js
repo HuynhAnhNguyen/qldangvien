@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, Tabs, Tab, Accordion } from "react-bootstrap";
 import Swal from "sweetalert2";
 import {
   createDangVien,
@@ -897,7 +897,7 @@ const DangVien = () => {
         <Modal.Header closeButton>
           <Modal.Title>Chi tiết Đảng viên</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        {/* <Modal.Body>
           {selectedDangVien && (
             <div>
               <Row className="mb-3">
@@ -1148,7 +1148,158 @@ const DangVien = () => {
               </Form.Group>
             </div>
           )}
-        </Modal.Body>
+        </Modal.Body> */}
+        <Modal.Body>
+  {selectedDangVien && (
+    <div className="row">
+      <div className="col-md-6 mb-3">
+        <div className="card h-100">
+          <div className="card-header bg-light">
+            <h5 className="mb-0">Thông tin cá nhân</h5>
+          </div>
+          <div className="card-body">
+            <ul className="list-group list-group-flush">
+              <li className="list-group-item d-flex justify-content-between align-items-center">
+                <span className="fw-bold">Họ và tên:</span>
+                <span>{selectedDangVien.hoten}</span>
+              </li>
+              <li className="list-group-item d-flex justify-content-between align-items-center">
+                <span className="fw-bold">Ngày sinh:</span>
+                <span>{new Date(selectedDangVien.ngaysinh).toLocaleDateString()}</span>
+              </li>
+              {/* Thêm các thông tin khác tương tự */}
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div className="col-md-6 mb-3">
+        <div className="card h-100">
+          <div className="card-header bg-light">
+            <h5 className="mb-0">Thông tin Đảng</h5>
+          </div>
+          <div className="card-body">
+            <ul className="list-group list-group-flush">
+              <li className="list-group-item d-flex justify-content-between align-items-center">
+                <span className="fw-bold">Chi bộ:</span>
+                <span>{selectedDangVien.chibo?.tenchibo || "Không xác định"}</span>
+              </li>
+              <li className="list-group-item d-flex justify-content-between align-items-center">
+                <span className="fw-bold">Ngày vào Đảng:</span>
+                <span>{new Date(selectedDangVien.ngayvaodang).toLocaleDateString()}</span>
+              </li>
+              {/* Thêm các thông tin khác tương tự */}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+</Modal.Body>
+<Modal.Body>
+  {selectedDangVien && (
+    <div className="row">
+      <div className="col-md-6">
+        <dl className="row">
+          <dt className="col-sm-4">Họ và tên:</dt>
+          <dd className="col-sm-8">{selectedDangVien.hoten}</dd>
+          
+          <dt className="col-sm-4">Ngày sinh:</dt>
+          <dd className="col-sm-8">{new Date(selectedDangVien.ngaysinh).toLocaleDateString()}</dd>
+          
+          <dt className="col-sm-4">Giới tính:</dt>
+          <dd className="col-sm-8">{selectedDangVien.gioitinh}</dd>
+          
+          {/* Thêm các thông tin khác tương tự */}
+        </dl>
+      </div>
+      
+      <div className="col-md-6">
+        <dl className="row">
+          <dt className="col-sm-4">Chi bộ:</dt>
+          <dd className="col-sm-8">{selectedDangVien.chibo?.tenchibo || "Không xác định"}</dd>
+          
+          <dt className="col-sm-4">Ngày vào Đảng:</dt>
+          <dd className="col-sm-8">{new Date(selectedDangVien.ngayvaodang).toLocaleDateString()}</dd>
+          
+          <dt className="col-sm-4">Trạng thái:</dt>
+          <dd className="col-sm-8">
+            {/* <span className={`badge bg-${getStatusBadgeColor(selectedDangVien.trangthaidangvien)}`}>
+              {getStatusText(selectedDangVien.trangthaidangvien)}
+            </span> */}
+          </dd>
+          {/* Thêm các thông tin khác tương tự */}
+        </dl>
+      </div>
+    </div>
+  )}
+</Modal.Body>
+<Modal.Body>
+  {selectedDangVien && (
+    <div className="timeline">
+      <div className="timeline-item">
+        <div className="timeline-point"></div>
+        <div className="timeline-content">
+          <h5>Vào Đảng</h5>
+          <p>{new Date(selectedDangVien.ngayvaodang).toLocaleDateString()}</p>
+        </div>
+      </div>
+      <div className="timeline-item">
+        <div className="timeline-point"></div>
+        <div className="timeline-content">
+          <h5>Chính thức</h5>
+          <p>{selectedDangVien.ngaychinhthuc ? new Date(selectedDangVien.ngaychinhthuc).toLocaleDateString() : "Chưa chính thức"}</p>
+        </div>
+      </div>
+      {/* Thêm các mốc thời gian khác */}
+    </div>
+  )}
+</Modal.Body>
+<Modal.Body>
+  {selectedDangVien && (
+    <Accordion defaultActiveKey="0">
+      <Accordion.Item eventKey="0">
+        <Accordion.Header>Thông tin cá nhân</Accordion.Header>
+        <Accordion.Body>
+          {/* Thông tin cá nhân */}
+        </Accordion.Body>
+      </Accordion.Item>
+      <Accordion.Item eventKey="1">
+        <Accordion.Header>Thông tin Đảng</Accordion.Header>
+        <Accordion.Body>
+          {/* Thông tin Đảng */}
+        </Accordion.Body>
+      </Accordion.Item>
+    </Accordion>
+  )}
+</Modal.Body>
+<Modal.Body>
+  {selectedDangVien && (
+    <Tabs defaultActiveKey="personal" className="mb-3">
+      <Tab eventKey="personal" title="Thông tin cá nhân">
+        <div className="p-3">
+          <dl className="row">
+            {/* Thông tin cá nhân */}
+          </dl>
+        </div>
+      </Tab>
+      <Tab eventKey="party" title="Thông tin Đảng">
+        <div className="p-3">
+          <dl className="row">
+            {/* Thông tin Đảng */}
+          </dl>
+        </div>
+      </Tab>
+      <Tab eventKey="position" title="Chức vụ">
+        <div className="p-3">
+          <dl className="row">
+            {/* Thông tin chức vụ */}
+          </dl>
+        </div>
+      </Tab>
+    </Tabs>
+  )}
+</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
             Đóng
