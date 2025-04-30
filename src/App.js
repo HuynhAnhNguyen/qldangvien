@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NewPage from "./pages/NewPage";
-import NewsManagementPage from "./pages/NewsManagementPage";
+import QuanLyTinTuc from "./pages/QuanLyTinTuc";
 import MemberManagementPage from "./pages/MemberManagementPage";
 import QuanLyChiBo from "./pages/QuanLyChiBo";
+import QuanLyDangVien from "./pages/QuanLyDangVien";
 
 
 
@@ -16,8 +17,8 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/trang-chu" element={<Home />} />
           <Route path="/dang-nhap" element={<Login />} />
-          <Route path="/quan-ly-tin-tuc" element={<NewsManagementPage />} />
-          {/* <Route path="/quan-ly-dang-vien" element={<MemberManagementPage />} /> */}
+          <Route path="/quan-ly-tin-tuc" element={<QuanLyTinTuc />} />
+          <Route path="/quan-ly-dang-vien" element={<QuanLyDangVien />} />
           <Route path="/quan-ly-chi-bo" element={<QuanLyChiBo />} />
         </Routes>
     </Router>

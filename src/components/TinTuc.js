@@ -9,7 +9,7 @@ import {
 } from "../services/apiService";
 import Swal from "sweetalert2";
 
-const NewsManagement = () => {
+const TinTuc = () => {
   const [news, setNews] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -530,4 +530,4 @@ const NewsManagement = () => {
   );
 };
 
-export default NewsManagement;
+export default TinTuc;

@@ -12471,3 +12471,54 @@ span.flatpickr-weekday {
   line-height: 1; /* Adjust line height for better appearance */
   white-space: nowrap;
 }
+
+.status-cell.hoatdong {
+  color: #28a745; /* Màu xanh lá - hoạt động */
+  font-weight: 500;
+}
+
+.status-cell.giaithe {
+  color: #dc3545; /* Màu đỏ - giải thể */
+  font-weight: 500;
+}
+
+.status-cell.tamdung {
+  color: #ffc107; /* Màu vàng - tạm dừng */
+  font-weight: 500;
+}
+
+.status-cell {
+  color: #6c757d; /* Màu xám - không xác định */
+}
+
+/* -----Trang Dangvien---------- */
+.custom-sm-btn-dangvien{
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  white-space: nowrap;
+}
+
+.color-black{
+  color: black;
+}
+
+/* Trạng thái đảng viên */
+.status-cell.chinhthuc {
+  color: #28a745; /* Màu xanh lá - chính thức */
+  font-weight: 500;
+}
+
+.status-cell.dubi {
+  color: #17a2b8; /* Màu xanh dương nhạt - dự bị */
+  font-weight: 500;
+}
+
+.status-cell.khaitru {
+  color: #dc3545; /* Màu đỏ - khai trừ */
+  font-weight: 500;
+  text-decoration: line-through;
+}
+
+.status-cell {
+  color: #6c757d; /* Màu xám - không xác định */
+}

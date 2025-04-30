@@ -6,7 +6,6 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL || "http://3.104.77.30:8
 // Cập nhật hàm login cho phù hợp với API yêu cầu
 export const login = async (userName, passWord) => {
   try {
-    // console.log(REACT_APP_API_URL);
     const response = await axios.post(`${REACT_APP_API_URL}/auth/signin`, {
       userName, 
       passWord,
@@ -132,76 +131,96 @@ export const updateChiBo = async (token, chiboId, formData) => {
   return response.data;
 };
 
- // Fetch XepLoai by ChiBoId
+// Fetch XepLoai by ChiBoId
 export const fetchXepLoaiByChiBoId = async (token, chiboId) => {
-  const response = await fetch(
-    `${REACT_APP_API_URL}/xeploai/findByChiBoId?chiboId=${chiboId}`,
-    {
-      headers: { Authorization: `${token}` },
+  const response = await axios.get(`${REACT_APP_API_URL}/xeploai/findByChiBoId`, {
+    params: { chiboId },
+    headers: {
+      Authorization: `${token}`,
       'Content-Type': 'application/json'
     }
-  );
-  return await response.json();
+  });
+  return await response.data;
 };
 
 // Create new XepLoai
-export const createXepLoai = async (token, chiboId, nam,  xeploai) => {
-  const response = await fetch(
-    `${REACT_APP_API_URL}/xeploai/create?chiboId=${chiboId}&nam=${nam}&xeploai=${xeploai}`,
+export const createXepLoai = async (token, chiboId, nam, xeploai) => {
+  const response = await axios.post(`${REACT_APP_API_URL}/xeploai/create?chiboId=${chiboId}&nam=${nam}&xeploai=${xeploai}`, 
+    { },
     {
-      method: "POST",
-      headers: { Authorization: `${token}` },
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      }
     }
   );
-  return await response.json();
+  return response.data;
 };
 
 // Update XepLoai
 export const updateXepLoai = async (token, xeploaiId, xeploai) => {
-  const response = await fetch(
-    `${REACT_APP_API_URL}/xeploai/update?xeploaiId=${xeploaiId}&xeploai=${xeploai}`,
+  const response = await axios.put(`${REACT_APP_API_URL}/xeploai/update?xeploaiId=${xeploaiId}&xeploai=${xeploai}`, 
+    {},
     {
-      method: "PUT",
-      headers: { Authorization: `${token}` },
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      }
     }
   );
-  return await response.json();
+  return response.data;
 };
 
-
+// Lấy danh sách chi bộ đang hoạt động
+export const fetchChiBoDangHoatDong = async (token) => {
+  const response = await fetch(`${REACT_APP_API_URL}/chibo/chiBoDangHoatDong`, {
+    headers: {
+      Authorization: `${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  return await response;
+};
 
 // Lấy danh sách Đảng viên
-// export const fetchMembers = async (token) => {
-//   const response = await axios.get(`${REACT_APP_API_URL}/dangvien/findAll`, {
-//     headers: {
-//       Authorization: `${token}`,
-//       'Content-Type': 'application/json'
-//     }
-//   });
-//   return response.data;
-// };
+export const fetchDangVien = async (token, searchType, selectedChiBoId) => {
+  let url = `${REACT_APP_API_URL}/dangvien/findAll`;
+  if (searchType === "approved") {
+    url = `${REACT_APP_API_URL}/dangvien/findApproved`;
+  } else if (searchType === "chibo" && selectedChiBoId) {
+    url = `${REACT_APP_API_URL}/dangvien/findByChiBoId?chiboId=${selectedChiBoId}`;
+  }
 
-// // Thêm Đảng viên mới
-// export const createMember  = async (token, memData) => {
-//   const response = await axios.post(`${REACT_APP_API_URL}/dangvien/create`, memData, {
-//     headers: {
-//       Authorization: `${token}`,
-//       'Content-Type': 'application/json'
-//     }
-//   });
-//   return response.data;
-// };
+  const response = await fetch(url, { headers: {
+    Authorization: `${token}`,
+    'Content-Type': 'application/json'
+  } });
+  
+  return await response;
+};
 
-// // Cập nhật Đảng viên
-// export const updateMember = async (token, dangvienId, memData) => {
-//   const response = await axios.put(`${REACT_APP_API_URL}/dangvien/update`, {
-//     ...memData,
-//     dangvienId: dangvienId
-//   }, {
-//     headers: {
-//       Authorization: `${token}`,
-//       'Content-Type': 'application/json'
-//     }
-//   });
-//   return response.data;
-// };
+// Thêm Đảng viên mới
+export const createDangVien  = async (token, chiboId, formData) => {
+  const response = await axios.post(`${REACT_APP_API_URL}/dangvien/create?chiboId=${chiboId}`, {
+    ...formData
+  }, {
+    headers: {
+      Authorization: `${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  return await response.data;
+};
+
+// Cập nhật Đảng viên
+export const updateDangVien = async (token, dangvienId, formData) => {
+  const response = await axios.put(`${REACT_APP_API_URL}/dangvien/update?dangvienId=${dangvienId}`, {
+    ...formData
+  }, {
+    headers: {
+      Authorization: `${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  return await response.data;
+};

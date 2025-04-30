@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
-import { fetchChiBo, createChiBo, updateChiBo, createXepLoai, updateXepLoai, fetchXepLoaiByChiBoId } from "../services/apiService";
+import {
+  fetchChiBo,
+  createChiBo,
+  updateChiBo,
+  createXepLoai,
+  updateXepLoai,
+  fetchXepLoaiByChiBoId,
+} from "../services/apiService";
 import Swal from "sweetalert2";
 
 const ChiBo = () => {
@@ -60,7 +67,7 @@ const ChiBo = () => {
       errors.danguycaptren = "Đảng ủy cấp trên phải có ít nhất 3 ký tự";
     } else if (formData.danguycaptren.length > 100) {
       errors.danguycaptren = "Đảng ủy cấp trên không được vượt quá 100 ký tự";
-    } 
+    }
 
     // diachi
     if (formData.diachi && formData.diachi.length > 200) {
@@ -74,7 +81,7 @@ const ChiBo = () => {
       errors.bithu = "Họ và tên bí thư phải có ít nhất 2 ký tự";
     } else if (formData.bithu.length > 50) {
       errors.bithu = "Họ và tên bí thư không được vượt quá 50 ký tự";
-    } 
+    }
 
     // phobithu
     if (formData.phobithu && formData.phobithu.length > 50) {
@@ -124,7 +131,9 @@ const ChiBo = () => {
     if (!xepLoaiForm.xeploai) {
       errors.xeploai = "Hình thức xếp loại là bắt buộc";
     } else if (
-      !["xuatsac", "tot", "hoanthanh", "khonghoanthanh"].includes(xepLoaiForm.xeploai)
+      !["xuatsac", "tot", "hoanthanh", "khonghoanthanh"].includes(
+        xepLoaiForm.xeploai
+      )
     ) {
       errors.xeploai = "Hình thức xếp loại không hợp lệ";
     }
@@ -186,7 +195,12 @@ const ChiBo = () => {
 
     try {
       setLoading(true);
-      const response = await createXepLoai(token, selectedChiBo.id, xepLoaiForm.nam, xepLoaiForm.xeploai);
+      const response = await createXepLoai(
+        token,
+        selectedChiBo.id,
+        xepLoaiForm.nam,
+        xepLoaiForm.xeploai
+      );
       if (response.resultCode === 0) {
         setXepLoaiList([...xepLoaiList, response.data]);
         setXepLoaiForm({ nam: "", xeploai: "" });
@@ -212,14 +226,18 @@ const ChiBo = () => {
 
     try {
       setLoading(true);
-      const response = await updateXepLoai(token, editXepLoaiId, xepLoaiForm.xeploai);
+      const response = await updateXepLoai(
+        token,
+        editXepLoaiId,
+        xepLoaiForm.xeploai
+      );
       if (response.resultCode === 0) {
         setXepLoaiList(
           xepLoaiList.map((item) =>
             item.id === editXepLoaiId ? response.data : item
           )
         );
-        
+
         setEditXepLoaiId(null);
         setXepLoaiForm({ nam: "", xeploai: "" });
         setValidationErrors({});
@@ -234,7 +252,7 @@ const ChiBo = () => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     loadChiBo();
   }, []);
@@ -536,7 +554,10 @@ const ChiBo = () => {
                 <i className="fas fa-search"></i>
               </button>
             </div>
-            <button className="btn btn-success custom-sm-btn" onClick={openAddModal}>
+            <button
+              className="btn btn-success custom-sm-btn"
+              onClick={openAddModal}
+            >
               <i className="fas fa-plus me-2"></i>Thêm mới
             </button>
           </div>
@@ -559,9 +580,10 @@ const ChiBo = () => {
               <tr>
                 <th style={{ width: "5%" }}>STT</th>
                 <th style={{ width: "20%" }}>Tên chi bộ</th>
-                <th style={{ width: "25%" }}>Đảng ủy cấp trên</th>
-                <th style={{ width: "20%" }}>Bí thư</th>
-                <th style={{ width: "20%" }}>Ngày thành lập</th>
+                <th style={{ width: "20%" }}>Đảng ủy cấp trên</th>
+                <th style={{ width: "15%" }}>Bí thư</th>
+                <th style={{ width: "15%" }}>Ngày thành lập</th>
+                <th style={{ width: "15%" }}>Trạng thái chi bộ</th>
                 <th style={{ width: "10%" }}>Thao tác</th>
               </tr>
             </thead>
@@ -573,6 +595,15 @@ const ChiBo = () => {
                   <td>{item.danguycaptren}</td>
                   <td>{item.bithu}</td>
                   <td>{new Date(item.ngaythanhlap).toLocaleDateString()}</td>
+                  <td className={`status-cell ${item.trangthai}`}>
+                    {item.trangthai === "hoatdong"
+                      ? "Hoạt động"
+                      : item.trangthai === "giaithe"
+                      ? "Giải thể"
+                      : item.trangthai === "tamdung"
+                      ? "Tạm dừng"
+                      : "Không xác định"}
+                  </td>
                   <td>
                     <div className="d-flex gap-1">
                       <button
@@ -598,7 +629,6 @@ const ChiBo = () => {
                       >
                         <i class="fa-solid fa-code-branch"></i>
                       </button>
-                      
                     </div>
                   </td>
                 </tr>
@@ -775,9 +805,9 @@ const ChiBo = () => {
                           <tr key={item.id}>
                             <td>{item.nam}</td>
                             <td>
-                              {item.xeploai === "xuatsac" 
-                              ? "Hoàn thành xuất sắc nhiệm vụ"
-                              : item.xeploai === "tot"
+                              {item.xeploai === "xuatsac"
+                                ? "Hoàn thành xuất sắc nhiệm vụ"
+                                : item.xeploai === "tot"
                                 ? "Hoàn thành tốt nhiệm vụ"
                                 : item.xeploai === "hoanthanh"
                                 ? "Hoàn thành nhiệm vụ"
@@ -801,7 +831,11 @@ const ChiBo = () => {
       </Modal>
 
       {/* Add Modal */}
-      <Modal show={showAddModal} onHide={() => setShowAddModal(false)} size="lg">
+      <Modal
+        show={showAddModal}
+        onHide={() => setShowAddModal(false)}
+        size="lg"
+      >
         <Modal.Header closeButton>
           <Modal.Title>Thêm chi bộ</Modal.Title>
         </Modal.Header>
@@ -817,7 +851,11 @@ const ChiBo = () => {
       </Modal>
 
       {/* Edit Modal */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg">
+      <Modal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        size="lg"
+      >
         <Modal.Header closeButton>
           <Modal.Title>Cập nhật chi bộ</Modal.Title>
         </Modal.Header>
@@ -826,7 +864,11 @@ const ChiBo = () => {
           <Button variant="secondary" onClick={() => setShowEditModal(false)}>
             Hủy
           </Button>
-          <Button variant="primary" onClick={handleUpdateChiBo} disabled={loading}>
+          <Button
+            variant="primary"
+            onClick={handleUpdateChiBo}
+            disabled={loading}
+          >
             {loading ? "Đang xử lý..." : "Lưu thay đổi"}
           </Button>
         </Modal.Footer>
@@ -870,10 +912,14 @@ const ChiBo = () => {
                     isInvalid={!!validationErrors.xeploai}
                   >
                     <option value="">Chọn xếp loại</option>
-                    <option value="xuatsac">Hoàn thành xuất sắc nhiệm vụ</option>
+                    <option value="xuatsac">
+                      Hoàn thành xuất sắc nhiệm vụ
+                    </option>
                     <option value="tot">Hoàn thành tốt nhiệm vụ</option>
                     <option value="hoanthanh">Hoàn thành nhiệm vụ</option>
-                    <option value="khonghoanthanh">Không hoàn thành nhiệm vụ</option>
+                    <option value="khonghoanthanh">
+                      Không hoàn thành nhiệm vụ
+                    </option>
                   </Form.Select>
                   <Form.Control.Feedback type="invalid">
                     {validationErrors.xeploai}
@@ -911,7 +957,7 @@ const ChiBo = () => {
                     <tr key={item.id}>
                       <td>{item.nam}</td>
                       <td>
-                        {item.xeploai === "tot"
+                        {item.xeploai === "xuatsac"
                           ? "Hoàn thành xuất sắc nhiệm vụ"
                           : item.xeploai === "tot"
                           ? "Hoàn thành tốt nhiệm vụ"
