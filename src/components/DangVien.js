@@ -1,11 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Row, Col, Tabs, Tab, Accordion } from "react-bootstrap";
+import {
+  Modal,
+  Button,
+  Form,
+  Row,
+  Col,
+  Tabs,
+  Tab,
+  Accordion,
+} from "react-bootstrap";
 import Swal from "sweetalert2";
 import {
   createDangVien,
   fetchChiBoDangHoatDong,
   fetchDangVien,
   updateDangVien,
+  fetchTheDang,
+  createTheDang,
+  updateTheDang,
+  deleteTheDang,
 } from "../services/apiService";
 
 const DangVien = () => {
@@ -25,6 +38,150 @@ const DangVien = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedDangVien, setSelectedDangVien] = useState(null);
+
+  // Thêm state
+  const [showTheDangModal, setShowTheDangModal] = useState(false);
+  const [theDangData, setTheDangData] = useState(null);
+  const [showAddTheDangForm, setShowAddTheDangForm] = useState(false);
+  const [theDangFormData, setTheDangFormData] = useState({
+    mathe: "",
+    ngaycap: new Date().toISOString().split("T")[0],
+    noicapthe: "",
+  });
+
+  // Hàm mở modal thẻ Đảng
+  const openTheDangModal = async (dangVienItem) => {
+    setSelectedDangVien(dangVienItem);
+    // setLoading(true);
+    try {
+      const response = await fetchTheDang(token, dangVienItem.id);
+      if (response.resultCode === 0) {
+        setTheDangData(response.data || null);
+        setShowAddTheDangForm(response.data === null); // Hiển thị form nếu không có thẻ
+        setTheDangFormData({
+          mathe: response.data?.mathe || "",
+          ngaycap:
+            response.data?.ngaycap || new Date().toISOString().split("T")[0],
+          noicapthe: response.data?.noicapthe || "",
+        });
+      } else {
+        throw new Error(response.message || "Không thể tải thông tin thẻ Đảng");
+      }
+      setShowTheDangModal(true);
+    } catch (error) {
+      console.error("Error fetching theDang:", error);
+      Swal.fire("Lỗi", "Không thể tải thông tin thẻ Đảng", "error");
+      setTheDangData(null);
+      setShowAddTheDangForm(true); // Hiển thị form nếu lỗi
+      setTheDangFormData({
+        mathe: "",
+        ngaycap: new Date().toISOString().split("T")[0],
+        noicapthe: "",
+      });
+      setShowTheDangModal(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // Hàm tạo thẻ Đảng
+  const handleCreateTheDang = async () => {
+    if (!theDangFormData.mathe || !theDangFormData.noicapthe) {
+      Swal.fire("Lỗi", "Vui lòng điền đầy đủ thông tin thẻ Đảng", "error");
+      return;
+    }
+    try {
+      // setLoading(true);
+      const response = await createTheDang(
+        token,
+        selectedDangVien.id,
+        theDangFormData
+      );
+      if (response.resultCode === 0) {
+        setTheDangData(response.data);
+        setShowAddTheDangForm(false);
+        Swal.fire("Thành công", "Thêm thẻ Đảng thành công", "success");
+      } else {
+        Swal.fire("Thất bại", response.message, "error");
+      }
+      // else {
+      //   throw new Error(response.message || "Thêm thẻ Đảng thất bại");
+      // }
+    } catch (error) {
+      Swal.fire(
+        "Lỗi",
+        error.message || "Đã xảy ra lỗi khi thêm thẻ Đảng",
+        "error"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Hàm xóa thẻ Đảng
+  const handleDeleteTheDang = async () => {
+    const result = await Swal.fire({
+      title: "Xác nhận xóa?",
+      text: "Bạn có chắc chắn muốn xóa thẻ Đảng này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        setLoading(true);
+        const response = await deleteTheDang(token, theDangData.thedangId);
+        if (response.resultCode === 0) {
+          setTheDangData(null);
+          setShowAddTheDangForm(true); // Hiển thị form sau khi xóa
+          Swal.fire("Đã xóa", "Thẻ Đảng đã được xóa", "success");
+        } else {
+          throw new Error(response.message || "Xóa thẻ Đảng thất bại");
+        }
+      } catch (error) {
+        Swal.fire("Lỗi", "Xóa thẻ Đảng thất bại", "error");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  // Hàm cập nhật thẻ Đảng
+  const handleUpdateTheDang = async () => {
+    if (!theDangFormData.mathe || !theDangFormData.noicapthe) {
+      Swal.fire("Lỗi", "Vui lòng điền đầy đủ thông tin thẻ Đảng", "error");
+      return;
+    }
+    try {
+      // setLoading(true);
+      const response = await updateTheDang(
+        token,
+        theDangData.thedangId,
+        theDangFormData
+      );
+      if (response.resultCode === 0) {
+        setTheDangData({
+          id: response.data.thedangId || response.data.id,
+          mathe: response.data.mathe,
+          ngaycap: response.data.ngaycap,
+          noicapthe: response.data.noicapthe,
+        });
+        setShowAddTheDangForm(false);
+        Swal.fire("Thành công", "Cập nhật thẻ Đảng thành công", "success");
+      } else {
+        throw new Error(response.message || "Cập nhật thẻ Đảng thất bại");
+      }
+    } catch (error) {
+      Swal.fire("Lỗi", "Cập nhật thẻ Đảng thất bại", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Form data
   const [formData, setFormData] = useState({
@@ -82,8 +239,6 @@ const DangVien = () => {
     // gioitinh
     if (!formData.gioitinh) {
       errors.gioitinh = "Giới tính là bắt buộc";
-    } else if (!["nam", "nu"].includes(formData.gioitinh.toLowerCase())) {
-      errors.gioitinh = "Giới tính không hợp lệ (Nam hoặc Nữ)";
     }
 
     // quequan
@@ -378,41 +533,6 @@ const DangVien = () => {
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Ngày sinh</Form.Label>
-            <Form.Control
-              type="date"
-              name="ngaysinh"
-              value={formData.ngaysinh}
-              onChange={handleInputChange}
-              isInvalid={!!validationErrors.ngaysinh}
-            />
-            <Form.Control.Feedback type="invalid">
-              {validationErrors.ngaysinh}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Col>
-      </Row>
-      <Row className="mb-3">
-        <Col md={6}>
-          <Form.Group>
-            <Form.Label>Giới tính</Form.Label>
-            <Form.Select
-              name="gioitinh"
-              value={formData.gioitinh}
-              onChange={handleInputChange}
-              isInvalid={!!validationErrors.gioitinh}
-            >
-              <option value="">Chọn giới tính</option>
-              <option value="Nam">Nam</option>
-              <option value="Nữ">Nữ</option>
-            </Form.Select>
-            <Form.Control.Feedback type="invalid">
-              {validationErrors.gioitinh}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Col>
-        <Col md={6}>
-          <Form.Group>
             <Form.Label>Chi bộ</Form.Label>
             <Form.Select
               name="chiboId"
@@ -432,6 +552,43 @@ const DangVien = () => {
             </Form.Control.Feedback>
           </Form.Group>
         </Col>
+        
+      </Row>
+      <Row className="mb-3">
+      <Col md={6}>
+          <Form.Group>
+            <Form.Label>Ngày sinh</Form.Label>
+            <Form.Control
+              type="date"
+              name="ngaysinh"
+              value={formData.ngaysinh}
+              onChange={handleInputChange}
+              isInvalid={!!validationErrors.ngaysinh}
+            />
+            <Form.Control.Feedback type="invalid">
+              {validationErrors.ngaysinh}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group>
+            <Form.Label>Giới tính</Form.Label>
+            <Form.Select
+              name="gioitinh"
+              value={formData.gioitinh}
+              onChange={handleInputChange}
+              isInvalid={!!validationErrors.gioitinh}
+            >
+              <option value="">Chọn giới tính</option>
+              <option value="Nam">Nam</option>
+              <option value="Nữ">Nữ</option>
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {validationErrors.gioitinh}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+        
       </Row>
       <Row className="mb-3">
         <Col md={6}>
@@ -819,6 +976,14 @@ const DangVien = () => {
                             >
                               <i className="fas fa-edit"></i>
                             </button>
+
+                            <button
+                              className="btn btn-sm btn-outline-info"
+                              onClick={() => openTheDangModal(item)}
+                              title="Xem thẻ Đảng"
+                            >
+                              <i className="fas fa-id-card"></i>
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -887,7 +1052,6 @@ const DangVien = () => {
           </>
         )}
       </div>
-
       {/* Detail Modal */}
       <Modal
         show={showDetailModal}
@@ -897,416 +1061,117 @@ const DangVien = () => {
         <Modal.Header closeButton>
           <Modal.Title>Chi tiết Đảng viên</Modal.Title>
         </Modal.Header>
-        {/* <Modal.Body>
-          {selectedDangVien && (
-            <div>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Họ và tên</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.hoten}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Ngày sinh</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={new Date(
-                        selectedDangVien.ngaysinh
-                      ).toLocaleDateString()}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Giới tính</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.gioitinh}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Quê quán</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.quequan}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Dân tộc</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.dantoc}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Trình độ văn hóa</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.trinhdovanhoa}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Nơi ở hiện nay</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.noihiennay}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Chuyên môn</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.chuyennmon}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Ngày vào Đảng</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={new Date(
-                        selectedDangVien.ngayvaodang
-                      ).toLocaleDateString()}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Ngày chính thức</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={
-                        selectedDangVien.ngaychinhthuc
-                          ? new Date(
-                              selectedDangVien.ngaychinhthuc
-                            ).toLocaleDateString()
-                          : ""
-                      }
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Người giới thiệu 1</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.nguoigioithieu1}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Người giới thiệu 2</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.nguoigioithieu2}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Chức vụ chính quyền</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.chucvuchinhquyen}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Chức vụ chi bộ</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.chucvuchibo}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Chức vụ Đảng ủy</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.chucvudanguy}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Chức vụ đoàn thể</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.chucvudoanthe}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Nơi sinh hoạt Đảng</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.noisinhhoatdang}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Chức danh</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.chucdanh}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Trình độ ngoại ngữ</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.trinhdongoaingu}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group>
-                    <Form.Label>Trình độ chính trị</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedDangVien.trinhdochinhtri}
-                      readOnly
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Form.Group className="mb-3">
-                <Form.Label>Trạng thái Đảng viên</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={
-                    selectedDangVien.trangthaidangvien === "chinhthuc"
-                      ? "Chính thức"
-                      : selectedDangVien.trangthaidangvien === "dubi"
-                      ? "Dự bị"
-                      : selectedDangVien.trangthaidangvien === "khaitru"
-                      ? "Khai trừ"
-                      : "Không xác định"
-                  }
-                  readOnly
-                />
-              </Form.Group>
-            </div>
-          )}
-        </Modal.Body> */}
         <Modal.Body>
-  {selectedDangVien && (
-    <div className="row">
-      <div className="col-md-6 mb-3">
-        <div className="card h-100">
-          <div className="card-header bg-light">
-            <h5 className="mb-0">Thông tin cá nhân</h5>
-          </div>
-          <div className="card-body">
-            <ul className="list-group list-group-flush">
-              <li className="list-group-item d-flex justify-content-between align-items-center">
-                <span className="fw-bold">Họ và tên:</span>
-                <span>{selectedDangVien.hoten}</span>
-              </li>
-              <li className="list-group-item d-flex justify-content-between align-items-center">
-                <span className="fw-bold">Ngày sinh:</span>
-                <span>{new Date(selectedDangVien.ngaysinh).toLocaleDateString()}</span>
-              </li>
-              {/* Thêm các thông tin khác tương tự */}
-            </ul>
-          </div>
-        </div>
-      </div>
-      
-      <div className="col-md-6 mb-3">
-        <div className="card h-100">
-          <div className="card-header bg-light">
-            <h5 className="mb-0">Thông tin Đảng</h5>
-          </div>
-          <div className="card-body">
-            <ul className="list-group list-group-flush">
-              <li className="list-group-item d-flex justify-content-between align-items-center">
-                <span className="fw-bold">Chi bộ:</span>
-                <span>{selectedDangVien.chibo?.tenchibo || "Không xác định"}</span>
-              </li>
-              <li className="list-group-item d-flex justify-content-between align-items-center">
-                <span className="fw-bold">Ngày vào Đảng:</span>
-                <span>{new Date(selectedDangVien.ngayvaodang).toLocaleDateString()}</span>
-              </li>
-              {/* Thêm các thông tin khác tương tự */}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  )}
-</Modal.Body>
-<Modal.Body>
-  {selectedDangVien && (
-    <div className="row">
-      <div className="col-md-6">
-        <dl className="row">
-          <dt className="col-sm-4">Họ và tên:</dt>
-          <dd className="col-sm-8">{selectedDangVien.hoten}</dd>
-          
-          <dt className="col-sm-4">Ngày sinh:</dt>
-          <dd className="col-sm-8">{new Date(selectedDangVien.ngaysinh).toLocaleDateString()}</dd>
-          
-          <dt className="col-sm-4">Giới tính:</dt>
-          <dd className="col-sm-8">{selectedDangVien.gioitinh}</dd>
-          
-          {/* Thêm các thông tin khác tương tự */}
-        </dl>
-      </div>
-      
-      <div className="col-md-6">
-        <dl className="row">
-          <dt className="col-sm-4">Chi bộ:</dt>
-          <dd className="col-sm-8">{selectedDangVien.chibo?.tenchibo || "Không xác định"}</dd>
-          
-          <dt className="col-sm-4">Ngày vào Đảng:</dt>
-          <dd className="col-sm-8">{new Date(selectedDangVien.ngayvaodang).toLocaleDateString()}</dd>
-          
-          <dt className="col-sm-4">Trạng thái:</dt>
-          <dd className="col-sm-8">
-            {/* <span className={`badge bg-${getStatusBadgeColor(selectedDangVien.trangthaidangvien)}`}>
-              {getStatusText(selectedDangVien.trangthaidangvien)}
-            </span> */}
-          </dd>
-          {/* Thêm các thông tin khác tương tự */}
-        </dl>
-      </div>
-    </div>
-  )}
-</Modal.Body>
-<Modal.Body>
-  {selectedDangVien && (
-    <div className="timeline">
-      <div className="timeline-item">
-        <div className="timeline-point"></div>
-        <div className="timeline-content">
-          <h5>Vào Đảng</h5>
-          <p>{new Date(selectedDangVien.ngayvaodang).toLocaleDateString()}</p>
-        </div>
-      </div>
-      <div className="timeline-item">
-        <div className="timeline-point"></div>
-        <div className="timeline-content">
-          <h5>Chính thức</h5>
-          <p>{selectedDangVien.ngaychinhthuc ? new Date(selectedDangVien.ngaychinhthuc).toLocaleDateString() : "Chưa chính thức"}</p>
-        </div>
-      </div>
-      {/* Thêm các mốc thời gian khác */}
-    </div>
-  )}
-</Modal.Body>
-<Modal.Body>
-  {selectedDangVien && (
-    <Accordion defaultActiveKey="0">
-      <Accordion.Item eventKey="0">
-        <Accordion.Header>Thông tin cá nhân</Accordion.Header>
-        <Accordion.Body>
-          {/* Thông tin cá nhân */}
-        </Accordion.Body>
-      </Accordion.Item>
-      <Accordion.Item eventKey="1">
-        <Accordion.Header>Thông tin Đảng</Accordion.Header>
-        <Accordion.Body>
-          {/* Thông tin Đảng */}
-        </Accordion.Body>
-      </Accordion.Item>
-    </Accordion>
-  )}
-</Modal.Body>
-<Modal.Body>
-  {selectedDangVien && (
-    <Tabs defaultActiveKey="personal" className="mb-3">
-      <Tab eventKey="personal" title="Thông tin cá nhân">
-        <div className="p-3">
-          <dl className="row">
-            {/* Thông tin cá nhân */}
-          </dl>
-        </div>
-      </Tab>
-      <Tab eventKey="party" title="Thông tin Đảng">
-        <div className="p-3">
-          <dl className="row">
-            {/* Thông tin Đảng */}
-          </dl>
-        </div>
-      </Tab>
-      <Tab eventKey="position" title="Chức vụ">
-        <div className="p-3">
-          <dl className="row">
-            {/* Thông tin chức vụ */}
-          </dl>
-        </div>
-      </Tab>
-    </Tabs>
-  )}
-</Modal.Body>
+          {selectedDangVien && (
+            <Tabs defaultActiveKey="personal" className="mb-3">
+                        <Tab eventKey="personal" title="Thông tin cá nhân 3">
+                          <div className="p-3">
+                            <dl className="row">
+                              <dt className="col-sm-4">Họ và tên:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.hoten}</dd>
+                              <dt className="col-sm-4">Ngày sinh:</dt>
+                              <dd className="col-sm-8">
+                                {new Date(selectedDangVien.ngaysinh).toLocaleDateString()}
+                              </dd>
+                              <dt className="col-sm-4">Giới tính:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.gioitinh}</dd>
+                              <dt className="col-sm-4">Quê quán:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.quequan}</dd>
+                              <dt className="col-sm-4">Dân tộc:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.dantoc}</dd>
+                              <dt className="col-sm-4">Trình độ văn hóa:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.trinhdovanhoa}</dd>
+                              <dt className="col-sm-4">Nơi ở hiện nay:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.noihiennay}</dd>
+                              <dt className="col-sm-4">Chuyên môn:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.chuyennmon}</dd>
+                              <dt className="col-sm-4">Trình độ ngoại ngữ:</dt>
+                              <dd className="col-sm-8">
+                                {selectedDangVien.trinhdongoaingu}
+                              </dd>
+                              <dt className="col-sm-4">Trình độ chính trị:</dt>
+                              <dd className="col-sm-8">
+                                {selectedDangVien.trinhdochinhtri}
+                              </dd>
+                            </dl>
+                          </div>
+                        </Tab>
+                        <Tab eventKey="party" title="Thông tin Đảng">
+                          <div className="p-3">
+                            <dl className="row">
+                              <dt className="col-sm-4">Chi bộ:</dt>
+                              <dd className="col-sm-8">
+                                {selectedDangVien.chibo?.tenchibo || "Không xác định"}
+                              </dd>
+                              <dt className="col-sm-4">Ngày vào Đảng:</dt>
+                              <dd className="col-sm-8">
+                                {new Date(
+                                  selectedDangVien.ngayvaodang
+                                ).toLocaleDateString()}
+                              </dd>
+                              <dt className="col-sm-4">Ngày chính thức:</dt>
+                              <dd className="col-sm-8">
+                                {selectedDangVien.ngaychinhthuc
+                                  ? new Date(
+                                      selectedDangVien.ngaychinhthuc
+                                    ).toLocaleDateString()
+                                  : "Chưa chính thức"}
+                              </dd>
+                              <dt className="col-sm-4">Người giới thiệu 1:</dt>
+                              <dd className="col-sm-8">
+                                {selectedDangVien.nguoigioithieu1}
+                              </dd>
+                              <dt className="col-sm-4">Người giới thiệu 2:</dt>
+                              <dd className="col-sm-8">
+                                {selectedDangVien.nguoigioithieu2}
+                              </dd>
+                              <dt className="col-sm-4">Nơi sinh hoạt Đảng:</dt>
+                              <dd className="col-sm-8">
+                                {selectedDangVien.noisinhhoatdang}
+                              </dd>
+                              <dt className="col-sm-4">Trạng thái:</dt>
+                              <dd className="col-sm-8">
+                                {selectedDangVien.trangthaidangvien === "chinhthuc"
+                                  ? "Chính thức"
+                                  : selectedDangVien.trangthaidangvien === "dubi"
+                                  ? "Dự bị"
+                                  : selectedDangVien.trangthaidangvien === "khaitru"
+                                  ? "Khai trừ"
+                                  : "Không xác định"}
+                              </dd>
+                            </dl>
+                          </div>
+                        </Tab>
+                        <Tab eventKey="position" title="Chức vụ">
+                          <div className="p-3">
+                            <dl className="row">
+                              <dt className="col-sm-4">Chức vụ chính quyền:</dt>
+                              <dd className="col-sm-8">
+                                {selectedDangVien.chucvuchinhquyen}
+                              </dd>
+                              <dt className="col-sm-4">Chức vụ chi bộ:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.chucvuchibo}</dd>
+                              <dt className="col-sm-4">Chức vụ Đảng ủy:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.chucvudanguy}</dd>
+                              <dt className="col-sm-4">Chức vụ đoàn thể:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.chucvudoanthe}</dd>
+                              <dt className="col-sm-4">Chức danh:</dt>
+                              <dd className="col-sm-8">{selectedDangVien.chucdanh}</dd>
+                            </dl>
+                          </div>
+                        </Tab>
+                        <Tab eventKey="card" title="Thẻ Đảng">
+                          {/* Content here */}
+                        </Tab>
+                      </Tabs>
+          )}
+        </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
             Đóng
           </Button>
         </Modal.Footer>
       </Modal>
-
       {/* Add Modal */}
       <Modal
         show={showAddModal}
@@ -1330,7 +1195,6 @@ const DangVien = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
       {/* Edit Modal */}
       <Modal
         show={showEditModal}
@@ -1655,6 +1519,198 @@ const DangVien = () => {
           >
             {loading ? "Đang xử lý..." : "Lưu thay đổi"}
           </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* // Modal thẻ Đảng */}
+      <Modal
+        show={showTheDangModal}
+        onHide={() => setShowTheDangModal(false)}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {showAddTheDangForm ? "Thêm/Cập nhật thẻ Đảng" : "Thẻ Đảng viên"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {showAddTheDangForm ? (
+            // Form thêm/cập nhật thẻ Đảng
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Số thẻ *</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="mathe"
+                  value={theDangFormData.mathe}
+                  onChange={(e) =>
+                    setTheDangFormData({
+                      ...theDangFormData,
+                      mathe: e.target.value,
+                    })
+                  }
+                  placeholder="Nhập số thẻ"
+                  required
+                  isInvalid={!!validationErrors.mathe}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {validationErrors.mathe}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Ngày cấp *</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="ngaycap"
+                  value={theDangFormData.ngaycap}
+                  onChange={(e) =>
+                    setTheDangFormData({
+                      ...theDangFormData,
+                      ngaycap: e.target.value,
+                    })
+                  }
+                  required
+                  isInvalid={!!validationErrors.ngaycap}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {validationErrors.ngaycap}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Nơi cấp *</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="noicapthe"
+                  value={theDangFormData.noicapthe}
+                  onChange={(e) =>
+                    setTheDangFormData({
+                      ...theDangFormData,
+                      noicapthe: e.target.value,
+                    })
+                  }
+                  placeholder="Nhập nơi cấp"
+                  required
+                  isInvalid={!!validationErrors.noicapthe}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {validationErrors.noicapthe}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Form>
+          ) : theDangData ? (
+            // Hiển thị thẻ Đảng nếu có
+            <div className="creative-full-bg-card">
+              <div className="title">Thẻ Đảng Viên</div>
+              <div className="subtitle">Đảng Cộng sản Việt Nam</div>
+              <div className="name-section">
+                {selectedDangVien?.hoten?.toUpperCase() || "N/A"}
+              </div>
+              <div className="number-section">
+                Số: {theDangData.mathe || "N/A"}
+              </div>
+              <div className="info-container">
+                <div className="info-left">
+                  <div>
+                    Ngày cấp:{" "}
+                    {theDangData.ngaycap
+                      ? new Date(theDangData.ngaycap).toLocaleDateString(
+                          "vi-VN"
+                        )
+                      : "N/A"}
+                  </div>
+                  {selectedDangVien?.ngayvaodang && (
+                    <div>
+                      Ngày vào Đảng:{" "}
+                      {new Date(
+                        selectedDangVien.ngayvaodang
+                      ).toLocaleDateString("vi-VN")}
+                    </div>
+                  )}
+                </div>
+                <div className="info-right">
+                  <div>Nơi cấp: {theDangData.noicapthe || "N/A"}</div>
+                  {selectedDangVien?.ngaychinhthuc && (
+                    <div>
+                      Ngày chính thức:{" "}
+                      {new Date(
+                        selectedDangVien.ngaychinhthuc
+                      ).toLocaleDateString("vi-VN")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Không hiển thị thông báo, vì showAddTheDangForm đã được đặt true
+            <div />
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          {showAddTheDangForm ? (
+            // Nút khi đang ở form thêm/cập nhật
+            <>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setShowAddTheDangForm(false);
+                  if (!theDangData) setShowTheDangModal(false); // Đóng modal nếu không có thẻ
+                }}
+                disabled={loading}
+              >
+                Hủy
+              </Button>
+              <Button
+                variant="primary"
+                onClick={
+                  theDangData ? handleUpdateTheDang : handleCreateTheDang
+                }
+                disabled={
+                  loading ||
+                  !theDangFormData.mathe ||
+                  !theDangFormData.noicapthe
+                }
+              >
+                {loading
+                  ? "Đang xử lý..."
+                  : theDangData
+                  ? "Cập nhật"
+                  : "Thêm thẻ"}
+              </Button>
+            </>
+          ) : (
+            // Nút khi có thẻ Đảng
+            <>
+              <Button
+                variant="danger"
+                onClick={handleDeleteTheDang}
+                disabled={loading}
+              >
+                <i className="fas fa-trash me-1"></i> Xóa thẻ
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setTheDangFormData({
+                    mathe: theDangData.mathe,
+                    ngaycap: theDangData.ngaycap,
+                    noicapthe: theDangData.noicapthe,
+                  });
+                  setShowAddTheDangForm(true);
+                }}
+                disabled={loading}
+              >
+                <i className="fas fa-edit me-1"></i> Cập nhật
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setShowTheDangModal(false)}
+                disabled={loading}
+              >
+                Đóng
+              </Button>
+            </>
+          )}
         </Modal.Footer>
       </Modal>
     </div>

@@ -224,3 +224,55 @@ export const updateDangVien = async (token, dangvienId, formData) => {
   });
   return await response.data;
 };
+
+// New functions for TheDang
+export const createTheDang = async (token, dangvienId, theDangData) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/thedang/create?dangvienId=${dangvienId}`,
+    theDangData,
+    { headers: {
+      Authorization: `${token}`,
+    'Content-Type': 'application/json'
+   } }
+  );
+  return await response.data;
+};
+
+export const updateTheDang = async (token, thedangId, theDangData) => {
+  const response = await axios.put(
+    `${REACT_APP_API_URL}/thedang/update?thedangId=${thedangId}`,
+    {
+      mathe: theDangData.mathe,
+      ngaycap: theDangData.ngaycap,
+      noicapthe: theDangData.noicapthe,
+    },
+    { headers: {
+      Authorization: `${token}`,
+    'Content-Type': 'application/json'
+   } }
+  );
+  return await response.data;
+};
+
+export const deleteTheDang = async (token, thedangId) => {
+  const response = await axios.delete(
+    `${REACT_APP_API_URL}/thedang/delete?thedangId=${thedangId}`,
+    { headers: {
+      Authorization: `${token}`,
+    'Content-Type': 'application/json'
+   } }
+  );
+  return await response.data;
+};
+
+export const fetchTheDang = async (token, dangvienId) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/thedang/findDetailByDangvienId?dangvienId=${dangvienId}`,
+    { headers: {
+      Authorization: `${token}`,
+    'Content-Type': 'application/json'
+   }  }
+  );
+  console.log(response.data);
+  return await response.data;
+};

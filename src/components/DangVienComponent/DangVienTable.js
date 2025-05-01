@@ -10,6 +10,7 @@ const DangVienTable = ({
   setCurrentPage,
   openDetailModal,
   openEditModal,
+  openTheDangModal,
 }) => {
   return (
     <>
@@ -74,6 +75,13 @@ const DangVienTable = ({
                           >
                             <i className="fas fa-edit"></i>
                           </button>
+                          <button
+                            className="btn btn-sm btn-outline-info"
+                            onClick={() => openTheDangModal(item)}
+                            title="Xem thẻ Đảng"
+                          >
+                            <i className="fas fa-id-card"></i>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -125,9 +133,7 @@ const DangVienTable = ({
                     <button
                       className="page-link"
                       onClick={() =>
-                        setCurrentPage((prev) =>
-                          Math.min(prev + 1, totalPages)
-                        )
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                       }
                       disabled={currentPage === totalPages}
                     >

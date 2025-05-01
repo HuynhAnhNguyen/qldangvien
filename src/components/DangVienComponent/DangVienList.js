@@ -5,8 +5,17 @@ import DangVienDetailModal from "./DangVienDetailModal";
 import DangVienAddModal from "./DangVienAddModal";
 import DangVienEditModal from "./DangVienEditModal";
 import Swal from "sweetalert2";
-import { createDangVien, fetchChiBoDangHoatDong, fetchDangVien, updateDangVien } from "../../services/apiService";
-
+import {
+  createDangVien,
+  fetchChiBoDangHoatDong,
+  fetchDangVien,
+  updateDangVien,
+  fetchTheDang,
+  createTheDang,
+  updateTheDang,
+  deleteTheDang,
+} from "../../services/apiService";
+import TheDangModal from "../TheDangComponent/TheDangModal";
 
 const DangVienList = () => {
   const [dangVien, setDangVien] = useState([]);
@@ -24,6 +33,19 @@ const DangVienList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedDangVien, setSelectedDangVien] = useState(null);
+
+  const [showTheDangModal, setShowTheDangModal] = useState(false);
+  const [showAddTheDangForm, setShowAddTheDangForm] = useState(false);
+  const [theDangData, setTheDangData] = useState({
+    mathe: "",
+    ngaycap: new Date().toISOString().split("T")[0],
+    noicapthe: "",
+  });
+  const [theDangFormData, setTheDangFormData] = useState({
+    mathe: "",
+    ngaycap: new Date().toISOString().split("T")[0],
+    noicapthe: "",
+  });
 
   const [formData, setFormData] = useState({
     hoten: "",
@@ -68,7 +90,8 @@ const DangVienList = () => {
       const today = new Date();
       const selectedDate = new Date(formData.ngaysinh);
       if (selectedDate > today) {
-        errors.ngaysinh = "Ngày sinh của Đảng viên không được là ngày trong tương lai";
+        errors.ngaysinh =
+          "Ngày sinh của Đảng viên không được là ngày trong tương lai";
       }
     }
 
@@ -85,15 +108,18 @@ const DangVienList = () => {
     }
 
     if (formData.trinhdovanhoa && formData.trinhdovanhoa.length > 100) {
-      errors.trinhdovanhoa = "Trình độ văn hóa của Đảng viên không được vượt quá 100 ký tự";
+      errors.trinhdovanhoa =
+        "Trình độ văn hóa của Đảng viên không được vượt quá 100 ký tự";
     }
 
     if (formData.noihiennay && formData.noihiennay.length > 200) {
-      errors.noihiennay = "Nơi ở hiện nay của Đảng viên không được vượt quá 200 ký tự";
+      errors.noihiennay =
+        "Nơi ở hiện nay của Đảng viên không được vượt quá 200 ký tự";
     }
 
     if (formData.chuyennmon && formData.chuyennmon.length > 100) {
-      errors.chuyennmon = "Trình độ chuyên môn của Đảng viên không được vượt quá 100 ký tự";
+      errors.chuyennmon =
+        "Trình độ chuyên môn của Đảng viên không được vượt quá 100 ký tự";
     }
 
     if (!formData.ngayvaodang) {
@@ -110,7 +136,8 @@ const DangVienList = () => {
       const selectedDate = new Date(formData.ngaychinhthuc);
       const ngayVaoDang = new Date(formData.ngayvaodang);
       if (selectedDate < ngayVaoDang) {
-        errors.ngaychinhthuc = "Ngày vào Đảng chính thức phải sau ngày vào Đảng";
+        errors.ngaychinhthuc =
+          "Ngày vào Đảng chính thức phải sau ngày vào Đảng";
       }
     }
 
@@ -124,6 +151,85 @@ const DangVienList = () => {
 
     if (!formData.chiboId) {
       errors.chiboId = "Chi bộ là bắt buộc";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateEditForm = () => {
+    const errors = {};
+    if (!formData.hoten.trim()) {
+      errors.hoten = "Họ và tên Đảng viên là bắt buộc";
+    } else if (formData.hoten.length < 2) {
+      errors.hoten = "Họ và tên Đảng viên phải có ít nhất 2 ký tự";
+    } else if (formData.hoten.length > 50) {
+      errors.hoten = "Họ và tên Đảng viên không được vượt quá 50 ký tự";
+    }
+
+    if (!formData.ngaysinh) {
+      errors.ngaysinh = "Ngày sinh của Đảng viên là bắt buộc";
+    } else {
+      const today = new Date();
+      const selectedDate = new Date(formData.ngaysinh);
+      if (selectedDate > today) {
+        errors.ngaysinh =
+          "Ngày sinh của Đảng viên không được là ngày trong tương lai";
+      }
+    }
+
+    if (!formData.gioitinh) {
+      errors.gioitinh = "Giới tính của Đảng viên là bắt buộc";
+    }
+
+    if (formData.quequan && formData.quequan.length > 200) {
+      errors.quequan = "Quê quán của Đảng viên không được vượt quá 200 ký tự";
+    }
+
+    if (formData.dantoc && formData.dantoc.length > 50) {
+      errors.dantoc = "Dân tộc của Đảng viên không được vượt quá 50 ký tự";
+    }
+
+    if (formData.trinhdovanhoa && formData.trinhdovanhoa.length > 100) {
+      errors.trinhdovanhoa =
+        "Trình độ văn hóa của Đảng viên không được vượt quá 100 ký tự";
+    }
+
+    if (formData.noihiennay && formData.noihiennay.length > 200) {
+      errors.noihiennay =
+        "Nơi ở hiện nay của Đảng viên không được vượt quá 200 ký tự";
+    }
+
+    if (formData.chuyennmon && formData.chuyennmon.length > 100) {
+      errors.chuyennmon =
+        "Trình độ chuyên môn của Đảng viên không được vượt quá 100 ký tự";
+    }
+
+    if (!formData.ngayvaodang) {
+      errors.ngayvaodang = "Ngày vào Đảng là bắt buộc";
+    } else {
+      const today = new Date();
+      const selectedDate = new Date(formData.ngayvaodang);
+      if (selectedDate > today) {
+        errors.ngayvaodang = "Ngày vào Đảng không được là ngày trong tương lai";
+      }
+    }
+
+    if (formData.ngaychinhthuc) {
+      const selectedDate = new Date(formData.ngaychinhthuc);
+      const ngayVaoDang = new Date(formData.ngayvaodang);
+      if (selectedDate < ngayVaoDang) {
+        errors.ngaychinhthuc =
+          "Ngày vào Đảng chính thức phải sau ngày vào Đảng";
+      }
+    }
+
+    if (!formData.trangthaidangvien) {
+      errors.trangthaidangvien = "Trạng thái Đảng viên là bắt buộc";
+    } else if (
+      !["chinhthuc", "dubi", "khaitru"].includes(formData.trangthaidangvien)
+    ) {
+      errors.trangthaidangvien = "Trạng thái Đảng viên không hợp lệ";
     }
 
     setValidationErrors(errors);
@@ -192,7 +298,7 @@ const DangVienList = () => {
   };
 
   const handleUpdateDangVien = async () => {
-    if (!validateForm()) {
+    if (!validateEditForm()) {
       Swal.fire("Lỗi!", "Vui lòng điền đầy đủ các trường bắt buộc!", "error");
       return;
     }
@@ -327,6 +433,37 @@ const DangVienList = () => {
     setShowDetailModal(true);
   };
 
+  const openTheDangModal = async (dangVienItem) => {
+    setSelectedDangVien(dangVienItem);
+    try {
+      const response = await fetchTheDang(token, dangVienItem.id);
+      if (response.resultCode === 0) {
+        setTheDangData(response.data || null);
+        setShowAddTheDangForm(response.data === null);
+        setTheDangFormData({
+          mathe: response.data?.mathe || "",
+          ngaycap:
+            response.data?.ngaycap || new Date().toISOString().split("T")[0],
+          noicapthe: response.data?.noicapthe || "",
+        });
+      } else {
+        throw new Error(response.message || "Không thể tải thông tin thẻ Đảng");
+      }
+      setShowTheDangModal(true);
+    } catch (error) {
+      console.error("Error fetching theDang:", error);
+      Swal.fire("Lỗi", "Không thể tải thông tin thẻ Đảng", "error");
+      setTheDangData(null);
+      setShowAddTheDangForm(true);
+      setTheDangFormData({
+        mathe: "",
+        ngaycap: new Date().toISOString().split("T")[0],
+        noicapthe: "",
+      });
+      setShowTheDangModal(true);
+    }
+  };
+
   return (
     <div className="container-fluid p-0 position-relative d-flex flex-column min-vh-100">
       <div className="p-4 flex-grow-1">
@@ -405,6 +542,7 @@ const DangVienList = () => {
           setCurrentPage={setCurrentPage}
           openDetailModal={openDetailModal}
           openEditModal={openEditModal}
+          openTheDangModal={openTheDangModal}
         />
 
         <DangVienDetailModal
@@ -433,6 +571,26 @@ const DangVienList = () => {
           handleInputChange={handleInputChange}
           handleUpdateDangVien={handleUpdateDangVien}
           loading={loading}
+        />
+
+        <TheDangModal
+          show={showTheDangModal}
+          onHide={() => setShowTheDangModal(false)}
+          selectedDangVien={selectedDangVien}
+          theDangData={theDangData}
+          setTheDangData={setTheDangData}
+          showAddTheDangForm={showAddTheDangForm}
+          setShowAddTheDangForm={setShowAddTheDangForm}
+          theDangFormData={theDangFormData}
+          setTheDangFormData={setTheDangFormData}
+          validationErrors={validationErrors}
+          token={token}
+          fetchTheDang={fetchTheDang}
+          createTheDang={createTheDang}
+          updateTheDang={updateTheDang}
+          deleteTheDang={deleteTheDang}
+          loading={loading}
+          setLoading={setLoading}
         />
       </div>
     </div>

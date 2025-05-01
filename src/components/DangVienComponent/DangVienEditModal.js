@@ -1,13 +1,12 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
-import DangVienForm from "./DangVienForm";
+import DangVienEditForm from "./DangVienEditForm";
 
 const DangVienEditModal = ({
   show,
   onHide,
   formData,
   validationErrors,
-  chiBoList,
   handleInputChange,
   handleUpdateDangVien,
   loading,
@@ -18,10 +17,9 @@ const DangVienEditModal = ({
         <Modal.Title>Cập nhật Đảng viên</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <DangVienForm
+        <DangVienEditForm
           formData={formData}
           validationErrors={validationErrors}
-          chiBoList={chiBoList}
           handleInputChange={handleInputChange}
         />
       </Modal.Body>
