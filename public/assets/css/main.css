@@ -12502,6 +12502,23 @@ span.flatpickr-weekday {
   color: black;
 }
 
+.btn-outline-excel{
+  /* background-color: #1d6f42; */
+  /* color: white; */
+  border-color: #1d6f42;
+  color: #1d6f42;
+  /* border-color: #004fb0; */
+  /* color: #0046ad; */
+}
+
+.btn-outline-excel:hover{
+  /* color: rgb(227, 166, 40); */
+    /* background-color: rgba(252, 185, 44, 0.1); */
+    color: white;
+    background-color: #1d6f42;
+}
+
+
 /* Trạng thái đảng viên */
 .status-cell.chinhthuc {
   color: #28a745; /* Màu xanh lá - chính thức */

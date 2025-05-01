@@ -14,8 +14,10 @@ import {
   createTheDang,
   updateTheDang,
   deleteTheDang,
+  exportDangVienToExcel,
 } from "../../services/apiService";
 import TheDangModal from "../TheDangComponent/TheDangModal";
+import QuyetDinhModal from "../QuyetDinhComponent/QuyetDinhModal";
 
 const DangVienList = () => {
   const [dangVien, setDangVien] = useState([]);
@@ -46,6 +48,29 @@ const DangVienList = () => {
     ngaycap: new Date().toISOString().split("T")[0],
     noicapthe: "",
   });
+
+  const [showQuyetDinhModal, setShowQuyetDinhModal] = useState(false);
+
+  // Thêm hàm này trong component
+const handleExportExcel = (dangVien) => {
+  try {
+    setLoading(true);
+    exportDangVienToExcel(dangVien);
+    Swal.fire({
+      icon: 'success',
+      title: 'Thành công',
+      text: `Đã xuất file Excel cho Đảng viên ${dangVien.hoten}`,
+    });
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Lỗi',
+      text: 'Xuất file thất bại',
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const [formData, setFormData] = useState({
     hoten: "",
@@ -464,6 +489,11 @@ const DangVienList = () => {
     }
   };
 
+  const openQuyetDinhModal = (dangVienItem) => {
+    setSelectedDangVien(dangVienItem);
+    setShowQuyetDinhModal(true);
+  };
+
   return (
     <div className="container-fluid p-0 position-relative d-flex flex-column min-vh-100">
       <div className="p-4 flex-grow-1">
@@ -543,6 +573,8 @@ const DangVienList = () => {
           openDetailModal={openDetailModal}
           openEditModal={openEditModal}
           openTheDangModal={openTheDangModal}
+          openQuyetDinhModal={openQuyetDinhModal}
+          handleExportExcel={handleExportExcel}
         />
 
         <DangVienDetailModal
@@ -591,6 +623,13 @@ const DangVienList = () => {
           deleteTheDang={deleteTheDang}
           loading={loading}
           setLoading={setLoading}
+        />
+
+        <QuyetDinhModal
+          show={showQuyetDinhModal}
+          onHide={() => setShowQuyetDinhModal(false)}
+          selectedDangVien={selectedDangVien}
+          token={token}
         />
       </div>
     </div>

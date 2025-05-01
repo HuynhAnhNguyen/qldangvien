@@ -11,6 +11,8 @@ const DangVienTable = ({
   openDetailModal,
   openEditModal,
   openTheDangModal,
+  openQuyetDinhModal,
+  handleExportExcel,
 }) => {
   return (
     <>
@@ -81,6 +83,22 @@ const DangVienTable = ({
                             title="Xem thẻ Đảng"
                           >
                             <i className="fas fa-id-card"></i>
+                          </button>
+
+                          <button
+                            className="btn btn-sm btn-outline-dark"
+                            onClick={() => openQuyetDinhModal(item)}
+                            title="Quyết định"
+                          >
+                            <i className="fas fa-file-alt"></i>
+                          </button>
+                          
+                          <button
+                            className="btn btn-sm btn-outline-excel"
+                            onClick={() => handleExportExcel(item)}
+                            title="Xuất thông tin ra Excel"
+                          >
+                            <i className="fas fa-file-excel"></i>
                           </button>
                         </div>
                       </td>

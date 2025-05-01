@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as XLSX from 'xlsx';
 
 // Định nghĩa URL API (có thể thay đổi dễ dàng)
 const REACT_APP_API_URL = process.env.REACT_APP_API_URL || "http://3.104.77.30:8080/api/v1/project";
@@ -275,4 +276,149 @@ export const fetchTheDang = async (token, dangvienId) => {
   );
   console.log(response.data);
   return await response.data;
+};
+
+
+export const fetchQuyetDinhByDangVien = async (token, dangvienId) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/quyetdinh/findByDangvienId?dangvienId=${dangvienId}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  // console.log(response.data);
+  return await response.data;
+};
+
+export const createQuyetDinh = async (token, dangvienId, quyetDinhData) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/quyetdinh/create?dangvienId=${dangvienId}`,
+    quyetDinhData,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  // console.log(response.data);
+  return await response.data;
+};
+
+export const updateQuyetDinh = async (token, quyetDinhId, quyetDinhData) => {
+  const response = await axios.put(
+    `${REACT_APP_API_URL}/quyetdinh/update?quyedinhId=${quyetDinhId}`,
+    quyetDinhData,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  // console.log(response.data);
+  return await response.data;
+};
+
+export const deleteQuyetDinh = async (token, quyetDinhId) => {
+  const response = await axios.delete(
+    `${REACT_APP_API_URL}/quyetdinh/delete?quyetdinhId=${quyetDinhId}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  // console.log(response.data);
+  return await response.data;
+};
+
+export const uploadFile = async (token, file) => {
+  try {
+    const response = await axios.post(
+      `${REACT_APP_API_URL}/file/uploadFile`, 
+      file, 
+      {
+        headers: {
+          Authorization: `${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+    
+    return await response.data;
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw error;
+  }
+};
+
+export const downloadFile = async (token, filename) => {
+  try {
+    const response = await axios.get(
+      `${REACT_APP_API_URL}/file/getFile/${filename}`,
+      {
+        headers: {
+          Authorization: `${token}`,
+        },
+        responseType: 'blob' // This is crucial for file downloads
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error('API Error downloading file:', error);
+    throw error;
+  }
+};
+
+export const exportDangVienToExcel = (dangVienData) => {
+  // Tạo workbook mới
+  const workbook = XLSX.utils.book_new();
+  
+  // Chuẩn bị dữ liệu
+  const excelData = [
+    ["Họ và tên", dangVienData.hoten || "Không có"],
+    ["Ngày sinh", dangVienData.ngaysinh || "Không có"],
+    ["Giới tính", dangVienData.gioitinh === "nu" ? "Nữ" : "Nam"],
+    ["Quê quán", dangVienData.quequan || "Không có"],
+    ["Dân tộc", dangVienData.dantoc || "Không có"],
+    ["Trình độ văn hóa", dangVienData.trinhdovanhoa || "Không có"],
+    ["Nơi ở hiện nay", dangVienData.noihiennay || "Không có"],
+    ["Chuyên môn", dangVienData.chuyennmon || "Không có"],
+    ["Trình độ ngoại ngữ", dangVienData.trinhdongoaingu || "Không có"],
+    ["Trình độ chính trị", dangVienData.trinhdochinhtri || "Không có"],
+    ["Chi bộ", dangVienData.chibo?.tenchibo || "Không xác định"],
+    ["Ngày vào Đảng", dangVienData.ngayvaodang || "Không có"],
+    ["Ngày chính thức", dangVienData.ngaychinhthuc || "Không có"],
+    ["Người giới thiệu 1", dangVienData.nguoigioithieu1 || "Không có"],
+    ["Người giới thiệu 2", dangVienData.nguoigioithieu2 || "Không có"],
+    ["Nơi sinh hoạt Đảng", dangVienData.noisinhhoatdang || "Không có"],
+    ["Trạng thái",  dangVienData.trangthaidangvien === "chinhthuc" ? "Chính thức" : dangVienData.trangthaidangvien === "dubi" ? "Dự bị" : 
+      dangVienData.trangthaidangvien === "khaitru" ? "Khai trừ" : "Khác"],
+    ["Chức vụ chính quyền", dangVienData.chucvuchinhquyen || "Không có"],
+    ["Chức vụ chi bộ", dangVienData.chucvuchibo || "Không có"],
+    ["Chức vụ Đảng ủy", dangVienData.chucvudanguy || "Không có"],
+    ["Chức vụ đoàn thể", dangVienData.chucvudoanthe || "Không có"],
+    ["Chức danh", dangVienData.chucdanh || "Không có"]
+  ];
+
+  // Tạo worksheet
+  const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+  
+  // Điều chỉnh độ rộng cột
+  worksheet['!cols'] = [
+    { width: 25 }, // Cột tiêu đề
+    { width: 40 }  // Cột giá trị
+  ];
+
+  // Thêm worksheet vào workbook
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Thông tin Đảng viên");
+
+  // Xuất file
+  const fileName = `DangVien_${dangVienData.hoten.replace(/\s+/g, '_')}.xlsx`;
+  XLSX.writeFile(workbook, fileName);
 };
