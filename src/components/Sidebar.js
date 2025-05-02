@@ -39,12 +39,7 @@ const Sidebar = () => {
     <nav id="sidebar" className="sidebar js-sidebar">
       <div className="sidebar-content js-simplebar p-2">
         <a className="sidebar-brand d-block text-center" onClick={() => navigate("/")}>
-          <img
-            style={{
-              maxHeight: "100px",
-              width: "100%",
-              objectFit: "contain",
-            }}
+          <img className="logo-sidebar"
             src="/assets/images/logo/logo.png"
             alt="Logo"
           />
@@ -52,14 +47,14 @@ const Sidebar = () => {
 
         <ul className="sidebar-nav">
           <li className="sidebar-item">
-            <a className="sidebar-link">
+            <a className="sidebar-link sidebar-link-static">
               <i className="fa-regular fa-user"></i>
               <span className="align-middle read-only-text">{fullname}</span>
             </a>
           </li>
 
           <li className="sidebar-item">
-            <a className="sidebar-link" href="">
+            <a className="sidebar-link sidebar-link-static">
               <i className="fa-solid fa-user-gear"></i>
               <span className="align-middle read-only-text">{role}</span>
             </a>
@@ -68,7 +63,7 @@ const Sidebar = () => {
           <hr />
           <li className={`sidebar-item ${isActive("/")}`}>
             <a className="sidebar-link" onClick={() => navigate("/")}>
-            <i className="fa-solid fa-house"></i>
+            <i className="fa-solid fa-home"></i>
               <span className="align-middle">Trang chủ</span>
             </a>
           </li>
@@ -80,9 +75,16 @@ const Sidebar = () => {
             </a>
           </li>
 
+          <li className={`sidebar-item ${isActive("/quan-ly-ho-so")}`}>
+            <a className="sidebar-link" onClick={() => navigate("/quan-ly-ho-so")}>
+            <i className="fa-solid fa-folder-open"></i>
+              <span className="align-middle">Quản lý hồ sơ Đảng</span>
+            </a>
+          </li>
+
           <li className={`sidebar-item ${isActive("/quan-ly-sinh-hoat")}`}>
             <a className="sidebar-link" onClick={() => navigate("/quan-ly-sinh-hoat")}>
-            <i className="fa-regular fa-calendar-days"></i>
+           <i className="fa-solid fa-calendar-check"></i>
               <span className="align-middle">Quản lý sinh hoạt Đảng</span>
             </a>
           </li>
@@ -110,7 +112,7 @@ const Sidebar = () => {
 
           <li className={`sidebar-item ${isActive("/bao-cao-thong-ke")}`}>
             <a className="sidebar-link" onClick={() => navigate("/bao-cao-thong-ke")}>
-            <i className="fa-solid fa-file-invoice"></i>
+            <i className="fa-solid fa-chart-bar"></i>
               <span className="align-middle">Báo cáo, thống kê</span>
             </a>
           </li>
@@ -122,6 +124,7 @@ const Sidebar = () => {
             </a>
           </li>
         </ul>
+        
       </div>
     </nav>
   );

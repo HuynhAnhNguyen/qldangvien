@@ -19,15 +19,15 @@ const DangVienTable = ({
       {searchType === "chibo" &&
       selectedChiBoId &&
       currentItems.length === 0 ? (
-        <div className="text-center py-4 color-black">
+        <div className="text-center py-4 text-muted">
           Không có Đảng viên thuộc chi bộ này!
         </div>
       ) : searchType === "approved" && currentItems.length === 0 ? (
-        <div className="text-center py-4 color-black">
+        <div className="text-center py-4 text-muted">
           Không có Đảng viên nào được phê duyệt!
         </div>
       ) : currentItems.length === 0 ? (
-        <div className="text-center py-4 color-black">
+        <div className="text-center py-4 text-muted">
           Không tìm thấy Đảng viên nào phù hợp!
         </div>
       ) : (

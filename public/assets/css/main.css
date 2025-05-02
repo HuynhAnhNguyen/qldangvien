@@ -12712,3 +12712,27 @@ span.flatpickr-weekday {
   background-color: #f0f0f0;
   color: #2a5ea7;
 }
+
+/* -----------------Side bar ----------------- */
+.sidebar-link-static {
+  cursor: default !important;
+  pointer-events: none !important;
+}
+.sidebar-link-static:hover {
+  background: none !important;
+  color: inherit !important;
+}
+
+.logo-sidebar{
+  max-height: 100px;
+  width: 100%;
+  object-fit: contain;
+}
+
+
+/* -------------- Hồ sơ Đảng viên ------------ */
+.custom-sm-btn-hoso{
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  white-space: nowrap;
+}

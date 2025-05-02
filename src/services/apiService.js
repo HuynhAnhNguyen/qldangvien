@@ -422,3 +422,63 @@ export const exportDangVienToExcel = (dangVienData) => {
   const fileName = `DangVien_${dangVienData.hoten.replace(/\s+/g, '_')}.xlsx`;
   XLSX.writeFile(workbook, fileName);
 };
+
+
+// Fetch hồ sơ theo Đảng viên ID
+export const fetchHoSoByDangVienId = async (token, dangvienId) => {
+  return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/findByDangvienId?dangvienId=${dangvienId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+};
+
+// Fetch hồ sơ đã duyệt theo Đảng viên ID
+export const fetchHoSoApprovedByDangVienId = async (token, dangvienId) => {
+  return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/findApprovedByDangvienId?dangvienId=${dangvienId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+};
+
+// Tạo hồ sơ mới
+export const createHoSo = async (token, dangvienId, hoSoData) => {
+  const response = await fetch(`http://3.104.77.30:8080/api/v1/project/hoso/create?dangvienId=${dangvienId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(hoSoData),
+  });
+  return response.json();
+};
+
+// Cập nhật hồ sơ
+export const updateHoSo = async (token, hoSoId, hoSoData) => {
+  const response = await fetch(`http://3.104.77.30:8080/api/v1/project/hoso/update?hosoId=${hoSoId}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(hoSoData),
+  });
+  return response.json();
+};
+
+// Xóa hồ sơ
+export const deleteHoSo = async (token, hoSoId) => {
+  return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/delete?hosoid=${hoSoId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+};
