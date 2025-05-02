@@ -8,6 +8,9 @@ import MemberManagementPage from "./pages/MemberManagementPage";
 import QuanLyChiBo from "./pages/QuanLyChiBo";
 import QuanLyDangVien from "./pages/QuanLyDangVien";
 import QuanLyHoSo from "./pages/QuanLyHoSo";
+import QuanLyKyDangPhi from "./pages/QuanLyKyDangPhi";
+import QuanLyDangPhi from "./pages/QuanLyDangPhi";
+import SaoLuuKhoiPhuc from "./pages/SaoLuuKhoiPhuc";
 
 
 
@@ -22,6 +25,9 @@ const App = () => {
           <Route path="/quan-ly-dang-vien" element={<QuanLyDangVien />} />
           <Route path="/quan-ly-chi-bo" element={<QuanLyChiBo />} />
           <Route path="/quan-ly-ho-so" element={<QuanLyHoSo />} />
+          <Route path="/quan-ly-ky-dang-phi" element={<QuanLyKyDangPhi />} />
+          <Route path="/quan-ly-dang-phi" element={<QuanLyDangPhi />} />
+          <Route path="/sao-luu-khoi-phuc" element={<SaoLuuKhoiPhuc />} />
         </Routes>
     </Router>
   );

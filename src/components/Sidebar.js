@@ -89,12 +89,26 @@ const Sidebar = () => {
             </a>
           </li>
 
-          <li className={`sidebar-item ${isActive("/quan-ly-dang-phi")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/quan-ly-dang-phi")}>
+          {/* <li className={`sidebar-item ${isActive("/quan-ly-ky-dang-phi")}`}>
+            <a className="sidebar-link" onClick={() => navigate("/quan-ly-ky-dang-phi")}>
             <i className="fa-regular fa-credit-card"></i>
               <span className="align-middle">Quản lý Đảng phí</span>
             </a>
-          </li>
+          </li> */}
+
+          <li className={`sidebar-item ${isActive("/quan-ly-dang-phi")}`}>
+    <a className="sidebar-link" onClick={() => navigate("/quan-ly-dang-phi")}>
+      <i className="fa-solid fa-money-bill"></i>
+      <span className="align-middle">Quản lý Đảng phí</span>
+    </a>
+  </li>
+
+  <li className={`sidebar-item ${isActive("/quan-ly-ky-dang-phi")}`}>
+    <a className="sidebar-link" onClick={() => navigate("/quan-ly-ky-dang-phi")}>
+      <i className="fa-solid fa-calendar-alt"></i>
+      <span className="align-middle">Quản lý kỳ Đảng phí</span>
+    </a>
+  </li>
 
           <li className={`sidebar-item ${isActive("/quan-ly-chi-bo")}`}>
             <a className="sidebar-link" onClick={() => navigate("/quan-ly-chi-bo")}>
@@ -114,6 +128,13 @@ const Sidebar = () => {
             <a className="sidebar-link" onClick={() => navigate("/bao-cao-thong-ke")}>
             <i className="fa-solid fa-chart-bar"></i>
               <span className="align-middle">Báo cáo, thống kê</span>
+            </a>
+          </li>
+
+          <li className={`sidebar-item ${isActive("/sao-luu-khoi-phuc")}`}>
+            <a className="sidebar-link" onClick={() => navigate("/sao-luu-khoi-phuc")}>
+            <i className="fa-solid fa-database"></i>
+              <span className="align-middle">Sao lưu, khôi phục</span>
             </a>
           </li>
 
