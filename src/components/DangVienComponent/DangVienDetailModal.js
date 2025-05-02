@@ -1,7 +1,104 @@
-import React from "react";
-import { Modal, Button, Tab, Tabs } from "react-bootstrap";
+import React, {useState, useEffect }from "react";
+import { Modal, Button, Tab, Tabs, Alert } from "react-bootstrap";
+import TheDangTabContent from "../TheDangComponent/TheDangTabContent";
+import QuyetDinhTabContent from "../QuyetDinhComponent/QuyetDinhTabContent";
+import { fetchTheDang, fetchQuyetDinhByDangVien, downloadFile } from "../../services/apiService";
+import Swal from "sweetalert2";
 
-const DangVienDetailModal = ({ show, onHide, selectedDangVien }) => {
+const DangVienDetailModal = ({ show, onHide, selectedDangVien, token }) => {
+  const [theDangData, setTheDangData] = useState(null);
+  const [quyetDinhList, setQuyetDinhList] = useState([]);
+  const [loadingTheDang, setLoadingTheDang] = useState(false);
+  const [loadingQuyetDinh, setLoadingQuyetDinh] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (show && selectedDangVien) {
+      loadTheDang();
+      loadQuyetDinh();
+    }
+  }, [show, selectedDangVien]);
+
+  const loadTheDang = async () => {
+    setLoadingTheDang(true);
+    try {
+      const data = await fetchTheDang(token, selectedDangVien.id);
+      if (data.resultCode === 0) {
+        setTheDangData(data.data);
+      } else {
+        setTheDangData(null);
+      }
+    } catch (err) {
+      setError("Không thể tải thông tin thẻ Đảng");
+    } finally {
+      setLoadingTheDang(false);
+    }
+  };
+
+  const handleDownloadFile = async (filename) => {
+      try {
+        // Get the file blob from API
+        const response = await downloadFile(token, filename);
+        
+        // Create download link
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // Try to get the original filename from headers
+        const contentDisposition = response.headers['content-disposition'];
+        let downloadFilename = filename;
+        
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+          if (filenameMatch && filenameMatch[1]) {
+            downloadFilename = filenameMatch[1];
+          }
+        }
+        
+        link.setAttribute('download', downloadFilename);
+        document.body.appendChild(link);
+        link.click();
+        Swal.fire({
+          icon: 'success',
+          title: 'Thành công',
+          text: 'Tải file thành công!',
+          confirmButtonText: 'Đóng'
+        });
+        // Clean up
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(link);
+        }, 100);
+        
+      } catch (error) {
+        console.error("Download failed:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi',
+          text: error.response?.data?.message || 'Tải file thất bại',
+          confirmButtonText: 'Đóng'
+        });
+      } finally {
+      }
+    };
+
+  const loadQuyetDinh = async () => {
+    setLoadingQuyetDinh(true);
+    try {
+      const data = await fetchQuyetDinhByDangVien(token, selectedDangVien.id);
+      if (data.resultCode === 0) {
+        setQuyetDinhList(Array.isArray(data.data) ? data.data : []);
+      } else {
+        setQuyetDinhList([]);
+      }
+    } catch (err) {
+      setError("Không thể tải danh sách quyết định");
+    } finally {
+      setLoadingQuyetDinh(false);
+    }
+  };
+
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
@@ -107,8 +204,25 @@ const DangVienDetailModal = ({ show, onHide, selectedDangVien }) => {
                 </dl>
               </div>
             </Tab>
+            <Tab eventKey="theDang" title="Thẻ Đảng">
+              <TheDangTabContent
+                theDangData={theDangData}
+                selectedDangVien={selectedDangVien}
+                loading={loadingTheDang}
+              />
+            </Tab>
+
+            {/* Tab Quyết định (read-only) */}
+            <Tab eventKey="quyetDinh" title="Quyết định">
+              <QuyetDinhTabContent
+                quyetDinhList={quyetDinhList}
+                onDownload={handleDownloadFile}
+                loading={loadingQuyetDinh}
+              />
+            </Tab>
           </Tabs>
         )}
+        {error && <Alert variant="danger">{error}</Alert>}
       </Modal.Body>
 
       <Modal.Footer>

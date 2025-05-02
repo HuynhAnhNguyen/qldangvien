@@ -581,6 +581,7 @@ const handleExportExcel = (dangVien) => {
           show={showDetailModal}
           onHide={() => setShowDetailModal(false)}
           selectedDangVien={selectedDangVien}
+          token={token}
         />
 
         <DangVienAddModal

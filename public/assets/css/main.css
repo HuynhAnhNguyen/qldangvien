@@ -12552,7 +12552,7 @@ span.flatpickr-weekday {
   margin: 0 auto;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   position: relative;
-  font-family: 'Poppins', sans-serif;
+  /* font-family: 'Poppins', sans-serif; */
   overflow: hidden;
   border: 1px solid rgba(255, 215, 0, 0.3); /* Viền vàng mờ */
   background-image: url('../images/codang/codang.svg'); /* SVG làm nền */

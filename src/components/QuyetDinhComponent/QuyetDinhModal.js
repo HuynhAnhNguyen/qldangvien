@@ -102,32 +102,6 @@ const QuyetDinhModal = ({ show, onHide, selectedDangVien, token }) => {
     }
   };
 
-//   const handleDownloadFile = async (filename) => {
-//     try {
-//       setLoading(true);
-//       const response = await downloadFile(token, filename);
-
-//       if (response.ok) {
-//         const blob = await response.blob();
-//         const url = window.URL.createObjectURL(blob);
-//         const a = document.createElement("a");
-//         a.href = url;
-//         a.download = filename;
-//         document.body.appendChild(a);
-//         a.click();
-//         window.URL.revokeObjectURL(url);
-//         document.body.removeChild(a);
-//       } else {
-//         throw new Error("Không thể tải file");
-//       }
-//     } catch (error) {
-//       console.error("Error downloading file:", error);
-//       Swal.fire("Lỗi", "Tải file thất bại", "error");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
 const handleDownloadFile = async (filename) => {
     try {
       setLoading(true);
