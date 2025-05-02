@@ -178,43 +178,6 @@ const ChatBot = () => {
           <i className="fas fa-robot fa-lg"></i>
         </button>
       )}
-
-      {/* CSS tùy chỉnh */}
-      <style>{`
-  .hover-card {
-    transition: all 0.3s ease;
-    border-radius: 10px !important;
-  }
-  .hover-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-    border: 1px solid #3b7ddd !important;
-  }
-  .img-hover-effect:hover {
-    transform: scale(1.03);
-    opacity: 0.9;
-  }
-  .card-img-container {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    text-align: center;
-    border-radius: 10px 10px 0 0 !important;
-  }
-  .page-item.active .page-link {
-    background-color: #3b7ddd;
-    border-color: #3b7ddd;
-    color: white;
-  }
-  .page-link {
-    color: #3b7ddd;
-    border: none;
-    margin: 0 5px;
-    border-radius: 5px !important;
-  }
-  .page-link:hover {
-    background-color: #f0f0f0;
-    color: #2a5ea7;
-  }
-`}</style>
     </>
   );
 };
