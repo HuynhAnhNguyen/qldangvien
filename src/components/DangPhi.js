@@ -415,7 +415,7 @@ const DangPhi = () => {
     try {
       const data = await fetchKyDangPhi(token);
       // const data = await response.json();
-      console.log(data);
+      // console.log(data);
       if (data.resultCode === 0) {
         setKyDangPhiList(Array.isArray(data.data) ? data.data : []);
       } else {
