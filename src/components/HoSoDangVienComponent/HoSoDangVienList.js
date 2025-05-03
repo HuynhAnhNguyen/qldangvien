@@ -65,16 +65,16 @@ const HoSoDangVienList = () => {
 
     setLoading(true);
     try {
-      let response;
+      let data;
       if (searchType === "all") {
-        response = await fetchHoSoByDangVienId(token, selectedDangVien.id);
+        data = await fetchHoSoByDangVienId(token, selectedDangVien.id);
       } else {
-        response = await fetchHoSoApprovedByDangVienId(
+        data = await fetchHoSoApprovedByDangVienId(
           token,
           selectedDangVien.id
         );
       }
-      const data = await response.json();
+      // const data = await response.json();
       if (data.resultCode === 0) {
         setHoSoList(Array.isArray(data.data) ? data.data : []);
         setError(null);

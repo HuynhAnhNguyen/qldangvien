@@ -274,7 +274,7 @@ export const fetchTheDang = async (token, dangvienId) => {
     'Content-Type': 'application/json'
    }  }
   );
-  console.log(response.data);
+  // console.log(response.data);
   return await response.data;
 };
 
@@ -425,72 +425,158 @@ export const exportDangVienToExcel = (dangVienData) => {
 
 
 // Fetch hồ sơ theo Đảng viên ID
+// export const fetchHoSoByDangVienId = async (token, dangvienId) => {
+//   return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/findByDangvienId?dangvienId=${dangvienId}`, {
+//     method: "GET",
+//     headers: {
+//       Authorization: `${token}`,
+//       "Content-Type": "application/json",
+//     },
+//   });
+// };
+
+// // Fetch hồ sơ đã duyệt theo Đảng viên ID
+// export const fetchHoSoApprovedByDangVienId = async (token, dangvienId) => {
+//   return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/findApprovedByDangvienId?dangvienId=${dangvienId}`, {
+//     method: "GET",
+//     headers: {
+//       Authorization: `${token}`,
+//       "Content-Type": "application/json",
+//     },
+//   });
+// };
+
+// // Tạo hồ sơ mới
+// export const createHoSo = async (token, dangvienId, hoSoData) => {
+//   const response = await fetch(`http://3.104.77.30:8080/api/v1/project/hoso/create?dangvienId=${dangvienId}`, {
+//     method: "POST",
+//     headers: {
+//       Authorization: `${token}`,
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(hoSoData),
+//   });
+//   return response.json();
+// };
+
+// // Cập nhật hồ sơ
+// export const updateHoSo = async (token, hoSoId, hoSoData) => {
+//   const response = await fetch(`http://3.104.77.30:8080/api/v1/project/hoso/update?hosoId=${hoSoId}`, {
+//     method: "PUT",
+//     headers: {
+//       Authorization: `${token}`,
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(hoSoData),
+//   });
+//   return response.json();
+// };
+
+// // Xóa hồ sơ
+// export const deleteHoSo = async (token, hoSoId) => {
+//   return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/delete?hosoid=${hoSoId}`, {
+//     method: "DELETE",
+//     headers: {
+//       Authorization: `${token}`,
+//       "Content-Type": "application/json",
+//     },
+//   });
+// };
+
+// export const fetchKyDangPhi= async (token) => {
+//   return await fetch(
+//     "http://3.104.77.30:8080/api/v1/project/kydangphi/findAll",
+//     {
+//         method: "GET",
+//       headers: {
+//         Authorization: `${token}`,
+//       },
+//     }
+//   );
+// }
+
+// Fetch hồ sơ theo Đảng viên ID
 export const fetchHoSoByDangVienId = async (token, dangvienId) => {
-  return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/findByDangvienId?dangvienId=${dangvienId}`, {
-    method: "GET",
-    headers: {
-      Authorization: `${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/hoso/findByDangvienId?dangvienId=${dangvienId}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
 };
 
 // Fetch hồ sơ đã duyệt theo Đảng viên ID
 export const fetchHoSoApprovedByDangVienId = async (token, dangvienId) => {
-  return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/findApprovedByDangvienId?dangvienId=${dangvienId}`, {
-    method: "GET",
-    headers: {
-      Authorization: `${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/hoso/findApprovedByDangvienId?dangvienId=${dangvienId}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
 };
 
 // Tạo hồ sơ mới
 export const createHoSo = async (token, dangvienId, hoSoData) => {
-  const response = await fetch(`http://3.104.77.30:8080/api/v1/project/hoso/create?dangvienId=${dangvienId}`, {
-    method: "POST",
-    headers: {
-      Authorization: `${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(hoSoData),
-  });
-  return response.json();
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/hoso/create?dangvienId=${dangvienId}`,
+    hoSoData,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
 };
 
 // Cập nhật hồ sơ
 export const updateHoSo = async (token, hoSoId, hoSoData) => {
-  const response = await fetch(`http://3.104.77.30:8080/api/v1/project/hoso/update?hosoId=${hoSoId}`, {
-    method: "PUT",
-    headers: {
-      Authorization: `${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(hoSoData),
-  });
-  return response.json();
+  const response = await axios.put(
+    `${REACT_APP_API_URL}/hoso/update?hosoId=${hoSoId}`,
+    hoSoData,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
 };
 
 // Xóa hồ sơ
 export const deleteHoSo = async (token, hoSoId) => {
-  return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/delete?hosoid=${hoSoId}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-};
-
-export const fetchKyDangPhi= async (token) => {
-  return await fetch(
-    "http://3.104.77.30:8080/api/v1/project/kydangphi/findAll",
-    {
-        method: "GET",
+  const response = await axios.delete(
+    `${REACT_APP_API_URL}/hoso/delete?hosoid=${hoSoId}`,
+    { 
       headers: {
         Authorization: `${token}`,
-      },
+        'Content-Type': 'application/json'
+      } 
     }
   );
-}
+  return response.data;
+};
+
+// Fetch kỳ đảng phí
+export const fetchKyDangPhi = async (token) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/kydangphi/findAll`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};

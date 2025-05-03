@@ -2,7 +2,8 @@ import React, {useState, useEffect }from "react";
 import { Modal, Button, Tab, Tabs, Alert } from "react-bootstrap";
 import TheDangTabContent from "../TheDangComponent/TheDangTabContent";
 import QuyetDinhTabContent from "../QuyetDinhComponent/QuyetDinhTabContent";
-import { fetchTheDang, fetchQuyetDinhByDangVien, downloadFile } from "../../services/apiService";
+import HoSoDangVienTabContent from "../HoSoDangVienComponent/HoSoDangVienTabContent";
+import { fetchTheDang, fetchQuyetDinhByDangVien, downloadFile, fetchHoSoByDangVienId } from "../../services/apiService";
 import Swal from "sweetalert2";
 
 const DangVienDetailModal = ({ show, onHide, selectedDangVien, token }) => {
@@ -10,12 +11,15 @@ const DangVienDetailModal = ({ show, onHide, selectedDangVien, token }) => {
   const [quyetDinhList, setQuyetDinhList] = useState([]);
   const [loadingTheDang, setLoadingTheDang] = useState(false);
   const [loadingQuyetDinh, setLoadingQuyetDinh] = useState(false);
+  const [hoSoList, setHoSoList] = useState([]);
+  const [loadingHoSo, setLoadingHoSo] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (show && selectedDangVien) {
       loadTheDang();
       loadQuyetDinh();
+      loadHoSo();
     }
   }, [show, selectedDangVien]);
 
@@ -98,6 +102,22 @@ const DangVienDetailModal = ({ show, onHide, selectedDangVien, token }) => {
       setLoadingQuyetDinh(false);
     }
   };
+
+  const loadHoSo = async () => {
+    setLoadingHoSo(true);
+    try{
+      const data = await fetchHoSoByDangVienId(token, selectedDangVien.id);
+      if (data.resultCode === 0) {
+        setHoSoList(Array.isArray(data.data) ? data.data : []);
+      } else {
+        setHoSoList([]);
+      }
+    } catch (err) {
+      setError("Không thể tải danh sách hồ sơ");
+    } finally {
+      setLoadingHoSo(false);
+    }
+  }
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
@@ -218,6 +238,14 @@ const DangVienDetailModal = ({ show, onHide, selectedDangVien, token }) => {
                 quyetDinhList={quyetDinhList}
                 onDownload={handleDownloadFile}
                 loading={loadingQuyetDinh}
+              />
+            </Tab>
+
+            <Tab eventKey="hoSo" title="Hồ sơ">
+              <HoSoDangVienTabContent
+                hoSoList={hoSoList}
+                onDownload={handleDownloadFile}
+                loading={loadingHoSo}
               />
             </Tab>
           </Tabs>

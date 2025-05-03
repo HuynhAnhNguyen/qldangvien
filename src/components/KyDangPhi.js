@@ -5,6 +5,7 @@ import {
   Form,
 } from "react-bootstrap";
 import Swal from "sweetalert2";
+import { fetchKyDangPhi } from "../services/apiService";
 
 const KyDangPhi = () => {
   // State management
@@ -36,16 +37,7 @@ const KyDangPhi = () => {
   const fetchKyDangPhiList = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        "http://3.104.77.30:8080/api/v1/project/kydangphi/findAll",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
-      );
-      const data = await response.json();
+      const data = await fetchKyDangPhi(token);
       if (data.resultCode === 0) {
         setKyDangPhiList(Array.isArray(data.data) ? data.data : []);
         setError(null);
