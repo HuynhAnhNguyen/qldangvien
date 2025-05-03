@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Modal,
-  Button,
-  Form,
-  Row,
-  Col,
-  Badge,
-  Spinner,
-} from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, Badge, Spinner } from "react-bootstrap";
 import Swal from "sweetalert2";
 import {
   fetchDangVien,
@@ -17,6 +9,7 @@ import {
   updateHoSo,
   deleteHoSo,
   uploadFile,
+  downloadFile,
 } from "../services/apiService";
 
 const HoSoDangVien = () => {
@@ -28,6 +21,7 @@ const HoSoDangVien = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [file, setFile] = useState(null);
   const itemsPerPage = 10;
 
   // Modal states
@@ -57,8 +51,9 @@ const HoSoDangVien = () => {
         throw new Error(data.message || "Không thể tải danh sách Đảng viên");
       }
     } catch (err) {
+      setError("Không thể tải danh sách Đảng viên");
       console.error("Error loading dangVien:", err);
-      Swal.fire("Lỗi!", "Không thể tải danh sách Đảng viên", "error");
+      // Swal.fire("Lỗi!", "Không thể tải danh sách Đảng viên", "error");
     }
   };
 
@@ -92,6 +87,80 @@ const HoSoDangVien = () => {
     }
   };
 
+  // Handle file upload
+  const handleUploadFile = async () => {
+    if (!file) return null;
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const data = await uploadFile(token, formData);
+      // console.log("Data: "+ data.data);
+
+      if (data.resultCode === 0) {
+        return data.data; // Assuming API returns the file URL in data.data
+      } else {
+        throw new Error(data.message || "Tải lên file thất bại");
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      Swal.fire("Lỗi", "Tải lên file thất bại", "error");
+      return null;
+    }
+  };
+
+  const handleDownloadFile = async (filename) => {
+      try {
+        setLoading(true);
+        
+        // Get the file blob from API
+        const response = await downloadFile(token, filename);
+        
+        // Create download link
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // Try to get the original filename from headers
+        const contentDisposition = response.headers['content-disposition'];
+        let downloadFilename = filename;
+        
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+          if (filenameMatch && filenameMatch[1]) {
+            downloadFilename = filenameMatch[1];
+          }
+        }
+        
+        link.setAttribute('download', downloadFilename);
+        document.body.appendChild(link);
+        link.click();
+        Swal.fire({
+          icon: 'success',
+          title: 'Thành công',
+          text: 'Tải file thành công!',
+          confirmButtonText: 'Đóng'
+        });
+        // Clean up
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(link);
+        }, 100);
+        
+      } catch (error) {
+        console.error("Download failed:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Lỗi',
+          text: error.response?.data?.message || 'Tải file thất bại',
+          confirmButtonText: 'Đóng'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
   // Create new hồ sơ
   const handleAddHoSo = async () => {
     if (!formData.taphoso || !formData.loaihoso) {
@@ -101,10 +170,26 @@ const HoSoDangVien = () => {
 
     try {
       setLoading(true);
-      const data = await createHoSo(token, selectedDangVien.id, formData);
+
+      // Upload file first if exists
+      let fileUrl = formData.fileUrl;
+      if (file) {
+        const uploadedFileUrl = await handleUploadFile();
+        if (!uploadedFileUrl) return;
+        fileUrl = uploadedFileUrl;
+      }
+
+      const hoSoData = {
+        ...formData,
+        fileUrl: fileUrl || "",
+      };
+
+      const data = await createHoSo(token, selectedDangVien.id, hoSoData);
+
       if (data.resultCode === 0) {
         setHoSoList([data.data, ...hoSoList]);
         setShowAddModal(false);
+        setFile(null);
         Swal.fire("Thành công!", "Thêm hồ sơ thành công", "success");
       } else {
         throw new Error(data.message || "Thêm hồ sơ thất bại");
@@ -126,7 +211,23 @@ const HoSoDangVien = () => {
 
     try {
       setLoading(true);
-      const data = await updateHoSo(token, selectedHoSo.id, formData);
+
+      // Upload new file if selected
+      let fileUrl = formData.fileUrl;
+      if (file) {
+        const uploadedFileUrl = await handleUploadFile();
+        if (!uploadedFileUrl) return;
+        fileUrl = uploadedFileUrl;
+      }
+
+      const hoSoData = {
+        ...formData,
+        fileUrl: fileUrl || formData.fileUrl,
+      };
+
+      const data = await updateHoSo(token, selectedHoSo.id, hoSoData);
+      // const data = await response.json();
+
       if (data.resultCode === 0) {
         setHoSoList(
           hoSoList.map((item) =>
@@ -134,6 +235,7 @@ const HoSoDangVien = () => {
           )
         );
         setShowEditModal(false);
+        setFile(null);
         Swal.fire("Thành công!", "Cập nhật hồ sơ thành công", "success");
       } else {
         throw new Error(data.message || "Cập nhật hồ sơ thất bại");
@@ -188,6 +290,13 @@ const HoSoDangVien = () => {
     }));
   };
 
+  // Handle file input change
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
   // Open add modal
   const openAddModal = () => {
     setFormData({
@@ -196,6 +305,7 @@ const HoSoDangVien = () => {
       fileUrl: "",
       ghichu: "",
     });
+    setFile(null);
     setShowAddModal(true);
   };
 
@@ -208,6 +318,7 @@ const HoSoDangVien = () => {
       fileUrl: hoSoItem.fileUrl,
       ghichu: hoSoItem.ghichu || "",
     });
+    setFile(null);
     setShowEditModal(true);
   };
 
@@ -215,6 +326,7 @@ const HoSoDangVien = () => {
   const handleDangVienSelect = (dangVien) => {
     setSelectedDangVien(dangVien);
     setCurrentPage(1);
+    setSearchTerm("");
   };
 
   // Filter hồ sơ based on search term
@@ -231,6 +343,12 @@ const HoSoDangVien = () => {
     currentPage * itemsPerPage
   );
 
+  // Thêm hàm xử lý thay đổi search term
+const handleSearchChange = (e) => {
+  setSearchTerm(e.target.value);
+  setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
+};
+
   // Load data on component mount and when selectedDangVien or searchType changes
   useEffect(() => {
     loadDangVien();
@@ -239,6 +357,11 @@ const HoSoDangVien = () => {
   useEffect(() => {
     loadHoSo();
   }, [selectedDangVien, searchType]);
+
+  // Thêm useEffect để reset trang khi thay đổi loại tìm kiếm (all/approved)
+useEffect(() => {
+  setCurrentPage(1);
+}, [searchType]);
 
   return (
     <div className="container-fluid p-0 position-relative d-flex flex-column min-vh-100">
@@ -280,7 +403,8 @@ const HoSoDangVien = () => {
                 className="form-control"
                 placeholder="Tìm kiếm hồ sơ..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                // onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchChange}
                 disabled={!selectedDangVien}
               />
             </div>
@@ -296,15 +420,12 @@ const HoSoDangVien = () => {
 
         {loading && (
           <div className="text-center py-4">
-            {/* <Spinner animation="border" variant="primary" /> */}
-            {/* <p className="mt-2">Đang tải dữ liệu...</p> */}
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
           </div>
         )}
 
-        {/* {error && <Alert variant="danger">{error}</Alert>} */}
         {error && <div className="alert alert-danger">{error}</div>}
 
         {/* HoSo table */}
@@ -320,7 +441,6 @@ const HoSoDangVien = () => {
         ) : (
           <>
             <div className="table-responsive mb-4">
-              {/* <Table striped bordered hover> */}
               <table className="table table-hover">
                 <thead className="table-light">
                   <tr>
@@ -337,7 +457,11 @@ const HoSoDangVien = () => {
                   {currentItems.map((item, index) => (
                     <tr key={index}>
                       <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                      <td>{item.taphoso}</td>
+                      <td>{item.taphoso === "tap1"
+                            ? "Tập 1"
+                            : item.taphoso === "tap2"
+                            ? "Tập 2"
+                            : "Tập 3"}</td>
                       <td>{item.loaihoso}</td>
                       <td>
                         <Badge
@@ -371,7 +495,6 @@ const HoSoDangVien = () => {
                             className="btn btn-sm btn-outline-danger"
                             onClick={() => handleDeleteHoSo(item.id)}
                             title="Xóa"
-                            // disabled={item.trangthai === "approved"}
                           >
                             <i className="fas fa-trash"></i>
                           </button>
@@ -381,37 +504,8 @@ const HoSoDangVien = () => {
                   ))}
                 </tbody>
               </table>
-              {/* </Table> */}
             </div>
 
-            {/* Pagination */}
-            {/* {totalPages > 1 && (
-              <div className="d-flex justify-content-center">
-                <Pagination>
-                  <Pagination.Prev
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  />
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (page) => (
-                      <Pagination.Item
-                        key={page}
-                        active={page === currentPage}
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </Pagination.Item>
-                    )
-                  )}
-                  <Pagination.Next
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
-                    disabled={currentPage === totalPages}
-                  />
-                </Pagination>
-              </div>
-            )} */}
             {totalPages > 1 && (
               <div className="mt-auto p-3 bg-light border-top">
                 <nav aria-label="Page navigation">
@@ -474,82 +568,6 @@ const HoSoDangVien = () => {
       </div>
 
       {/* Add HoSo Modal */}
-      {/* <Modal show={showAddModal} onHide={() => setShowAddModal(false)} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Thêm Hồ Sơ Mới</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Tập hồ sơ *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="taphoso"
-                    value={formData.taphoso}
-                    onChange={handleInputChange}
-                    placeholder="Nhập tên tập hồ sơ"
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Loại hồ sơ *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="loaihoso"
-                    value={formData.loaihoso}
-                    onChange={handleInputChange}
-                    placeholder="Nhập loại hồ sơ"
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Đường dẫn file</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="fileUrl"
-                    value={formData.fileUrl}
-                    onChange={handleInputChange}
-                    placeholder="Nhập đường dẫn file"
-                  />
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group>
-                  <Form.Label>Ghi chú</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="ghichu"
-                    value={formData.ghichu}
-                    onChange={handleInputChange}
-                    placeholder="Nhập ghi chú"
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-            <div className="mt-3">
-              <h6>Đảng viên: {selectedDangVien?.hoten}</h6>
-            </div>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowAddModal(false)}>
-            Hủy
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleAddHoSo}
-            disabled={!formData.taphoso || !formData.loaihoso || loading}
-          >
-            {loading ? "Đang xử lý..." : "Thêm mới"}
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
       <Modal
         show={showAddModal}
         onHide={() => setShowAddModal(false)}
@@ -563,19 +581,26 @@ const HoSoDangVien = () => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Tập hồ sơ <span className="text-danger">*</span></Form.Label>
-                  <Form.Control
-                    type="text"
+                  <Form.Label>
+                    Tập hồ sơ <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Select
                     name="taphoso"
                     value={formData.taphoso}
                     onChange={handleInputChange}
-                    placeholder="Nhập tên tập hồ sơ"
-                  />
+                  >
+                    <option value="">Chọn tập hồ sơ</option>
+                    <option value="tap1">Tập 1</option>
+                    <option value="tap2">Tập 2</option>
+                    <option value="tap3">Tập 3</option>
+                  </Form.Select>
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Loại hồ sơ <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Loại hồ sơ <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     name="loaihoso"
@@ -589,47 +614,23 @@ const HoSoDangVien = () => {
             <Row className="mb-3">
               <Col md={12}>
                 <Form.Group>
-                  <Form.Label>File hồ sơ <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    File hồ sơ <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="file"
-                    onChange={async (e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        try {
-                          setLoading(true);
-                          const formData = new FormData();
-                          formData.append("file", file);
-
-                          const response = await uploadFile(token, formData);
-                          setFormData((prev) => ({
-                            ...prev,
-                            fileUrl: response.fileUrl, // Giả sử API trả về URL file
-                          }));
-
-                          Swal.fire(
-                            "Thành công",
-                            "Upload file thành công",
-                            "success"
-                          );
-                        } catch (error) {
-                          console.error("Upload error:", error);
-                          Swal.fire("Lỗi", "Upload file thất bại", "error");
-                        } finally {
-                          setLoading(false);
-                        }
-                      }
-                    }}
+                    onChange={handleFileChange}
                     disabled={loading}
                   />
                   {formData.fileUrl && (
                     <div className="mt-2">
                       <a
-                        href={formData.fileUrl}
+                        onClick={() => handleDownloadFile(formData.fileUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary"
                       >
-                        Xem file đã tải lên
+                        File hiện tại: {formData.fileUrl}
                       </a>
                     </div>
                   )}
@@ -670,7 +671,7 @@ const HoSoDangVien = () => {
             disabled={
               !formData.taphoso ||
               !formData.loaihoso ||
-              !formData.fileUrl ||
+              (!formData.fileUrl && !file) ||
               loading
             }
           >
@@ -699,26 +700,35 @@ const HoSoDangVien = () => {
         size="lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title>Cập nhật Hồ Sơ Đảng Viên {selectedDangVien?.hoten}</Modal.Title>
+          <Modal.Title>
+            Cập nhật Hồ Sơ Đảng Viên
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Tập hồ sơ <span className="text-danger">*</span></Form.Label>
-                  <Form.Control
-                    type="text"
+                  <Form.Label>
+                    Tập hồ sơ <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Select
                     name="taphoso"
                     value={formData.taphoso}
                     onChange={handleInputChange}
-                    placeholder="Nhập tên tập hồ sơ"
-                  />
+                  >
+                    <option value="">Chọn tập hồ sơ</option>
+                    <option value="tap1">Tập 1</option>
+                    <option value="tap2">Tập 2</option>
+                    <option value="tap3">Tập 3</option>
+                  </Form.Select>
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Loại hồ sơ <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Loại hồ sơ <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     name="loaihoso"
@@ -730,23 +740,36 @@ const HoSoDangVien = () => {
               </Col>
             </Row>
             <Row className="mb-3">
-              <Col md={6}>
+              <Col md={12}>
                 <Form.Group>
-                  <Form.Label>Đường dẫn file</Form.Label>
+                  <Form.Label>File hồ sơ</Form.Label>
                   <Form.Control
-                    type="text"
-                    name="fileUrl"
-                    value={formData.fileUrl}
-                    onChange={handleInputChange}
-                    placeholder="Nhập đường dẫn file"
+                    type="file"
+                    onChange={handleFileChange}
+                    disabled={loading}
                   />
+                  {formData.fileUrl && (
+                    <div className="mt-2">
+                      <a
+                        onClick={() => handleDownloadFile(formData.fileUrl)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary"
+                      >
+                        File hiện tại: {formData.fileUrl}
+                      </a>
+                    </div>
+                  )}
                 </Form.Group>
               </Col>
-              <Col md={6}>
+            </Row>
+            <Row className="mb-3">
+              <Col md={12}>
                 <Form.Group>
                   <Form.Label>Ghi chú</Form.Label>
                   <Form.Control
-                    type="text"
+                    as="textarea"
+                    rows={3}
                     name="ghichu"
                     value={formData.ghichu}
                     onChange={handleInputChange}
@@ -790,7 +813,20 @@ const HoSoDangVien = () => {
             onClick={handleUpdateHoSo}
             disabled={!formData.taphoso || !formData.loaihoso || loading}
           >
-            {loading ? "Đang xử lý..." : "Cập nhật"}
+            {loading ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                <span className="ms-2">Đang xử lý...</span>
+              </>
+            ) : (
+              "Cập nhật"
+            )}
           </Button>
         </Modal.Footer>
       </Modal>
