@@ -74,7 +74,7 @@ const ChiBoTable = ({
         </table>
       </div>
 
-      {filteredChiBo.length > 0 && (
+      {filteredChiBo.length > 10 && (
         <div className="mt-auto p-3 bg-light border-top">
           <nav aria-label="Page navigation">
             <ul className="pagination justify-content-center mb-0">

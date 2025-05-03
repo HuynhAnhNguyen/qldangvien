@@ -493,7 +493,7 @@ const username = localStorage.getItem("fullname");
                 <i className="fas fa-search"></i>
               </button>
             </div>
-            <Button
+            <Button className="custom-sm-btn-dangvien"
               variant="success"
               onClick={openAddModal}
               disabled={loading}

@@ -3,13 +3,8 @@ import {
   Modal,
   Button,
   Form,
-  Table,
-  InputGroup,
-  FormControl,
-  Pagination,
 } from "react-bootstrap";
 import Swal from "sweetalert2";
-// import { FaSearch, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
 const KyDangPhi = () => {
   // State management
@@ -17,17 +12,17 @@ const KyDangPhi = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
-  
+
   // Pagination and search
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
-  
+
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedKyDangPhi, setSelectedKyDangPhi] = useState(null);
-  
+
   // Form data
   const [formData, setFormData] = useState({
     ten: "",
@@ -44,7 +39,7 @@ const KyDangPhi = () => {
       const response = await fetch(
         "http://3.104.77.30:8080/api/v1/project/kydangphi/findAll",
         {
-            method: "GET",
+          method: "GET",
           headers: {
             Authorization: `${token}`,
           },
@@ -70,7 +65,9 @@ const KyDangPhi = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://3.104.77.30:8080/api/v1/project/kydangphi/create?sotien=${sotien}&tenKydangphi=${encodeURIComponent(ten)}`,
+        `http://3.104.77.30:8080/api/v1/project/kydangphi/create?sotien=${sotien}&tenKydangphi=${encodeURIComponent(
+          ten
+        )}`,
         {
           method: "POST",
           headers: {
@@ -93,7 +90,9 @@ const KyDangPhi = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://3.104.77.30:8080/api/v1/project/kydangphi/update?kydangphiId=${id}&tenKydangphi=${encodeURIComponent(ten)}&sotien=${sotien}`,
+        `http://3.104.77.30:8080/api/v1/project/kydangphi/update?kydangphiId=${id}&tenKydangphi=${encodeURIComponent(
+          ten
+        )}&sotien=${sotien}`,
         {
           method: "PUT",
           headers: {
@@ -111,45 +110,27 @@ const KyDangPhi = () => {
     }
   };
 
-  // Delete KyDangPhi
-  const deleteKyDangPhi = async (id) => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `http://3.104.77.30:8080/api/v1/project/kydangphi/delete?kydangphiId=${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error deleting KyDangPhi:", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Form validation
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.ten.trim()) {
       errors.ten = "Tên kỳ đảng phí là bắt buộc";
     }
-    
+
     if (!formData.sotien) {
       errors.sotien = "Số tiền là bắt buộc";
     } else if (isNaN(formData.sotien) || Number(formData.sotien) <= 0) {
       errors.sotien = "Số tiền phải là số dương";
     }
-    
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset về trang 1 khi search
   };
 
   // Handle create
@@ -189,11 +170,14 @@ const KyDangPhi = () => {
         throw new Error(response.message || "Failed to update KyDangPhi");
       }
     } catch (error) {
-      Swal.fire("Lỗi", error.message || "Cập nhật kỳ đảng phí thất bại", "error");
+      Swal.fire(
+        "Lỗi",
+        error.message || "Cập nhật kỳ đảng phí thất bại",
+        "error"
+      );
     }
   };
 
-  
   // Open edit modal
   const openEditModal = (kyDangPhi) => {
     setSelectedKyDangPhi(kyDangPhi);
@@ -232,119 +216,161 @@ const KyDangPhi = () => {
   );
 
   return (
-    <div className="container-fluid p-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Quản lý Kỳ Đảng Phí</h2>
-        <Button variant="success" onClick={openAddModal}>
-          {/* <FaPlus className="me-2" />  */}
-          Thêm mới
-        </Button>
-      </div>
-
-      {/* Search bar */}
-      <div className="mb-4">
-        <InputGroup style={{ maxWidth: "400px" }}>
-          <FormControl
-            placeholder="Tìm kiếm kỳ đảng phí..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <InputGroup.Text>
-            {/* <FaSearch /> */}
-          </InputGroup.Text>
-        </InputGroup>
-      </div>
-
-      {/* Loading indicator */}
-      {loading && (
-        <div className="text-center py-4">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
+    <div className="container-fluid p-0 position-relative d-flex flex-column min-vh-100">
+      <div className="p-4 flex-grow-1">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+          <h1 className="h3 mb-3 mb-md-0">Quản lý Kỳ Đảng phí</h1>
+          <div className="d-flex gap-2 align-items-center">
+            <div
+              className="d-flex"
+              style={{ width: "100%", maxWidth: "450px" }}
+            >
+              <input
+                type="text"
+                className="form-control custom-sm-input"
+                placeholder="Tìm kiếm kỳ đảng phí..."
+                value={searchTerm}
+                onChange={handleSearch}
+                style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+              />
+              <button
+                className="btn btn-primary custom-sm-btn"
+                style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+              >
+                <i className="fas fa-search"></i>
+              </button>
+            </div>
+            <button
+              className="btn btn-success custom-sm-btn-dangvien"
+              onClick={openAddModal}
+            >
+              <i className="fas fa-plus me-2"></i>Thêm mới
+            </button>
           </div>
         </div>
-      )}
+        {/* Loading indicator */}
+        {loading && (
+          <div className="text-center py-4">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        )}
 
-      {/* Error message */}
-      {error && <div className="alert alert-danger">{error}</div>}
+        {/* Error message */}
+        {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* Data table */}
-      <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Tên kỳ đảng phí</th>
-              <th>Số tiền</th>
-              <th>Người tạo</th>
-              <th>Thời gian tạo</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.length > 0 ? (
-              currentItems.map((item, index) => (
-                <tr key={item.id}>
-                  <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                  <td>{item.ten}</td>
-                  <td>
-                    {new Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    }).format(item.sotien)}
-                  </td>
-                  <td>{item.nguoitao}</td>
-                  <td>{item.thoigiantao}</td>
-                  <td>
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => openEditModal(item)}
-                      disabled={loading}
+        {/* Data table */}
+        {currentItems.length === 0 ? (
+          <div className="text-center py-4 color-black">
+            Không có Kỳ Đảng phí nào!
+          </div>
+        ) : (
+          <>
+            <div className="table-responsive mb-4">
+              <table className="table table-hover">
+                <thead className="table-light">
+                  <tr>
+                    <th style={{ width: "5%" }}>STT</th>
+                    <th style={{ width: "30%" }}>Tên kỳ đảng phí</th>
+                    <th style={{ width: "15%" }}>Số tiền</th>
+                    <th style={{ width: "15%" }}>Người tạo</th>
+                    <th style={{ width: "25%" }}>Thời gian tạo</th>
+                    <th style={{ width: "10%" }}>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((item, index) => (
+                    <tr key={item.id}>
+                      <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                      <td>{item.ten}</td>
+
+                      <td>
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "decimal", // Sử dụng 'decimal' thay vì 'currency'
+                        }).format(item.sotien)}{" "}
+                        VND
+                      </td>
+                      <td>{item.nguoitao}</td>
+                      <td>{item.thoigiantao}</td>
+                      <td>
+                        <div className="d-flex gap-1">
+                          <button
+                            className="btn btn-sm btn-outline-warning"
+                            onClick={() => openEditModal(item)}
+                            title="Chỉnh sửa"
+                            disabled={loading}
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="mt-auto p-3 bg-light border-top">
+                <nav aria-label="Page navigation">
+                  <ul className="pagination justify-content-center mb-0">
+                    <li
+                      className={`page-item ${
+                        currentPage === 1 ? "disabled" : ""
+                      }`}
                     >
-                      {/* <FaEdit /> */}
-                    </Button>
-        
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="text-center">
-                  Không có dữ liệu
-                </td>
-              </tr>
+                      <button
+                        className="page-link"
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        disabled={currentPage === 1}
+                      >
+                        « Trước
+                      </button>
+                    </li>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <li
+                          key={page}
+                          className={`page-item ${
+                            page === currentPage ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      )
+                    )}
+                    <li
+                      className={`page-item ${
+                        currentPage === totalPages ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
+                        disabled={currentPage === totalPages}
+                      >
+                        Tiếp »
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
             )}
-          </tbody>
-        </Table>
+          </>
+        )}
       </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="d-flex justify-content-center mt-4">
-          <Pagination>
-            <Pagination.Prev
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            />
-            {Array.from({ length: totalPages }, (_, i) => (
-              <Pagination.Item
-                key={i + 1}
-                active={i + 1 === currentPage}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </Pagination.Item>
-            ))}
-            <Pagination.Next
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            />
-          </Pagination>
-        </div>
-      )}
 
       {/* Add Modal */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)}>
@@ -354,10 +380,13 @@ const KyDangPhi = () => {
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Tên kỳ đảng phí *</Form.Label>
+              <Form.Label>
+                Tên kỳ đảng phí <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="ten"
+                placeholder="Tên kỳ Đảng phí"
                 value={formData.ten}
                 onChange={(e) =>
                   setFormData({ ...formData, ten: e.target.value })
@@ -370,10 +399,13 @@ const KyDangPhi = () => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Số tiền *</Form.Label>
+              <Form.Label>
+                Số tiền <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Control
                 type="number"
                 name="sotien"
+                placeholder="Số tiền"
                 value={formData.sotien}
                 onChange={(e) =>
                   setFormData({ ...formData, sotien: e.target.value })
@@ -404,7 +436,9 @@ const KyDangPhi = () => {
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Tên kỳ đảng phí *</Form.Label>
+              <Form.Label>
+                Tên kỳ đảng phí <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="ten"
@@ -420,7 +454,9 @@ const KyDangPhi = () => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Số tiền *</Form.Label>
+              <Form.Label>
+                Số tiền <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Control
                 type="number"
                 name="sotien"
