@@ -616,3 +616,56 @@ export const rejectPheDuyet = async (token, pheduyetId) => {
   );
   return response.data;
 };
+
+// Lấy trạng thái Đảng phí theo kỳ
+export const fetchTrangThaiDangPhiByKy = async (token, kydangphiId) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/trangthaidangphi/findByKydangphiId`,
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+      params: {
+        kydangphiId,
+      },
+    }
+  );
+  return response.data;
+};
+
+// Lấy trạng thái Đảng phí theo Đảng viên
+export const fetchTrangThaiDangPhiByDangVien = async (token, dangvienId) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/trangthaidangphi/findByDangvienId`,
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+      params: {
+        dangvienId,
+      },
+    }
+  );
+  return response.data;
+};
+
+// Xác nhận đóng Đảng phí
+export const confirmDangPhi = async (token, kydangphiId, dangvienId) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/trangthaidangphi/confirm`,
+    {},
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+      params: {
+        kydangphiId,
+        dangvienId,
+      },
+    }
+  );
+  return response.data;
+};

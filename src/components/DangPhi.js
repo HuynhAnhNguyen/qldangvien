@@ -392,7 +392,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Badge } from "react-bootstrap";
 import Swal from "sweetalert2";
-import { fetchDangVien, fetchKyDangPhi } from "../services/apiService";
+import { confirmDangPhi, fetchDangVien, fetchKyDangPhi, fetchTrangThaiDangPhiByDangVien, fetchTrangThaiDangPhiByKy } from "../services/apiService";
 
 const DangPhi = () => {
   const [kyDangPhiList, setKyDangPhiList] = useState([]);
@@ -413,8 +413,8 @@ const DangPhi = () => {
   // Lấy danh sách kỳ Đảng phí
   const loadKyDangPhi = async () => {
     try {
-      const response = await fetchKyDangPhi(token);
-      const data = await response.json();
+      const data = await fetchKyDangPhi(token);
+      // const data = await response.json();
       console.log(data);
       if (data.resultCode === 0) {
         setKyDangPhiList(Array.isArray(data.data) ? data.data : []);
@@ -451,12 +451,12 @@ const DangPhi = () => {
     try {
       let data;
       if (searchType === "ky" && selectedKyDangPhi) {
-        data = await apiService.fetchTrangThaiDangPhiByKy(
+        data = await fetchTrangThaiDangPhiByKy(
           token,
           selectedKyDangPhi.id
         );
       } else if (searchType === "dangvien" && selectedDangVien) {
-        data = await apiService.fetchTrangThaiDangPhiByDangVien(
+        data = await fetchTrangThaiDangPhiByDangVien(
           token,
           selectedDangVien.id
         );
@@ -491,7 +491,7 @@ const DangPhi = () => {
     if (result.isConfirmed) {
       try {
         setLoading(true);
-        const data = await apiService.confirmDangPhi(
+        const data = await confirmDangPhi(
           token,
           kydangphiId,
           dangvienId
