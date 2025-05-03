@@ -123,7 +123,14 @@ const Sidebar = () => {
               <span className="align-middle">Quản lý tin tức</span>
             </a>
           </li>
-
+          
+          <li className={`sidebar-item ${isActive("/quan-ly-phe-duyet")}`}>
+            <a className="sidebar-link" onClick={() => navigate("/quan-ly-phe-duyet")}>
+            <i className="fa-solid fa-check-circle"></i>
+              <span className="align-middle">Quản lý phê duyệt</span>
+            </a>
+          </li>
+          
           <li className={`sidebar-item ${isActive("/bao-cao-thong-ke")}`}>
             <a className="sidebar-link" onClick={() => navigate("/bao-cao-thong-ke")}>
             <i className="fa-solid fa-chart-bar"></i>

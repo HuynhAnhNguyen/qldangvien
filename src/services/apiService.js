@@ -482,3 +482,15 @@ export const deleteHoSo = async (token, hoSoId) => {
     },
   });
 };
+
+export const fetchKyDangPhi= async (token) => {
+  return await fetch(
+    "http://3.104.77.30:8080/api/v1/project/kydangphi/findAll",
+    {
+        method: "GET",
+      headers: {
+        Authorization: `${token}`,
+      },
+    }
+  );
+}
