@@ -5,7 +5,7 @@ import {
   Form,
 } from "react-bootstrap";
 import Swal from "sweetalert2";
-import { fetchKyDangPhi } from "../services/apiService";
+import { createKyDangPhi, fetchKyDangPhi, updateKyDangPhi } from "../services/apiService";
 
 const KyDangPhi = () => {
   // State management
@@ -53,54 +53,54 @@ const KyDangPhi = () => {
   };
 
   // Create new KyDangPhi
-  const createKyDangPhi = async (ten, sotien) => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `http://3.104.77.30:8080/api/v1/project/kydangphi/create?sotien=${sotien}&tenKydangphi=${encodeURIComponent(
-          ten
-        )}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error creating KyDangPhi:", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const createKyDangPhi = async (ten, sotien) => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(
+  //       `http://3.104.77.30:8080/api/v1/project/kydangphi/create?sotien=${sotien}&tenKydangphi=${encodeURIComponent(
+  //         ten
+  //       )}`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           Authorization: `${token}`,
+  //         },
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (error) {
+  //     console.error("Error creating KyDangPhi:", error);
+  //     throw error;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // Update KyDangPhi
-  const updateKyDangPhi = async (id, ten, sotien) => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `http://3.104.77.30:8080/api/v1/project/kydangphi/update?kydangphiId=${id}&tenKydangphi=${encodeURIComponent(
-          ten
-        )}&sotien=${sotien}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error updating KyDangPhi:", error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const updateKyDangPhi = async (id, ten, sotien) => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await fetch(
+  //       `http://3.104.77.30:8080/api/v1/project/kydangphi/update?kydangphiId=${id}&tenKydangphi=${encodeURIComponent(
+  //         ten
+  //       )}&sotien=${sotien}`,
+  //       {
+  //         method: "PUT",
+  //         headers: {
+  //           Authorization: `${token}`,
+  //         },
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (error) {
+  //     console.error("Error updating KyDangPhi:", error);
+  //     throw error;
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // Form validation
   const validateForm = () => {
@@ -130,7 +130,8 @@ const KyDangPhi = () => {
     if (!validateForm()) return;
 
     try {
-      const response = await createKyDangPhi(formData.ten, formData.sotien);
+      const response = await createKyDangPhi(token, formData.ten, formData.sotien);
+      // console.log(response);
       if (response.resultCode === 0) {
         Swal.fire("Thành công", "Thêm kỳ đảng phí thành công", "success");
         setShowAddModal(false);
@@ -149,7 +150,7 @@ const KyDangPhi = () => {
     if (!validateForm()) return;
 
     try {
-      const response = await updateKyDangPhi(
+      const response = await updateKyDangPhi(token, 
         selectedKyDangPhi.id,
         formData.ten,
         formData.sotien

@@ -36,7 +36,7 @@ export const sendChatMessage = async (token, message) => {
 };
 
 // Lấy danh sách tin tức
-export const fetchNews = async (token) => {
+export const fetchTinTuc = async (token) => {
   const response = await axios.get(`${REACT_APP_API_URL}/tintuc/findAll`, {
     headers: {
       Authorization: `${token}`,
@@ -47,7 +47,7 @@ export const fetchNews = async (token) => {
 };
 
 // Thêm tin tức mới
-export const createNews = async (token, newsData) => {
+export const createTinTuc = async (token, newsData) => {
   const response = await axios.post(`${REACT_APP_API_URL}/tintuc/create`, newsData, {
     headers: {
       Authorization: `${token}`,
@@ -58,7 +58,7 @@ export const createNews = async (token, newsData) => {
 };
 
 // Cập nhật tin tức
-export const updateNews = async (token, newsId, newsData) => {
+export const updateTinTuc = async (token, newsId, newsData) => {
   const response = await axios.put(`${REACT_APP_API_URL}/tintuc/update`, {
     ...newsData,
     tintucId: newsId
@@ -72,7 +72,7 @@ export const updateNews = async (token, newsId, newsData) => {
 };
 
 // Xóa tin tức
-export const deleteNews = async (token, newsId) => {
+export const deleteTinTuc = async (token, newsId) => {
   const response = await axios.delete(`${REACT_APP_API_URL}/tintuc/delete`, {
     params: { tintucId: newsId },
     headers: {
@@ -425,77 +425,6 @@ export const exportDangVienToExcel = (dangVienData) => {
 
 
 // Fetch hồ sơ theo Đảng viên ID
-// export const fetchHoSoByDangVienId = async (token, dangvienId) => {
-//   return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/findByDangvienId?dangvienId=${dangvienId}`, {
-//     method: "GET",
-//     headers: {
-//       Authorization: `${token}`,
-//       "Content-Type": "application/json",
-//     },
-//   });
-// };
-
-// // Fetch hồ sơ đã duyệt theo Đảng viên ID
-// export const fetchHoSoApprovedByDangVienId = async (token, dangvienId) => {
-//   return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/findApprovedByDangvienId?dangvienId=${dangvienId}`, {
-//     method: "GET",
-//     headers: {
-//       Authorization: `${token}`,
-//       "Content-Type": "application/json",
-//     },
-//   });
-// };
-
-// // Tạo hồ sơ mới
-// export const createHoSo = async (token, dangvienId, hoSoData) => {
-//   const response = await fetch(`http://3.104.77.30:8080/api/v1/project/hoso/create?dangvienId=${dangvienId}`, {
-//     method: "POST",
-//     headers: {
-//       Authorization: `${token}`,
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(hoSoData),
-//   });
-//   return response.json();
-// };
-
-// // Cập nhật hồ sơ
-// export const updateHoSo = async (token, hoSoId, hoSoData) => {
-//   const response = await fetch(`http://3.104.77.30:8080/api/v1/project/hoso/update?hosoId=${hoSoId}`, {
-//     method: "PUT",
-//     headers: {
-//       Authorization: `${token}`,
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(hoSoData),
-//   });
-//   return response.json();
-// };
-
-// // Xóa hồ sơ
-// export const deleteHoSo = async (token, hoSoId) => {
-//   return fetch(`http://3.104.77.30:8080/api/v1/project/hoso/delete?hosoid=${hoSoId}`, {
-//     method: "DELETE",
-//     headers: {
-//       Authorization: `${token}`,
-//       "Content-Type": "application/json",
-//     },
-//   });
-// };
-
-// export const fetchKyDangPhi= async (token) => {
-//   return await fetch(
-//     "http://3.104.77.30:8080/api/v1/project/kydangphi/findAll",
-//     {
-//         method: "GET",
-//       headers: {
-//         Authorization: `${token}`,
-//       },
-//     }
-//   );
-// }
-
-// Fetch hồ sơ theo Đảng viên ID
 export const fetchHoSoByDangVienId = async (token, dangvienId) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/hoso/findByDangvienId?dangvienId=${dangvienId}`,
@@ -576,6 +505,113 @@ export const fetchKyDangPhi = async (token) => {
         Authorization: `${token}`,
         'Content-Type': 'application/json'
       } 
+    }
+  );
+  return response.data;
+};
+
+// Tạo kỳ đảng phí mới
+export const createKyDangPhi = async (token, ten, sotien) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/kydangphi/create`,
+    {},
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+      params: {
+        sotien,
+        tenKydangphi: ten,
+      },
+    }
+  );
+  return response.data;
+};
+
+// Cập nhật Kỳ Đảng Phí
+export const updateKyDangPhi = async (token, id, ten, sotien) => {
+  const response = await axios.put(
+    `${REACT_APP_API_URL}/kydangphi/update`,
+    {},
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+      params: {
+        kydangphiId: id,
+        tenKydangphi: ten,
+        sotien,
+      },
+    }
+  );
+  return response.data;
+};
+
+// Lấy danh sách phê duyệt theo username
+export const fetchPheDuyetByUsername = async (token, username) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/pheduyet/findByUsername`,
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+      params: {
+        username,
+      },
+    }
+  );
+  return response.data;
+};
+
+// Gửi yêu cầu phê duyệt
+export const createPheDuyet = async (token, pheDuyetData) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/pheduyet/create`,
+    pheDuyetData,
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response.data;
+};
+
+// Phê duyệt yêu cầu
+export const approvePheDuyet = async (token, pheduyetId) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/pheduyet/approval`,
+    {},
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+      params: {
+        pheduyetId,
+      },
+    }
+  );
+  return response.data;
+};
+
+// Từ chối yêu cầu
+export const rejectPheDuyet = async (token, pheduyetId) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/pheduyet/reject`,
+    {},
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+      params: {
+        pheduyetId,
+      },
     }
   );
   return response.data;

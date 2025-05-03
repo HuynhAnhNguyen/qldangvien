@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import {
-  fetchNews,
-  createNews,
-  updateNews,
-  deleteNews,
+  fetchTinTuc,
+  createTinTuc,
+  updateTinTuc,
+  deleteTinTuc,
   uploadImage,
 } from "../services/apiService";
 import Swal from "sweetalert2";
@@ -39,7 +39,7 @@ const TinTuc = () => {
   const loadNews = async () => {
     setLoading(true);
     try {
-      const response = await fetchNews(token);
+      const response = await fetchTinTuc(token);
       // console.log("Phản hồi API:", response);
       // console.log("Phản hồi API:", response.data);
       // setNews(data);
@@ -86,7 +86,7 @@ const TinTuc = () => {
         imageUrl = uploadedFile.data;
       }
 
-      const newNews = await createNews(token, {
+      const newNews = await createTinTuc(token, {
         tieude: formData.tieude,
         mota: formData.mota,
         imageUrl,
@@ -114,7 +114,7 @@ const TinTuc = () => {
         imageUrl = uploadedFile;
       }
 
-      const updatedNews = await updateNews(token, selectedNews.tintucId, {
+      const updatedNews = await updateTinTuc(token, selectedNews.tintucId, {
         tieude: formData.tieude,
         mota: formData.mota,
         imageUrl,
@@ -139,7 +139,7 @@ const TinTuc = () => {
   const handleDeleteNews = async () => {
     try {
       setLoading(true);
-      await deleteNews(token, selectedNews.tintucId);
+      await deleteTinTuc(token, selectedNews.tintucId);
 
       setNews(news.filter((item) => item.tintucId !== selectedNews.tintucId));
       setShowDeleteModal(false);
