@@ -38,8 +38,12 @@ const Sidebar = () => {
   return (
     <nav id="sidebar" className="sidebar js-sidebar">
       <div className="sidebar-content js-simplebar p-2">
-        <a className="sidebar-brand d-block text-center" onClick={() => navigate("/")}>
-          <img className="logo-sidebar"
+        <a
+          className="sidebar-brand d-block text-center"
+          onClick={() => navigate("/")}
+        >
+          <img
+            className="logo-sidebar"
             src="/assets/images/logo/logo.png"
             alt="Logo"
           />
@@ -48,7 +52,7 @@ const Sidebar = () => {
         <ul className="sidebar-nav">
           <li className="sidebar-item">
             <a className="sidebar-link sidebar-link-static">
-              <i className="fa-regular fa-user"></i>
+              <i className="fa-solid fa-user"></i>
               <span className="align-middle read-only-text">{fullname}</span>
             </a>
           </li>
@@ -63,96 +67,128 @@ const Sidebar = () => {
           <hr />
           <li className={`sidebar-item ${isActive("/")}`}>
             <a className="sidebar-link" onClick={() => navigate("/")}>
-            <i className="fa-solid fa-home"></i>
+              <i className="fa-solid fa-home"></i>
               <span className="align-middle">Trang chủ</span>
             </a>
           </li>
 
           <li className={`sidebar-item ${isActive("/quan-ly-dang-vien")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/quan-ly-dang-vien")}>
-            <i className="fa-solid fa-user-tie"></i>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/quan-ly-dang-vien")}
+            >
+              <i className="fa-solid fa-user-tie"></i>
               <span className="align-middle">Quản lý Đảng viên</span>
             </a>
           </li>
 
           <li className={`sidebar-item ${isActive("/quan-ly-ho-so")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/quan-ly-ho-so")}>
-            <i className="fa-solid fa-folder-open"></i>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/quan-ly-ho-so")}
+            >
+              <i className="fa-solid fa-folder-open"></i>
               <span className="align-middle">Quản lý hồ sơ Đảng</span>
             </a>
           </li>
 
           <li className={`sidebar-item ${isActive("/quan-ly-sinh-hoat")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/quan-ly-sinh-hoat")}>
-           <i className="fa-solid fa-calendar-check"></i>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/quan-ly-sinh-hoat")}
+            >
+              <i className="fa-solid fa-calendar-check"></i>
               <span className="align-middle">Quản lý sinh hoạt Đảng</span>
             </a>
           </li>
 
-          {/* <li className={`sidebar-item ${isActive("/quan-ly-ky-dang-phi")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/quan-ly-ky-dang-phi")}>
-            <i className="fa-regular fa-credit-card"></i>
+          <li className={`sidebar-item ${isActive("/quan-ly-dang-phi")}`}>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/quan-ly-dang-phi")}
+            >
+              <i className="fa-solid fa-money-bill"></i>
               <span className="align-middle">Quản lý Đảng phí</span>
             </a>
-          </li> */}
+          </li>
 
-          <li className={`sidebar-item ${isActive("/quan-ly-dang-phi")}`}>
-    <a className="sidebar-link" onClick={() => navigate("/quan-ly-dang-phi")}>
-      <i className="fa-solid fa-money-bill"></i>
-      <span className="align-middle">Quản lý Đảng phí</span>
-    </a>
-  </li>
-
-  <li className={`sidebar-item ${isActive("/quan-ly-ky-dang-phi")}`}>
-    <a className="sidebar-link" onClick={() => navigate("/quan-ly-ky-dang-phi")}>
-      <i className="fa-solid fa-calendar-alt"></i>
-      <span className="align-middle">Quản lý kỳ Đảng phí</span>
-    </a>
-  </li>
+          <li className={`sidebar-item ${isActive("/quan-ly-ky-dang-phi")}`}>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/quan-ly-ky-dang-phi")}
+            >
+              <i className="fa-solid fa-calendar-alt"></i>
+              <span className="align-middle">Quản lý kỳ Đảng phí</span>
+            </a>
+          </li>
 
           <li className={`sidebar-item ${isActive("/quan-ly-chi-bo")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/quan-ly-chi-bo")}>
-            <i className="fa-solid fa-users"></i>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/quan-ly-chi-bo")}
+            >
+              <i className="fa-solid fa-users"></i>
               <span className="align-middle">Quản lý chi bộ</span>
             </a>
           </li>
 
           <li className={`sidebar-item ${isActive("/quan-ly-tin-tuc")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/quan-ly-tin-tuc")}>
-            <i className="fa-regular fa-newspaper"></i>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/quan-ly-tin-tuc")}
+            >
+              <i className="fa-regular fa-newspaper"></i>
               <span className="align-middle">Quản lý tin tức</span>
             </a>
           </li>
-          
+
           <li className={`sidebar-item ${isActive("/quan-ly-phe-duyet")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/quan-ly-phe-duyet")}>
-            <i className="fa-solid fa-check-circle"></i>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/quan-ly-phe-duyet")}
+            >
+              <i className="fa-solid fa-check-circle"></i>
               <span className="align-middle">Quản lý phê duyệt</span>
             </a>
           </li>
-          
+
+          <li className={`sidebar-item ${isActive("/quan-ly-tai-khoan")}`}>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/quan-ly-tai-khoan")}
+            >
+              <i className="fa-solid fa-user"></i>
+              <span className="align-middle">Quản lý tài khoản</span>
+            </a>
+          </li>
+
           <li className={`sidebar-item ${isActive("/bao-cao-thong-ke")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/bao-cao-thong-ke")}>
-            <i className="fa-solid fa-chart-bar"></i>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/bao-cao-thong-ke")}
+            >
+              <i className="fa-solid fa-chart-bar"></i>
               <span className="align-middle">Báo cáo, thống kê</span>
             </a>
           </li>
 
           <li className={`sidebar-item ${isActive("/sao-luu-khoi-phuc")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/sao-luu-khoi-phuc")}>
-            <i className="fa-solid fa-database"></i>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/sao-luu-khoi-phuc")}
+            >
+              <i className="fa-solid fa-database"></i>
               <span className="align-middle">Sao lưu, khôi phục</span>
             </a>
           </li>
 
           <li className="sidebar-item">
             <a className="sidebar-link" onClick={handleLogout}>
-            <i className="fa-solid fa-arrow-right-from-bracket"></i>
+              <i className="fa-solid fa-arrow-right-from-bracket"></i>
               <span className="align-middle">Đăng xuất</span>
             </a>
           </li>
         </ul>
-        
       </div>
     </nav>
   );
