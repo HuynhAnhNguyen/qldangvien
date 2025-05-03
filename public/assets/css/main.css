@@ -12636,7 +12636,7 @@ span.flatpickr-weekday {
 
 .creative-full-bg-card .info-left,
 .creative-full-bg-card .info-right {
-  width: 45%;
+  width: 50%;
   font-size: 14px;
 }
 
@@ -12646,6 +12646,7 @@ span.flatpickr-weekday {
   padding: 5px;
   border-radius: 5px;
   transition: background-color 0.3s ease;
+  white-space: nowrap;
 }
 
 .creative-full-bg-card .info-left div:hover,

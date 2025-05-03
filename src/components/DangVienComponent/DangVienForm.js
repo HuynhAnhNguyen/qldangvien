@@ -12,7 +12,7 @@ const DangVienForm = ({
       <Row className="mb-3">
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Họ và tên Đảng viên</Form.Label>
+            <Form.Label>Họ và tên Đảng viên <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="text"
               name="hoten"
@@ -27,7 +27,7 @@ const DangVienForm = ({
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Ngày sinh</Form.Label>
+            <Form.Label>Ngày sinh <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="date"
               name="ngaysinh"
@@ -44,7 +44,7 @@ const DangVienForm = ({
       <Row className="mb-3">
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Giới tính</Form.Label>
+            <Form.Label>Giới tính <span className="text-danger">*</span></Form.Label>
             <Form.Select
               name="gioitinh"
               value={formData.gioitinh}
@@ -62,7 +62,7 @@ const DangVienForm = ({
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Chi bộ</Form.Label>
+            <Form.Label>Chi bộ <span className="text-danger">*</span></Form.Label>
             <Form.Select
               name="chiboId"
               value={formData.chiboId}
@@ -150,7 +150,7 @@ const DangVienForm = ({
         
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Ngày vào Đảng</Form.Label>
+            <Form.Label>Ngày vào Đảng <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="date"
               name="ngayvaodang"
@@ -323,7 +323,7 @@ const DangVienForm = ({
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Trạng thái Đảng viên</Form.Label>
+            <Form.Label>Trạng thái Đảng viên <span className="text-danger">*</span></Form.Label>
             <Form.Select
               name="trangthaidangvien"
               value={formData.trangthaidangvien}

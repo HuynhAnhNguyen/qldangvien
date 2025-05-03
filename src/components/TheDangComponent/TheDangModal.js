@@ -127,7 +127,7 @@ const TheDangModal = ({
         {showAddTheDangForm ? (
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Số thẻ *</Form.Label>
+              <Form.Label>Số thẻ <span className="text-danger">*</span></Form.Label>
               <Form.Control
                 type="text"
                 name="mathe"
@@ -148,7 +148,7 @@ const TheDangModal = ({
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Ngày cấp *</Form.Label>
+              <Form.Label>Ngày cấp <span className="text-danger">*</span></Form.Label>
               <Form.Control
                 type="date"
                 name="ngaycap"
@@ -168,7 +168,7 @@ const TheDangModal = ({
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Nơi cấp *</Form.Label>
+              <Form.Label>Nơi cấp <span className="text-danger">*</span></Form.Label>
               <Form.Control
                 type="text"
                 name="noicapthe"

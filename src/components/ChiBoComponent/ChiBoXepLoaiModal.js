@@ -26,7 +26,7 @@ const ChiBoXepLoaiModal = ({
           <Row className="mb-3">
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Năm</Form.Label>
+                <Form.Label>Năm <span className="text-danger">*</span></Form.Label>
                 <Form.Control
                   type="text"
                   name="nam"
@@ -42,7 +42,7 @@ const ChiBoXepLoaiModal = ({
             </Col>
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Hình thức xếp loại</Form.Label>
+                <Form.Label>Hình thức xếp loại <span className="text-danger">*</span></Form.Label>
                 <Form.Select
                   name="xeploai"
                   value={xepLoaiForm.xeploai}

@@ -7,7 +7,7 @@ const ChiBoForm = ({ formData, validationErrors, handleInputChange }) => {
       <Row className="mb-3">
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Tên chi bộ</Form.Label>
+            <Form.Label>Tên chi bộ <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="text"
               name="tenchibo"
@@ -22,7 +22,7 @@ const ChiBoForm = ({ formData, validationErrors, handleInputChange }) => {
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Tên Đảng ủy cấp trên</Form.Label>
+            <Form.Label>Tên Đảng ủy cấp trên <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="text"
               name="danguycaptren"
@@ -39,7 +39,7 @@ const ChiBoForm = ({ formData, validationErrors, handleInputChange }) => {
       <Row className="mb-3">
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Họ và tên bí thư</Form.Label>
+            <Form.Label>Họ và tên bí thư <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="text"
               name="bithu"
@@ -86,7 +86,7 @@ const ChiBoForm = ({ formData, validationErrors, handleInputChange }) => {
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Ngày thành lập chi bộ</Form.Label>
+            <Form.Label>Ngày thành lập chi bộ <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="date"
               name="ngaythanhlap"
@@ -101,7 +101,7 @@ const ChiBoForm = ({ formData, validationErrors, handleInputChange }) => {
         </Col>
       </Row>
       <Form.Group className="mb-3">
-        <Form.Label>Trạng thái hoạt động của chi bộ</Form.Label>
+        <Form.Label>Trạng thái hoạt động của chi bộ <span className="text-danger">*</span></Form.Label>
         <Form.Select
           name="trangthai"
           value={formData.trangthai}

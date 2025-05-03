@@ -446,7 +446,7 @@ const handleDownloadFile = async (filename) => {
         {(showAddForm || showEditForm) && (
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Loại quyết định *</Form.Label>
+              <Form.Label>Loại quyết định <span className="text-danger">*</span></Form.Label>
               <Form.Control
                 type="text"
                 name="loaiquyetdinh"
@@ -461,7 +461,7 @@ const handleDownloadFile = async (filename) => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Tên quyết định *</Form.Label>
+              <Form.Label>Tên quyết định <span className="text-danger">*</span></Form.Label>
               <Form.Control
                 type="text"
                 name="tenquyetdinh"
@@ -476,7 +476,7 @@ const handleDownloadFile = async (filename) => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Năm *</Form.Label>
+              <Form.Label>Năm <span className="text-danger">*</span></Form.Label>
               <Form.Control
                 type="text"
                 name="nam"

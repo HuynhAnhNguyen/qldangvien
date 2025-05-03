@@ -11,7 +11,7 @@ const DangVienEditForm = ({
       <Row className="mb-3">
         <Col md={4}>
           <Form.Group>
-            <Form.Label>Họ và tên Đảng viên</Form.Label>
+            <Form.Label>Họ và tên Đảng viên <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="text"
               name="hoten"
@@ -26,7 +26,7 @@ const DangVienEditForm = ({
         </Col>
         <Col md={4}>
           <Form.Group>
-            <Form.Label>Ngày sinh</Form.Label>
+            <Form.Label>Ngày sinh <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="date"
               name="ngaysinh"
@@ -41,7 +41,7 @@ const DangVienEditForm = ({
         </Col>
         <Col md={4}>
           <Form.Group>
-            <Form.Label>Giới tính</Form.Label>
+            <Form.Label>Giới tính <span className="text-danger">*</span></Form.Label>
             <Form.Select
               name="gioitinh"
               value={formData.gioitinh}
@@ -123,7 +123,7 @@ const DangVienEditForm = ({
         </Col>
         <Col md={4}>
           <Form.Group>
-            <Form.Label>Ngày vào Đảng</Form.Label>
+            <Form.Label>Ngày vào Đảng <span className="text-danger">*</span></Form.Label>
             <Form.Control
               type="date"
               name="ngayvaodang"
@@ -286,7 +286,7 @@ const DangVienEditForm = ({
         </Col>
         <Col md={4}>
           <Form.Group>
-            <Form.Label>Trạng thái Đảng viên</Form.Label>
+            <Form.Label>Trạng thái Đảng viên <span className="text-danger">*</span></Form.Label>
             <Form.Select
               name="trangthaidangvien"
               value={formData.trangthaidangvien}
