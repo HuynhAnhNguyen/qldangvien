@@ -12,6 +12,7 @@ import QuanLyKyDangPhi from "./pages/QuanLyKyDangPhi";
 import QuanLyDangPhi from "./pages/QuanLyDangPhi";
 import SaoLuuKhoiPhuc from "./pages/SaoLuuKhoiPhuc";
 import QuanLyPheDuyet from "./pages/QuanLyPheDuyet";
+import QuanLySinhHoatDang from "./pages/QuanLySinhHoatDang";
 
 
 
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="/quan-ly-dang-phi" element={<QuanLyDangPhi />} />
           <Route path="/sao-luu-khoi-phuc" element={<SaoLuuKhoiPhuc />} />
           <Route path="/quan-ly-phe-duyet" element={<QuanLyPheDuyet />} />
+          <Route path="/quan-ly-sinh-hoat" element={<QuanLySinhHoatDang />} />
         </Routes>
     </Router>
   );
