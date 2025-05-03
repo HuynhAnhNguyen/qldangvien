@@ -1,133 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Modal, Row, Col, Badge } from "react-bootstrap";
 import Swal from "sweetalert2";
-import axios from "axios";
-import { fetchDangVien, fetchHoSoByDangVienId } from "../services/apiService";
-
-// API Service Functions
-const apiService = {
-  // Lấy danh sách Đảng viên
-//   fetchDangVien: async (token) => {
-//     try {
-//       const response = await axios.get(
-//         "http://3.104.77.30:8080/api/v1/project/dangvien",
-//         {
-//           headers: { Authorization: `${token}` },
-//         }
-//       );
-//       return response.data;
-//     } catch (error) {
-//       throw new Error(
-//         error.response?.data?.message || "Không thể tải danh sách Đảng viên"
-//       );
-//     }
-//   },
-
-  // Lấy danh sách hồ sơ theo Đảng viên
-//   fetchHoSoByDangVienId: async (token, dangvienId) => {
-//     try {
-//       const response = await axios.get(
-//         `http://3.104.77.30:8080/api/v1/project/hoso/findByDangVienId?dangvienId=${dangvienId}`,
-//         {
-//           headers: { Authorization: `${token}` },
-//         }
-//       );
-//       return response.data;
-//     } catch (error) {
-//       throw new Error(
-//         error.response?.data?.message || "Không thể tải danh sách hồ sơ"
-//       );
-//     }
-//   },
-
-  // Lấy danh sách tin tức
-//   fetchTinTuc: async (token) => {
-//     try {
-//       const response = await axios.get(
-//         "http://3.104.77.30:8080/api/v1/project/tintuc",
-//         {
-//           headers: { Authorization: `${token}` },
-//         }
-//       );
-//       return response.data;
-//     } catch (error) {
-//       throw new Error(
-//         error.response?.data?.message || "Không thể tải danh sách tin tức"
-//       );
-//     }
-//   },
-
-  // Lấy danh sách phê duyệt theo username
-  fetchPheDuyetByUsername: async (token, username) => {
-    try {
-      const response = await axios.get(
-        `http://3.104.77.30:8080/api/v1/project/pheduyet/findByUsername?username=${username}`,
-        {
-          headers: { Authorization: `${token}` },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Không thể tải danh sách phê duyệt"
-      );
-    }
-  },
-
-  // Gửi yêu cầu phê duyệt
-  createPheDuyet: async (token, pheDuyetData) => {
-    try {
-      const response = await axios.post(
-        "http://3.104.77.30:8080/api/v1/project/pheduyet/create",
-        pheDuyetData,
-        {
-          headers: { Authorization: `${token}` },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Gửi yêu cầu phê duyệt thất bại"
-      );
-    }
-  },
-
-  // Phê duyệt yêu cầu
-  approvePheDuyet: async (token, pheduyetId) => {
-    try {
-      const response = await axios.post(
-        `http://3.104.77.30:8080/api/v1/project/pheduyet/approval?pheduyetId=${pheduyetId}`,
-        {},
-        {
-          headers: { Authorization: `${token}` },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Phê duyệt thất bại"
-      );
-    }
-  },
-
-  // Từ chối yêu cầu
-  rejectPheDuyet: async (token, pheduyetId) => {
-    try {
-      const response = await axios.post(
-        `http://3.104.77.30:8080/api/v1/project/pheduyet/reject?pheduyetId=${pheduyetId}`,
-        {},
-        {
-          headers: { Authorization: `${token}` },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Từ chối phê duyệt thất bại"
-      );
-    }
-  },
-};
+import { approvePheDuyet, createPheDuyet, fetchDangVien, fetchHoSoByDangVienId, fetchPheDuyetByUsername, fetchTinTuc, rejectPheDuyet } from "../services/apiService";
 
 const PheDuyet = () => {
   const [dangVienList, setDangVienList] = useState([]);
@@ -152,9 +26,6 @@ const PheDuyet = () => {
     ghichu: "",
   });
 
-  // Lấy token và username từ cookies
-//   const token = Cookies.get("token");
-//   const username = Cookies.get("username");
 const token = localStorage.getItem("token");
 const username = localStorage.getItem("fullname");
 
@@ -175,25 +46,25 @@ const username = localStorage.getItem("fullname");
   };
 
   // Lấy danh sách tin tức
-//   const loadTinTuc = async () => {
-//     try {
-//       const data = await getAll
-//       if (data.resultCode === 0) {
-//         setTinTucList(Array.isArray(data.data) ? data.data : []);
-//       } else {
-//         throw new Error(data.message);
-//       }
-//     } catch (err) {
-//       setError("Không thể tải danh sách tin tức");
-//       console.error("Error loading tinTuc:", err);
-//     }
-//   };
+  const loadTinTuc = async () => {
+    try {
+      const data = await fetchTinTuc(token);
+      if (data.resultCode === 0) {
+        setTinTucList(Array.isArray(data.data) ? data.data : []);
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (err) {
+      setError("Không thể tải danh sách tin tức");
+      console.error("Error loading tinTuc:", err);
+    }
+  };
 
   // Lấy danh sách phê duyệt
   const loadPheDuyet = async () => {
     setLoading(true);
-    try {
-      const data = await apiService.fetchPheDuyetByUsername(token, username);
+    try { 
+      const data = await fetchPheDuyetByUsername(token, username);
       if (data.resultCode === 0) {
         setPheDuyetList(Array.isArray(data.data) ? data.data : []);
         setError(null);
@@ -215,8 +86,7 @@ const username = localStorage.getItem("fullname");
       return;
     }
     try {
-      const response = await fetchHoSoByDangVienId(token, dangvienId);
-      const data = await response.json();
+      const data = await fetchHoSoByDangVienId(token, dangvienId);
       if (data.resultCode === 0) {
         setHoSoList(Array.isArray(data.data) ? data.data : []);
       } else {
@@ -262,7 +132,7 @@ const username = localStorage.getItem("fullname");
         }),
       };
 
-      const data = await apiService.createPheDuyet(token, pheDuyetData);
+      const data = await createPheDuyet(token, pheDuyetData);
       if (data.resultCode === 0) {
         setPheDuyetList([data.data, ...pheDuyetList]);
         setShowAddModal(false);
@@ -302,7 +172,7 @@ const username = localStorage.getItem("fullname");
     if (result.isConfirmed) {
       try {
         setLoading(true);
-        const data = await apiService.approvePheDuyet(token, pheduyetId);
+        const data = await approvePheDuyet(token, pheduyetId);
         if (data.resultCode === 0) {
           setPheDuyetList(
             pheDuyetList.map((item) =>
@@ -338,7 +208,7 @@ const username = localStorage.getItem("fullname");
     if (result.isConfirmed) {
       try {
         setLoading(true);
-        const data = await apiService.rejectPheDuyet(token, pheduyetId);
+        const data = await rejectPheDuyet(token, pheduyetId);
         if (data.resultCode === 0) {
           setPheDuyetList(
             pheDuyetList.map((item) =>
@@ -428,7 +298,7 @@ const username = localStorage.getItem("fullname");
   // Load dữ liệu khi component mount
   useEffect(() => {
     loadDangVien();
-    // loadTinTuc();
+    loadTinTuc();
     loadPheDuyet();
   }, []);
 

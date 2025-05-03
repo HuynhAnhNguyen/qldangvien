@@ -390,66 +390,9 @@
 // export default DangPhi;
 
 import React, { useState, useEffect } from "react";
-import { Form, Button, Badge, Row, Col } from "react-bootstrap";
+import { Form, Button, Badge } from "react-bootstrap";
 import Swal from "sweetalert2";
-import axios from "axios";
 import { fetchDangVien, fetchKyDangPhi } from "../services/apiService";
-
-// API Service Functions
-const apiService = {
-  
-  // Lấy trạng thái Đảng phí theo kỳ
-  fetchTrangThaiDangPhiByKy: async (token, kydangphiId) => {
-    try {
-      const response = await axios.get(
-        `http://3.104.77.30:8080/api/v1/project/trangthaidangphi/findByKydangphiId?kydangphiId=${kydangphiId}`,
-        {
-          headers: { Authorization: `${token}` },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Không thể tải trạng thái Đảng phí"
-      );
-    }
-  },
-
-  // Lấy trạng thái Đảng phí theo Đảng viên
-  fetchTrangThaiDangPhiByDangVien: async (token, dangvienId) => {
-    try {
-      const response = await axios.get(
-        `http://3.104.77.30:8080/api/v1/project/trangthaidangphi/findByDangvienId?dangvienId=${dangvienId}`,
-        {
-          headers: { Authorization: `${token}` },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Không thể tải trạng thái Đảng phí"
-      );
-    }
-  },
-
-  // Xác nhận đóng Đảng phí
-  confirmDangPhi: async (token, kydangphiId, dangvienId) => {
-    try {
-      const response = await axios.post(
-        `http://3.104.77.30:8080/api/v1/project/trangthaidangphi/confirm?kydangphiId=${kydangphiId}&dangvienId=${dangvienId}`,
-        {},
-        {
-          headers: { Authorization: `${token}` },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.message || "Xác nhận Đảng phí thất bại"
-      );
-    }
-  },
-};
 
 const DangPhi = () => {
   const [kyDangPhiList, setKyDangPhiList] = useState([]);
