@@ -669,3 +669,127 @@ export const confirmDangPhi = async (token, kydangphiId, dangvienId) => {
   );
   return response.data;
 };
+
+// Fetch all accounts
+export const fetchAllAccounts = async (token) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/account/findAll`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
+
+// Fetch all roles
+export const fetchAllRoles = async (token) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/account/findAllRole`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
+
+// Activate account
+export const activateAccount = async (token, username) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/account/activeAccount?username=${username}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
+
+// Deactivate account
+export const deactivateAccount = async (token, username) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/account/deactiveAccount?username=${username}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
+
+// Create new account
+export const createAccount = async (token, formData) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/account/create?roleName=${formData.roleName}`,
+    {
+      userName: formData.userName,
+      passWord: formData.passWord,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      fullname: formData.fullname
+    },
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
+
+// Change password
+export const changePassword = async (token, username, passwordData ) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/account/changePw`,
+    {
+      username: username,
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword,
+    },
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
+
+// Change role
+export const changeRole = async (token, username, roleName) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/account/changeRole?username=${username}&role=${roleName}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
+
+// Delete account
+export const deleteAccount = async (token, username) => {
+  const response = await axios.delete(
+    `${REACT_APP_API_URL}/account/delete?username=${username}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};

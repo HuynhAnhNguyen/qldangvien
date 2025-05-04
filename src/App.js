@@ -4,7 +4,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NewPage from "./pages/NewPage";
 import QuanLyTinTuc from "./pages/QuanLyTinTuc";
-import MemberManagementPage from "./pages/MemberManagementPage";
 import QuanLyChiBo from "./pages/QuanLyChiBo";
 import QuanLyDangVien from "./pages/QuanLyDangVien";
 import QuanLyHoSo from "./pages/QuanLyHoSo";

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import Swal from "sweetalert2";
+import { activateAccount, changePassword, changeRole, createAccount, deactivateAccount, deleteAccount, fetchAllAccounts, fetchAllRoles } from "../services/apiService";
 
 const TaiKhoan = () => {
   const [accounts, setAccounts] = useState([]);
@@ -34,7 +35,7 @@ const TaiKhoan = () => {
   });
 
   const [changeRoleData, setChangeRoleData] = useState({
-    roleId: "",
+    roleName: "",
   });
 
   const token = localStorage.getItem("token");
@@ -57,9 +58,9 @@ const TaiKhoan = () => {
     if (!formData.fullname.trim()) {
       errors.fullname = "Họ và tên là bắt buộc";
     }
-    // if (!formData.roleName) {
-    //   errors.roleName = "Vai trò là bắt buộc";
-    // }
+    if (!formData.roleName) {
+      errors.roleName = "Vai trò là bắt buộc";
+    }
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -69,10 +70,7 @@ const TaiKhoan = () => {
   const loadAccounts = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://3.104.77.30:8080/api/v1/project/account/findAll", {
-        headers: { Authorization: `${token}` },
-      });
-      const data = await response.json();
+      const data= await fetchAllAccounts(token);
       if (data.resultCode === 0) {
         setAccounts(Array.isArray(data.data) ? data.data : []);
         setError(null);
@@ -91,10 +89,7 @@ const TaiKhoan = () => {
   // Fetch roles
   const loadRoles = async () => {
     try {
-      const response = await fetch("http://3.104.77.30:8080/api/v1/project/account/findAllRole", {
-        headers: { Authorization: `${token}` },
-      });
-      const data = await response.json();
+      const data= await fetchAllRoles(token);
       if (data.resultCode === 0) {
         setRoles(Array.isArray(data.data) ? data.data : []);
       } else {
@@ -122,11 +117,7 @@ const TaiKhoan = () => {
     if (result.isConfirmed) {
       try {
         setLoading(true);
-        const response = await fetch(
-          `http://3.104.77.30:8080/api/v1/project/account/activeAccount?username=${username}`,
-          { headers: { Authorization: `${token}` } }
-        );
-        const data = await response.json();
+        const data= await activateAccount(token, username);
         if (data.resultCode === 0) {
           setAccounts(
             accounts.map((item) =>
@@ -161,18 +152,18 @@ const TaiKhoan = () => {
     if (result.isConfirmed) {
       try {
         setLoading(true);
-        const response = await fetch(
-          `http://3.104.77.30:8080/api/v1/project/account/deactiveAccount?username=${username}`,
-          { headers: { Authorization: `${token}` } }
-        );
-        const data = await response.json();
+        const data= await deactivateAccount(token, username);
         if (data.resultCode === 0) {
           setAccounts(
             accounts.map((item) =>
               item.username === username ? data.data : item
             )
           );
-          Swal.fire("Thành công!", "Vô hiệu hóa tài khoản thành công", "success");
+          Swal.fire(
+            "Thành công!",
+            "Vô hiệu hóa tài khoản thành công",
+            "success"
+          );
         } else {
           throw new Error(data.message || "Vô hiệu hóa tài khoản thất bại");
         }
@@ -193,15 +184,7 @@ const TaiKhoan = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://3.104.77.30:8080/api/v1/project/account/create", {
-        method: "POST",
-        headers: {
-          Authorization: `${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...formData, roleName: formData.roleName }),
-      });
-      const data = await response.json();
+      const data= await createAccount(token, formData);
       if (data.resultCode === 0) {
         setAccounts([...accounts, data.data]);
         setShowAddModal(false);
@@ -227,18 +210,7 @@ const TaiKhoan = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://3.104.77.30:8080/api/v1/project/account/changePw", {
-        method: "POST",
-        headers: {
-          Authorization: `${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: selectedAccount.username,
-          ...changePwData,
-        }),
-      });
-      const data = await response.json();
+      const data= await changePassword(token, selectedAccount.username, changePwData)
       if (data.resultCode === 0) {
         setShowChangePwModal(false);
         Swal.fire("Thành công!", "Đổi mật khẩu thành công", "success");
@@ -254,19 +226,25 @@ const TaiKhoan = () => {
 
   // Change role
   const handleChangeRole = async () => {
-    if (!changeRoleData.roleId) {
+    if (!changeRoleData.roleName) {
       Swal.fire("Lỗi!", "Vui lòng chọn vai trò", "error");
       return;
     }
 
     try {
       setLoading(true);
-      const response = await fetch(
-        `http://3.104.77.30:8080/api/v1/project/account/changeRole?username=${selectedAccount.username}&role=${changeRoleData.roleId}`,
-        { headers: { Authorization: `${token}` } }
-      );
-      const data = await response.json();
+      const data= await changeRole(token, selectedAccount.username, changeRoleData.roleName)
       if (data.resultCode === 0) {
+        // Cập nhật lại danh sách accounts với role mới
+        setAccounts(
+          accounts.map((item) =>
+            item.username === selectedAccount.username
+              ? { ...item, roleName: changeRoleData.roleName }
+              : item
+          )
+        );
+
+        await loadAccounts();
         setShowChangeRoleModal(false);
         Swal.fire("Thành công!", "Thay đổi vai trò thành công", "success");
       } else {
@@ -276,6 +254,37 @@ const TaiKhoan = () => {
       Swal.fire("Lỗi!", "Thay đổi vai trò thất bại", "error");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Delete account
+  const handleDeleteAccount = async (username) => {
+    const result = await Swal.fire({
+      title: "Xác nhận xóa?",
+      text: `Bạn có chắc chắn muốn xóa tài khoản ${username}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        setLoading(true);
+        const data= await deleteAccount(token, username);
+        if (data.resultCode === 0) {
+          setAccounts(accounts.filter((item) => item.username !== username));
+          Swal.fire("Thành công!", "Xóa tài khoản thành công", "success");
+        } else {
+          throw new Error(data.message || "Xóa tài khoản thất bại");
+        }
+      } catch (err) {
+        Swal.fire("Lỗi!", "Xóa tài khoản thất bại", "error");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -333,7 +342,7 @@ const TaiKhoan = () => {
   // Open change role modal
   const openChangeRoleModal = (account) => {
     setSelectedAccount(account);
-    setChangeRoleData({ roleId: "" });
+    setChangeRoleData({ roleName: account.roleName || "" });
     setShowChangeRoleModal(true);
   };
 
@@ -341,9 +350,11 @@ const TaiKhoan = () => {
   const renderAddForm = () => (
     <Form>
       <Row className="mb-3">
-      <Col md={6}>
+        <Col md={6}>
           <Form.Group>
-            <Form.Label>Họ và tên <span className="text-danger">*</span></Form.Label>
+            <Form.Label>
+              Họ và tên <span className="text-danger">*</span>
+            </Form.Label>
             <Form.Control
               type="text"
               name="fullname"
@@ -358,7 +369,9 @@ const TaiKhoan = () => {
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Username <span className="text-danger">*</span></Form.Label>
+            <Form.Label>
+              Username <span className="text-danger">*</span>
+            </Form.Label>
             <Form.Control
               type="text"
               name="userName"
@@ -375,7 +388,9 @@ const TaiKhoan = () => {
       <Row className="mb-3">
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Email <span className="text-danger">*</span></Form.Label>
+            <Form.Label>
+              Email <span className="text-danger">*</span>
+            </Form.Label>
             <Form.Control
               type="email"
               name="email"
@@ -390,7 +405,9 @@ const TaiKhoan = () => {
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Mật khẩu <span className="text-danger">*</span></Form.Label>
+            <Form.Label>
+              Mật khẩu <span className="text-danger">*</span>
+            </Form.Label>
             <Form.Control
               type="password"
               name="passWord"
@@ -418,7 +435,9 @@ const TaiKhoan = () => {
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Vai trò <span className="text-danger">*</span></Form.Label>
+            <Form.Label>
+              Vai trò <span className="text-danger">*</span>
+            </Form.Label>
             <Form.Select
               name="roleName"
               value={formData.roleName}
@@ -428,7 +447,7 @@ const TaiKhoan = () => {
               <option value="">Chọn vai trò</option>
               {roles.map((role) => (
                 <option key={role.id} value={role.name}>
-                  {role.id}{" - "}{role.name}
+                  {role.id} - {role.name}
                 </option>
               ))}
             </Form.Select>
@@ -447,7 +466,10 @@ const TaiKhoan = () => {
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
           <h1 className="h3 mb-3 mb-md-0">Danh sách tài khoản</h1>
           <div className="d-flex gap-2 align-items-center">
-            <div className="d-flex" style={{ width: "100%", maxWidth: "450px" }}>
+            <div
+              className="d-flex"
+              style={{ width: "100%", maxWidth: "450px" }}
+            >
               <input
                 type="text"
                 className="form-control custom-sm-input"
@@ -549,6 +571,14 @@ const TaiKhoan = () => {
                           >
                             <i className="fas fa-user-tag"></i>
                           </button>
+
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDeleteAccount(item.username)}
+                            title="Xóa tài khoản"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -560,35 +590,49 @@ const TaiKhoan = () => {
               <div className="mt-auto p-3 bg-light border-top">
                 <nav aria-label="Page navigation">
                   <ul className="pagination justify-content-center mb-0">
-                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                    <li
+                      className={`page-item ${
+                        currentPage === 1 ? "disabled" : ""
+                      }`}
+                    >
                       <button
                         className="page-link"
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
                         disabled={currentPage === 1}
                       >
                         « Trước
                       </button>
                     </li>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <li
-                        key={page}
-                        className={`page-item ${page === currentPage ? "active" : ""}`}
-                      >
-                        <button
-                          className="page-link"
-                          onClick={() => setCurrentPage(page)}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <li
+                          key={page}
+                          className={`page-item ${
+                            page === currentPage ? "active" : ""
+                          }`}
                         >
-                          {page}
-                        </button>
-                      </li>
-                    ))}
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      )
+                    )}
                     <li
-                      className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
+                      className={`page-item ${
+                        currentPage === totalPages ? "disabled" : ""
+                      }`}
                     >
                       <button
                         className="page-link"
                         onClick={() =>
-                          setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
                         }
                         disabled={currentPage === totalPages}
                       >
@@ -604,7 +648,11 @@ const TaiKhoan = () => {
       </div>
 
       {/* Add Modal */}
-      <Modal show={showAddModal} onHide={() => setShowAddModal(false)} size="lg">
+      <Modal
+        show={showAddModal}
+        onHide={() => setShowAddModal(false)}
+        size="lg"
+      >
         <Modal.Header closeButton>
           <Modal.Title>Thêm tài khoản</Modal.Title>
         </Modal.Header>
@@ -613,67 +661,108 @@ const TaiKhoan = () => {
           <Button variant="secondary" onClick={() => setShowAddModal(false)}>
             Hủy
           </Button>
-          <Button variant="primary" onClick={handleAddAccount} disabled={loading}>
+          <Button
+            variant="primary"
+            onClick={handleAddAccount}
+            disabled={loading}
+          >
             {loading ? "Đang xử lý..." : "Thêm mới"}
           </Button>
         </Modal.Footer>
       </Modal>
 
       {/* Change Password Modal */}
-      <Modal show={showChangePwModal} onHide={() => setShowChangePwModal(false)}>
+      <Modal
+        show={showChangePwModal}
+        onHide={() => setShowChangePwModal(false)}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Đổi mật khẩu</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Mật khẩu hiện tại <span className="text-danger">*</span></Form.Label>
+              <Form.Label>
+                Mật khẩu hiện tại <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Control
                 type="password"
                 value={changePwData.currentPassword}
                 onChange={(e) =>
-                  setChangePwData({ ...changePwData, currentPassword: e.target.value })
+                  setChangePwData({
+                    ...changePwData,
+                    currentPassword: e.target.value,
+                  })
                 }
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Mật khẩu mới <span className="text-danger">*</span></Form.Label>
+              <Form.Label>
+                Mật khẩu mới <span className="text-danger">*</span>
+              </Form.Label>
               <Form.Control
                 type="password"
                 value={changePwData.newPassword}
                 onChange={(e) =>
-                  setChangePwData({ ...changePwData, newPassword: e.target.value })
+                  setChangePwData({
+                    ...changePwData,
+                    newPassword: e.target.value,
+                  })
                 }
               />
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowChangePwModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowChangePwModal(false)}
+          >
             Hủy
           </Button>
-          <Button variant="primary" onClick={handleChangePassword} disabled={loading}>
+          <Button
+            variant="primary"
+            onClick={handleChangePassword}
+            disabled={loading}
+          >
             {loading ? "Đang xử lý..." : "Đổi mật khẩu"}
           </Button>
         </Modal.Footer>
       </Modal>
 
       {/* Change Role Modal */}
-      <Modal show={showChangeRoleModal} onHide={() => setShowChangeRoleModal(false)}>
+      <Modal
+        show={showChangeRoleModal}
+        onHide={() => setShowChangeRoleModal(false)}
+      >
         <Modal.Header closeButton>
-          <Modal.Title>Thay đổi vai trò</Modal.Title>
+          <Modal.Title>
+            Thay đổi vai trò cho {selectedAccount?.username}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group>
-              <Form.Label>Vai trò <span className="text-danger">*</span></Form.Label>
+              <Form.Label>Vai trò hiện tại</Form.Label>
+              <Form.Control
+                type="text"
+                value={selectedAccount?.roleName || "Chưa có"}
+                disabled
+              />
+            </Form.Group>
+            <Form.Group className="mt-3">
+              <Form.Label>
+                Vai trò mới<span className="text-danger">*</span>
+              </Form.Label>
               <Form.Select
-                value={changeRoleData.roleId}
-                onChange={(e) => setChangeRoleData({ roleId: e.target.value })}
+                value={changeRoleData.roleName}
+                onChange={(e) =>
+                  setChangeRoleData({ roleName: e.target.value })
+                }
               >
                 <option value="">Chọn vai trò</option>
                 {roles.map((role) => (
-                  <option key={role.id} value={role.id}>
+                  <option key={role.id} value={role.roleName}>
                     {role.name}
                   </option>
                 ))}
@@ -682,10 +771,17 @@ const TaiKhoan = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowChangeRoleModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowChangeRoleModal(false)}
+          >
             Hủy
           </Button>
-          <Button variant="primary" onClick={handleChangeRole} disabled={loading}>
+          <Button
+            variant="primary"
+            onClick={handleChangeRole}
+            disabled={loading}
+          >
             {loading ? "Đang xử lý..." : "Thay đổi"}
           </Button>
         </Modal.Footer>
