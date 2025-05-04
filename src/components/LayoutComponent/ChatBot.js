@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { sendChatMessage } from "../services/apiService";
+import { sendChatMessage } from "../../services/apiService";
 
 const ChatBot = () => {
   const [chatbotOpen, setChatbotOpen] = useState(false);
@@ -29,7 +29,7 @@ const ChatBot = () => {
       if (!token) {
         throw new Error("Token không tồn tại, vui lòng đăng nhập lại.");
       }
-      const data = await sendChatMessage(token, message); // Gọi API đã tách
+      const data = await sendChatMessage(token, message);
       //   console.log(token);
       //   console.log(message);
       //   console.log(data);

@@ -1,5 +1,5 @@
 import React from "react";
-import ChatBot from "./ChatBot";
+import ChatBot from "../components/LayoutComponent/ChatBot";
 
 const News = () => {
 

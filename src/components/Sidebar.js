@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -23,11 +24,39 @@ const Sidebar = () => {
     }
   }, [navigate, location]);
 
+  // const handleLogout = () => {
+  //   // Xóa tất cả dữ liệu trong localStorage
+  //   localStorage.clear();
+  //   // Chuyển hướng về trang đăng nhập
+  //   navigate("/dang-nhap");
+  // };
   const handleLogout = () => {
-    // Xóa tất cả dữ liệu trong localStorage
-    localStorage.clear();
-    // Chuyển hướng về trang đăng nhập
-    navigate("/dang-nhap");
+    Swal.fire({
+      title: 'Xác nhận đăng xuất',
+      text: 'Bạn có chắc chắn muốn đăng xuất?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Đăng xuất',
+      cancelButtonText: 'Hủy'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Xóa tất cả dữ liệu trong localStorage
+        localStorage.clear();
+        // Hiển thị thông báo đăng xuất thành công
+        Swal.fire({
+          title: 'Đã đăng xuất',
+          text: 'Bạn đã đăng xuất thành công',
+          icon: 'success',
+          timer: 1500, // Tự động đóng sau 1.5 giây
+          showConfirmButton: false
+        }).then(() => {
+          // Chuyển hướng về trang đăng nhập sau khi hiển thị thông báo
+          navigate("/dang-nhap");
+        });
+      }
+    });
   };
 
   // Hàm kiểm tra active menu
