@@ -184,6 +184,21 @@ export const fetchChiBoDangHoatDong = async (token) => {
 };
 
 // Lấy danh sách Đảng viên
+// export const fetchDangVien = async (token, searchType, selectedChiBoId) => {
+//   let url = `${REACT_APP_API_URL}/dangvien/findAll`;
+//   if (searchType === "approved") {
+//     url = `${REACT_APP_API_URL}/dangvien/findApproved`;
+//   } else if (searchType === "chibo" && selectedChiBoId) {
+//     url = `${REACT_APP_API_URL}/dangvien/findByChiBoId?chiboId=${selectedChiBoId}`;
+//   }
+
+//   const response = await fetch(url, { headers: {
+//     Authorization: `${token}`,
+//     'Content-Type': 'application/json'
+//   } });
+  
+//   return await response;
+// };
 export const fetchDangVien = async (token, searchType, selectedChiBoId) => {
   let url = `${REACT_APP_API_URL}/dangvien/findAll`;
   if (searchType === "approved") {
@@ -197,6 +212,19 @@ export const fetchDangVien = async (token, searchType, selectedChiBoId) => {
     'Content-Type': 'application/json'
   } });
   
+  if (!response.ok) {
+    const errorData = await response.json();
+    
+    // Nếu lỗi 401 (Unauthorized) thì xóa token và chuyển hướng
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      window.location.href = '/dang-nhap';
+    }
+    
+    throw new Error(errorData.message || 'Lỗi khi tải danh sách Đảng viên');
+  }
+
   return await response;
 };
 

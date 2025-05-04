@@ -5,6 +5,7 @@ const DangVienEditForm = ({
   formData,
   validationErrors,
   handleInputChange,
+  userRole,
 }) => {
   return (
     <Form>
@@ -17,6 +18,7 @@ const DangVienEditForm = ({
               name="hoten"
               value={formData.hoten}
               onChange={handleInputChange}
+              disabled={userRole !== 'ROLE_ADMIN'}
               isInvalid={!!validationErrors.hoten}
             />
             <Form.Control.Feedback type="invalid">

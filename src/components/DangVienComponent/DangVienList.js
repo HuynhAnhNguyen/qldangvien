@@ -49,7 +49,57 @@ const DangVienList = () => {
     noicapthe: "",
   });
 
+  const [userRole, setUserRole] = useState(localStorage.getItem('role'));
+
   const [showQuyetDinhModal, setShowQuyetDinhModal] = useState(false);
+
+   // Kiểm tra quyền trước khi thực hiện các hành động
+   const checkPermission = (requiredRole = 'ROLE_ADMIN') => {
+    return userRole === requiredRole;
+  };
+
+  // Thêm điều kiện vào các nút chức năng
+  const renderActionButtons = (dangVienItem) => {
+    return (
+      <div className="d-flex gap-2">
+        <button 
+          className="btn btn-primary btn-sm" 
+          onClick={() => openDetailModal(dangVienItem)}
+        >
+          <i className="fas fa-eye"></i>
+        </button>
+        
+        {checkPermission() && (
+          <>
+            <button 
+              className="btn btn-warning btn-sm" 
+              onClick={() => openEditModal(dangVienItem)}
+            >
+              <i className="fas fa-edit"></i>
+            </button>
+            <button 
+              className="btn btn-info btn-sm" 
+              onClick={() => openTheDangModal(dangVienItem)}
+            >
+              <i className="fas fa-id-card"></i>
+            </button>
+            <button 
+              className="btn btn-secondary btn-sm" 
+              onClick={() => openQuyetDinhModal(dangVienItem)}
+            >
+              <i className="fas fa-file-alt"></i>
+            </button>
+            <button 
+              className="btn btn-success btn-sm" 
+              onClick={() => handleExportExcel(dangVienItem)}
+            >
+              <i className="fas fa-file-excel"></i>
+            </button>
+          </>
+        )}
+      </div>
+    );
+  };
 
   // Thêm hàm này trong component
 const handleExportExcel = (dangVien) => {
@@ -543,12 +593,20 @@ const handleExportExcel = (dangVien) => {
                 <i className="fas fa-search"></i>
               </button>
             </div>
-            <button
+            {/* <button
               className="btn btn-success custom-sm-btn-dangvien"
               onClick={openAddModal}
             >
               <i className="fas fa-plus me-2"></i>Thêm mới
-            </button>
+            </button> */}
+            {checkPermission() && (
+          <button
+            className="btn btn-success custom-sm-btn-dangvien"
+            onClick={openAddModal}
+          >
+            <i className="fas fa-plus me-2"></i>Thêm mới
+          </button>
+        )}
           </div>
         </div>
 
