@@ -793,3 +793,35 @@ export const deleteAccount = async (token, username) => {
   );
   return response.data;
 };
+
+export const backupDatabase = async (token) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/database/backup`,
+    {},
+    {
+      headers: {
+        Authorization: `${token}`,
+      },
+      responseType: "blob",
+    }
+  );
+  return response;
+};
+
+export const restoreDatabase = async (token, file) => {
+  // const formData = new FormData();
+  // formData.append("file", file);
+
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/database/restore`,
+    file,
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  console.log(response);
+  return response;
+};

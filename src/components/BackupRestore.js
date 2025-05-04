@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, Col, Row } from "react-bootstrap";
 import Swal from "sweetalert2";
-import axios from "axios";
+import { backupDatabase, restoreDatabase } from "../services/apiService";
 
 const BackupRestore = () => {
   const [showRestoreModal, setShowRestoreModal] = useState(false);
@@ -28,17 +28,7 @@ const token = localStorage.getItem("token");
     if (result.isConfirmed) {
       try {
         setLoading(true);
-        const response = await axios.post(
-          "http://3.104.77.30:8080/api/v1/project/database/backup",
-          {},
-          {
-            headers: {
-              Authorization: `${token}`,
-            },
-            responseType: "blob", // Nhận file dưới dạng blob
-          }
-        );
-
+        const response= await backupDatabase(token);
         // Tạo URL để tải file
         const contentDisposition = response.headers["content-disposition"];
         const fileName = contentDisposition
@@ -117,24 +107,16 @@ const token = localStorage.getItem("token");
       const formData = new FormData();
       formData.append("file", selectedFile);
 
-      const response = await axios.post(
-        "http://3.104.77.30:8080/api/v1/project/database/restore",
-        formData,
-        {
-          headers: {
-            Authorization: `${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response= await restoreDatabase(token, formData);
+      Swal.fire("Thành công!", response.data.message, "success");
 
-      if (response.data.resultCode === 0) {
-        setShowRestoreModal(false);
-        setSelectedFile(null);
-        Swal.fire("Thành công!", "Khôi phục dữ liệu thành công!", "success");
-      } else {
-        throw new Error(response.data.message || "Khôi phục dữ liệu thất bại");
-      }
+      // if (response.data.status === 200) {
+      //   setShowRestoreModal(false);
+      //   setSelectedFile(null);
+      //   Swal.fire("Thành công!", "Khôi phục dữ liệu thành công!", "success");
+      // } else {
+      //   throw new Error(response.data.message || "Khôi phục dữ liệu thất bại");
+      // }
     } catch (error) {
       Swal.fire(
         "Lỗi!",
