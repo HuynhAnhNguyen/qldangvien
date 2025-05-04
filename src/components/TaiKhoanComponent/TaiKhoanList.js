@@ -408,6 +408,7 @@ const TaiKhoanList = () => {
         handleDeleteAccount={handleDeleteAccount}
         loading={loading}
         error={error}
+        openAddModal={openAddModal}
       />
       <TaiKhoanAddModal
         show={showAddModal}

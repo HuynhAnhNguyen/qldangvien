@@ -14,6 +14,7 @@ const TaiKhoanTable = ({
   handleDeleteAccount,
   loading,
   error,
+  openAddModal,
 }) => {
   const itemsPerPage = 10;
 
@@ -53,6 +54,12 @@ const TaiKhoanTable = ({
               <i className="fas fa-search"></i>
             </button>
           </div>
+          <button
+            className="btn btn-success custom-sm-btn-dangvien"
+            onClick={openAddModal}
+          >
+            <i className="fas fa-plus me-2"></i>Thêm mới
+          </button>
         </div>
       </div>
 
@@ -152,7 +159,9 @@ const TaiKhoanTable = ({
               <nav aria-label="Page navigation">
                 <ul className="pagination justify-content-center mb-0">
                   <li
-                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                    className={`page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
                   >
                     <button
                       className="page-link"
