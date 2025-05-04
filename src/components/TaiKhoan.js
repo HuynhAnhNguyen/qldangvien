@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import Swal from "sweetalert2";
-import { activateAccount, changePassword, changeRole, createAccount, deactivateAccount, deleteAccount, fetchAllAccounts, fetchAllRoles } from "../services/apiService";
+import {
+  activateAccount,
+  changePassword,
+  changeRole,
+  createAccount,
+  deactivateAccount,
+  deleteAccount,
+  fetchAllAccounts,
+  fetchAllRoles,
+} from "../services/apiService";
 
 const TaiKhoan = () => {
   const [accounts, setAccounts] = useState([]);
@@ -23,6 +32,7 @@ const TaiKhoan = () => {
   const [formData, setFormData] = useState({
     userName: "",
     passWord: "",
+    confirmPassword: "",
     email: "",
     phoneNumber: "",
     fullname: "",
@@ -32,6 +42,7 @@ const TaiKhoan = () => {
   const [changePwData, setChangePwData] = useState({
     currentPassword: "",
     newPassword: "",
+    confirmNewPassword: "",
   });
 
   const [changeRoleData, setChangeRoleData] = useState({
@@ -49,6 +60,14 @@ const TaiKhoan = () => {
     }
     if (!formData.passWord.trim()) {
       errors.passWord = "Mật khẩu là bắt buộc";
+    } else if (formData.passWord.length < 6) {
+      errors.passWord = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+
+    if (!formData.confirmPassword) {
+      errors.confirmPassword = "Vui lòng xác nhận mật khẩu";
+    } else if (formData.passWord !== formData.confirmPassword) {
+      errors.confirmPassword = "Mật khẩu không khớp";
     }
     if (!formData.email.trim()) {
       errors.email = "Email là bắt buộc";
@@ -66,11 +85,35 @@ const TaiKhoan = () => {
     return Object.keys(errors).length === 0;
   };
 
+  // Thêm hàm validateChangePassword
+  const validateChangePassword = () => {
+    const errors = {};
+
+    if (!changePwData.currentPassword) {
+      errors.currentPassword = "Vui lòng nhập mật khẩu hiện tại";
+    }
+
+    if (!changePwData.newPassword) {
+      errors.newPassword = "Vui lòng nhập mật khẩu mới";
+    } else if (changePwData.newPassword.length < 6) {
+      errors.newPassword = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+
+    if (!changePwData.confirmNewPassword) {
+      errors.confirmNewPassword = "Vui lòng xác nhận mật khẩu mới";
+    } else if (changePwData.newPassword !== changePwData.confirmNewPassword) {
+      errors.confirmNewPassword = "Mật khẩu không khớp";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   // Fetch accounts
   const loadAccounts = async () => {
     setLoading(true);
     try {
-      const data= await fetchAllAccounts(token);
+      const data = await fetchAllAccounts(token);
       if (data.resultCode === 0) {
         setAccounts(Array.isArray(data.data) ? data.data : []);
         setError(null);
@@ -89,7 +132,7 @@ const TaiKhoan = () => {
   // Fetch roles
   const loadRoles = async () => {
     try {
-      const data= await fetchAllRoles(token);
+      const data = await fetchAllRoles(token);
       if (data.resultCode === 0) {
         setRoles(Array.isArray(data.data) ? data.data : []);
       } else {
@@ -117,7 +160,7 @@ const TaiKhoan = () => {
     if (result.isConfirmed) {
       try {
         setLoading(true);
-        const data= await activateAccount(token, username);
+        const data = await activateAccount(token, username);
         if (data.resultCode === 0) {
           setAccounts(
             accounts.map((item) =>
@@ -152,7 +195,7 @@ const TaiKhoan = () => {
     if (result.isConfirmed) {
       try {
         setLoading(true);
-        const data= await deactivateAccount(token, username);
+        const data = await deactivateAccount(token, username);
         if (data.resultCode === 0) {
           setAccounts(
             accounts.map((item) =>
@@ -184,7 +227,7 @@ const TaiKhoan = () => {
 
     try {
       setLoading(true);
-      const data= await createAccount(token, formData);
+      const data = await createAccount(token, formData);
       if (data.resultCode === 0) {
         setAccounts([...accounts, data.data]);
         setShowAddModal(false);
@@ -203,14 +246,18 @@ const TaiKhoan = () => {
 
   // Change password
   const handleChangePassword = async () => {
-    if (!changePwData.currentPassword || !changePwData.newPassword) {
+    if (!validateChangePassword()) {
       Swal.fire("Lỗi!", "Vui lòng điền đầy đủ thông tin mật khẩu", "error");
       return;
     }
 
     try {
       setLoading(true);
-      const data= await changePassword(token, selectedAccount.username, changePwData)
+      const data = await changePassword(
+        token,
+        selectedAccount.username,
+        changePwData
+      );
       if (data.resultCode === 0) {
         setShowChangePwModal(false);
         Swal.fire("Thành công!", "Đổi mật khẩu thành công", "success");
@@ -233,7 +280,11 @@ const TaiKhoan = () => {
 
     try {
       setLoading(true);
-      const data= await changeRole(token, selectedAccount.username, changeRoleData.roleName)
+      const data = await changeRole(
+        token,
+        selectedAccount.username,
+        changeRoleData.roleName
+      );
       if (data.resultCode === 0) {
         // Cập nhật lại danh sách accounts với role mới
         setAccounts(
@@ -273,7 +324,7 @@ const TaiKhoan = () => {
     if (result.isConfirmed) {
       try {
         setLoading(true);
-        const data= await deleteAccount(token, username);
+        const data = await deleteAccount(token, username);
         if (data.resultCode === 0) {
           setAccounts(accounts.filter((item) => item.username !== username));
           Swal.fire("Thành công!", "Xóa tài khoản thành công", "success");
@@ -300,7 +351,16 @@ const TaiKhoan = () => {
       ...prev,
       [name]: value,
     }));
+    // Clear error khi người dùng nhập
+  if (name === "passWord" || name === "confirmPassword") {
+    setValidationErrors((prev) => ({
+      ...prev,
+      passWord: "",
+      confirmPassword: "",
+    }));
+  } else {
     setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+  }
   };
 
   // Pagination and search
@@ -386,7 +446,7 @@ const TaiKhoan = () => {
         </Col>
       </Row>
       <Row className="mb-3">
-        <Col md={6}>
+        <Col md={4}>
           <Form.Group>
             <Form.Label>
               Email <span className="text-danger">*</span>
@@ -403,7 +463,7 @@ const TaiKhoan = () => {
             </Form.Control.Feedback>
           </Form.Group>
         </Col>
-        <Col md={6}>
+        <Col md={4}>
           <Form.Group>
             <Form.Label>
               Mật khẩu <span className="text-danger">*</span>
@@ -417,6 +477,23 @@ const TaiKhoan = () => {
             />
             <Form.Control.Feedback type="invalid">
               {validationErrors.passWord}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+        <Col md={4}>
+          <Form.Group>
+            <Form.Label>
+              Xác nhận mật khẩu <span className="text-danger">*</span>
+            </Form.Label>
+            <Form.Control
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+              isInvalid={!!validationErrors.confirmPassword}
+            />
+            <Form.Control.Feedback type="invalid">
+              {validationErrors.confirmPassword}
             </Form.Control.Feedback>
           </Form.Group>
         </Col>
@@ -694,7 +771,11 @@ const TaiKhoan = () => {
                     currentPassword: e.target.value,
                   })
                 }
+                isInvalid={!!validationErrors.currentPassword}
               />
+              <Form.Control.Feedback type="invalid">
+                {validationErrors.currentPassword}
+              </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>
@@ -709,7 +790,30 @@ const TaiKhoan = () => {
                     newPassword: e.target.value,
                   })
                 }
+                isInvalid={!!validationErrors.newPassword}
               />
+              <Form.Control.Feedback type="invalid">
+                {validationErrors.newPassword}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>
+                Xác nhận mật khẩu mới <span className="text-danger">*</span>
+              </Form.Label>
+              <Form.Control
+                type="password"
+                value={changePwData.confirmNewPassword}
+                onChange={(e) =>
+                  setChangePwData({
+                    ...changePwData,
+                    confirmNewPassword: e.target.value,
+                  })
+                }
+                isInvalid={!!validationErrors.confirmNewPassword}
+              />
+              <Form.Control.Feedback type="invalid">
+                {validationErrors.confirmNewPassword}
+              </Form.Control.Feedback>
             </Form.Group>
           </Form>
         </Modal.Body>
