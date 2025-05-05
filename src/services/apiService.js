@@ -837,9 +837,6 @@ export const backupDatabase = async (token) => {
 };
 
 export const restoreDatabase = async (token, file) => {
-  // const formData = new FormData();
-  // formData.append("file", file);
-
   const response = await axios.post(
     `${REACT_APP_API_URL}/database/restore`,
     file,
@@ -851,5 +848,19 @@ export const restoreDatabase = async (token, file) => {
     }
   );
   console.log(response);
+  return response;
+};
+
+export const searchFilteredDangVien = async (token, searchTerm) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/dangvien/restorefindByKeyword?keyword=${encodeURIComponent(searchTerm)}`,
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  // console.log(response);
   return response;
 };

@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/apiService";
 
-const Login = ({ setUserRole }) => {
+const Login = () => {
   const [loginInput, setLoginInput] = useState("");
   const [password, setPassword] = useState("");
   const [loginInputError, setLoginInputError] = useState("");
@@ -32,10 +32,6 @@ const Login = ({ setUserRole }) => {
 
     try {
       const data = await login(loginInput, password);
-      // console.log(data);
-      // console.log(data.data.fullname);
-      // console.log(data.data.token);
-      // console.log(data.data.role);
       if(data.resultCode === -1){
         Swal.fire({
           title: "Lỗi!",
@@ -48,32 +44,13 @@ const Login = ({ setUserRole }) => {
           title: "Thành công!",
           text: "Đăng nhập thành công!",
           icon: "success",
-          confirmButtonText: "OK",
+          timer: 1000, // Tự động đóng sau 1.5 giây
+          showConfirmButton: false
         });
         // Lưu token vào localStorage
         localStorage.setItem("token", data.data.token);
         localStorage.setItem("fullname", data.data.fullname);
         localStorage.setItem("role", data.data.role);
-
-        setUserRole(data.data.role); // Cập nhật role trong state
-        
-        // Chuyển hướng dựa trên role
-        // if (data.data.role === 'ROLE_USER') {
-        //   navigate("/"); // Chuyển về trang chủ nếu là USER
-        // } else {
-        //   navigate("/quan-ly-dang-vien"); // Chuyển đến trang quản lý nếu là ADMIN hoặc STAFF
-        // }
-
-        if (data.data.role === 'ROLE_ADMIN') {
-          navigate("/quan-ly-dang-vien");
-        } else if (data.data.role === 'ROLE_STAFF') {
-          navigate("/quan-ly-dang-vien");
-        } else {
-          // ROLE_USER sẽ bị chuyển hướng lại trang login
-          navigate("/dang-nhap");
-        }
-
-
 
         navigate("/"); // Chuyển hướng về trang chủ
       }

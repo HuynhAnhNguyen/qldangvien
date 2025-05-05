@@ -6,7 +6,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import Swal from "sweetalert2";
-import { useState, useEffect } from "react";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NewPage from "./pages/NewPage";
@@ -18,26 +17,18 @@ import QuanLyKyDangPhi from "./pages/QuanLyKyDangPhi";
 import QuanLyDangPhi from "./pages/QuanLyDangPhi";
 import SaoLuuKhoiPhuc from "./pages/SaoLuuKhoiPhuc";
 import QuanLyPheDuyet from "./pages/QuanLyPheDuyet";
-import QuanLySinhHoatDang from "./pages/QuanLySinhHoatDang";
 import QuanLyTaiKhoan from "./pages/QuanLyTaiKhoan";
 
 const App = () => {
-  const [userRole, setUserRole] = useState(null);
-
-  useEffect(() => {
-    // Lấy role từ localStorage khi app khởi động
-    const role = localStorage.getItem("role");
-    setUserRole(role);
-  }, []);
   return (
     <Router>
       <Routes>
-        {/* <Route path="/" element={<Home />} /> */}
-        {/* <Route path="/dang-nhap" element={<Login />} /> */}
-        <Route
+        <Route path="/" element={<Home />} />
+        <Route path="/dang-nhap" element={<Login />} />
+        {/* <Route
           path="/dang-nhap"
           element={<Login setUserRole={setUserRole} />}
-        />
+        /> */}
         {/* <Route
           path="/"
           element={
@@ -60,7 +51,7 @@ const App = () => {
             </ProtectedRoute>
           }
         /> */}
-        <Route
+        {/* <Route
           path="/"
           element={
             <ProtectedRoute
@@ -79,7 +70,8 @@ const App = () => {
               <QuanLyDangVien />
             </ProtectedRoute>
           }
-        />
+        /> */}
+
         <Route path="/quan-ly-tin-tuc" element={<QuanLyTinTuc />} />
         <Route path="/quan-ly-dang-vien" element={<QuanLyDangVien />} />
         <Route path="/quan-ly-chi-bo" element={<QuanLyChiBo />} />
@@ -88,7 +80,6 @@ const App = () => {
         <Route path="/quan-ly-dang-phi" element={<QuanLyDangPhi />} />
         <Route path="/sao-luu-khoi-phuc" element={<SaoLuuKhoiPhuc />} />
         <Route path="/quan-ly-phe-duyet" element={<QuanLyPheDuyet />} />
-        <Route path="/quan-ly-sinh-hoat" element={<QuanLySinhHoatDang />} />
         <Route path="/quan-ly-tai-khoan" element={<QuanLyTaiKhoan />} />
       </Routes>
     </Router>
@@ -115,25 +106,25 @@ const App = () => {
   
 //   return children;
 // };
-const ProtectedRoute = ({ children, role }) => {
-  // Nếu chưa đăng nhập -> về trang đăng nhập
-  if (!role) {
-    return <Navigate to="/dang-nhap" replace />;
-  }
+// const ProtectedRoute = ({ children, role }) => {
+//   // Nếu chưa đăng nhập -> về trang đăng nhập
+//   if (!role) {
+//     return <Navigate to="/dang-nhap" replace />;
+//   }
   
-  // Nếu là ROLE_USER -> chặn hoàn toàn, giữ ở trang login
-  if (role === 'ROLE_USER') {
-    Swal.fire({
-      title: "Tài khoản bị hạn chế",
-      text: "Tài khoản của bạn không có quyền truy cập hệ thống",
-      icon: "error",
-      confirmButtonText: "OK",
-    });
-    return <Navigate to="/dang-nhap" replace />;
-  }
+//   // Nếu là ROLE_USER -> chặn hoàn toàn, giữ ở trang login
+//   if (role === 'ROLE_USER') {
+//     Swal.fire({
+//       title: "Tài khoản bị hạn chế",
+//       text: "Tài khoản của bạn không có quyền truy cập hệ thống",
+//       icon: "error",
+//       confirmButtonText: "OK",
+//     });
+//     return <Navigate to="/dang-nhap" replace />;
+//   }
   
-  // Các role khác (ADMIN, STAFF) được truy cập
-  return children;
-};
+//   // Các role khác (ADMIN, STAFF) được truy cập
+//   return children;
+// };
 
 export default App;

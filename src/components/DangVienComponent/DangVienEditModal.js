@@ -10,7 +10,6 @@ const DangVienEditModal = ({
   handleInputChange,
   handleUpdateDangVien,
   loading,
-  userRole,
 }) => {
   return (
     <Modal show={show} onHide={onHide} size="lg">
@@ -22,25 +21,19 @@ const DangVienEditModal = ({
           formData={formData}
           validationErrors={validationErrors}
           handleInputChange={handleInputChange}
-          userRole={userRole}
         />
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>
           Hủy
         </Button>
-        {/* <Button
+        <Button
           variant="primary"
           onClick={handleUpdateDangVien}
           disabled={loading}
         >
           {loading ? "Đang xử lý..." : "Lưu thay đổi"}
-        </Button> */}
-        {userRole === 'ROLE_ADMIN' && ( // Chỉ hiện nút lưu cho ADMIN
-          <Button variant="primary" onClick={handleUpdateDangVien} disabled={loading}>
-            {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
-          </Button>
-        )}
+        </Button>
       </Modal.Footer>
     </Modal>
   );

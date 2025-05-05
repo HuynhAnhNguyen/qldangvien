@@ -13,12 +13,17 @@ const DangVienTable = ({
   openTheDangModal,
   openQuyetDinhModal,
   handleExportExcel,
+  searchTerm,
 }) => {
   return (
     <>
-      {searchType === "chibo" &&
-      selectedChiBoId &&
-      currentItems.length === 0 ? (
+      {searchType === "all" && searchTerm && currentItems.length === 0 ? (
+        <div className="text-center py-4 text-muted">
+          Không tìm thấy Đảng viên nào phù hợp với từ khóa "{searchTerm}"
+        </div>
+      ) : searchType === "chibo" &&
+        selectedChiBoId &&
+        currentItems.length === 0 ? (
         <div className="text-center py-4 text-muted">
           Không có Đảng viên thuộc chi bộ này!
         </div>
@@ -38,10 +43,11 @@ const DangVienTable = ({
                 <tr>
                   <th style={{ width: "5%" }}>STT</th>
                   <th style={{ width: "20%" }}>Họ và tên</th>
-                  <th style={{ width: "20%" }}>Ngày sinh</th>
+                  <th style={{ width: "10%" }}>Ngày sinh</th>
                   <th style={{ width: "20%" }}>Nơi sinh hoạt Đảng</th>
-                  <th style={{ width: "15%" }}>Trạng thái</th>
-                  <th style={{ width: "20%" }}>Thao tác</th>
+                  <th style={{ width: "15%" }}>Trạng thái Đảng viên</th>
+                  <th style={{ width: "15%" }}>Trạng thái phê duyệt</th>
+                  <th style={{ width: "15%" }}>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -60,6 +66,21 @@ const DangVienTable = ({
                           : item.trangthaidangvien === "khaitru"
                           ? "Khai trừ"
                           : "Không xác định"}
+                      </td>
+                      <td>
+                        {item.trangthaithongtin === "approved" ? (
+                          <span className="badge bg-success">
+                            Đã được duyệt
+                          </span>
+                        ) : item.trangthaithongtin === "pending" ? (
+                          <span className="badge bg-warning text-dark">
+                            Chờ phê duyệt
+                          </span>
+                        ) : item.trangthaithongtin === "saved" ? (
+                          <span className="badge bg-primary">Đã lưu</span>
+                        ) : (
+                          <span className="badge bg-danger">Từ chối</span>
+                        )}
                       </td>
                       <td>
                         <div className="d-flex gap-1">
@@ -92,7 +113,7 @@ const DangVienTable = ({
                           >
                             <i className="fas fa-file-alt"></i>
                           </button>
-                          
+
                           <button
                             className="btn btn-sm btn-outline-excel"
                             onClick={() => handleExportExcel(item)}

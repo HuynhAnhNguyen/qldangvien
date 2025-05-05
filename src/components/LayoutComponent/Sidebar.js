@@ -121,16 +121,6 @@ const Sidebar = () => {
             </a>
           </li>
 
-          <li className={`sidebar-item ${isActive("/quan-ly-sinh-hoat")}`}>
-            <a
-              className="sidebar-link"
-              onClick={() => navigate("/quan-ly-sinh-hoat")}
-            >
-              <i className="fa-solid fa-calendar-check"></i>
-              <span className="align-middle">Quản lý sinh hoạt Đảng</span>
-            </a>
-          </li>
-
           <li className={`sidebar-item ${isActive("/quan-ly-dang-phi")}`}>
             <a
               className="sidebar-link"

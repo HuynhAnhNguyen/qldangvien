@@ -15,6 +15,7 @@ import {
   updateTheDang,
   deleteTheDang,
   exportDangVienToExcel,
+  searchFilteredDangVien,
 } from "../../services/apiService";
 import TheDangModal from "../TheDangComponent/TheDangModal";
 import QuyetDinhModal from "../QuyetDinhComponent/QuyetDinhModal";
@@ -49,57 +50,9 @@ const DangVienList = () => {
     noicapthe: "",
   });
 
-  const [userRole, setUserRole] = useState(localStorage.getItem('role'));
+  const [filteredDangVien, setFilteredDangVien] = useState([]);
 
   const [showQuyetDinhModal, setShowQuyetDinhModal] = useState(false);
-
-   // Kiểm tra quyền trước khi thực hiện các hành động
-   const checkPermission = (requiredRole = 'ROLE_ADMIN') => {
-    return userRole === requiredRole;
-  };
-
-  // Thêm điều kiện vào các nút chức năng
-  const renderActionButtons = (dangVienItem) => {
-    return (
-      <div className="d-flex gap-2">
-        <button 
-          className="btn btn-primary btn-sm" 
-          onClick={() => openDetailModal(dangVienItem)}
-        >
-          <i className="fas fa-eye"></i>
-        </button>
-        
-        {checkPermission() && (
-          <>
-            <button 
-              className="btn btn-warning btn-sm" 
-              onClick={() => openEditModal(dangVienItem)}
-            >
-              <i className="fas fa-edit"></i>
-            </button>
-            <button 
-              className="btn btn-info btn-sm" 
-              onClick={() => openTheDangModal(dangVienItem)}
-            >
-              <i className="fas fa-id-card"></i>
-            </button>
-            <button 
-              className="btn btn-secondary btn-sm" 
-              onClick={() => openQuyetDinhModal(dangVienItem)}
-            >
-              <i className="fas fa-file-alt"></i>
-            </button>
-            <button 
-              className="btn btn-success btn-sm" 
-              onClick={() => handleExportExcel(dangVienItem)}
-            >
-              <i className="fas fa-file-excel"></i>
-            </button>
-          </>
-        )}
-      </div>
-    );
-  };
 
   // Thêm hàm này trong component
 const handleExportExcel = (dangVien) => {
@@ -145,6 +98,7 @@ const handleExportExcel = (dangVien) => {
     trinhdochinhtri: "",
     trangthaidangvien: "",
     chiboId: "",
+    trangthaithongtin: "",
   });
 
   const token = localStorage.getItem("token");
@@ -332,7 +286,9 @@ const handleExportExcel = (dangVien) => {
       const response = await fetchDangVien(token, searchType, selectedChiBoId);
       const data = await response.json();
       if (data.resultCode === 0) {
-        setDangVien(Array.isArray(data.data) ? data.data : []);
+        const dvList = Array.isArray(data.data) ? data.data : [];
+        setDangVien(dvList);
+        setFilteredDangVien(dvList);
         setError(null);
         setCurrentPage(1);
       } else {
@@ -411,6 +367,11 @@ const handleExportExcel = (dangVien) => {
     loadDangVien();
   }, [searchType, selectedChiBoId]);
 
+  useEffect(() => {
+    // Khi dangVien thay đổi, cập nhật filteredDangVien
+    setFilteredDangVien(dangVien);
+  }, [dangVien]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -424,19 +385,46 @@ const handleExportExcel = (dangVien) => {
     setSearchType(e.target.value);
     setSelectedChiBoId("");
     setSearchTerm("");
+    setFilteredDangVien(dangVien);
   };
 
-  const filteredDangVien =
-    searchType === "all"
-      ? dangVien.filter(
-          (item) =>
-            item.hoten?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-            item.ngaysinh?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-            item.noisinhhoatdang
-              ?.toLowerCase()
-              ?.includes(searchTerm.toLowerCase())
-        )
-      : dangVien;
+  // const filteredDangVien =
+  //   searchType === "all"
+  //     ? dangVien.filter(
+  //         (item) =>
+  //           item.hoten?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+  //           item.ngaysinh?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+  //           item.noisinhhoatdang
+  //             ?.toLowerCase()
+  //             ?.includes(searchTerm.toLowerCase())
+  //       )
+  //     : dangVien;
+
+  const handleSearch = async () => {
+    try {
+        if (searchTerm.trim() === "") {
+            await loadDangVien();
+            return;
+        }
+
+        if(searchType === "all"){
+          const response = await searchFilteredDangVien(token, searchTerm);
+          const data = await response.json();
+          if (data.resultCode === 0) {
+            setFilteredDangVien(Array.isArray(data.data) ? data.data : []);
+          } else {
+            throw new Error(data.message || "Không thể tìm kiếm Đảng viên");
+          }
+        }else{
+          await loadDangVien();
+        }
+    } catch (error) {
+        console.error("Error searching dang vien:", error);
+        setFilteredDangVien([]);
+    }finally{
+      setError(false);
+    }
+};
 
   const totalPages = Math.ceil(filteredDangVien.length / itemsPerPage);
   const currentItems = filteredDangVien.slice(
@@ -589,24 +577,17 @@ const handleExportExcel = (dangVien) => {
               <button
                 className="btn btn-primary custom-sm-btn"
                 style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+                onClick={handleSearch}
               >
                 <i className="fas fa-search"></i>
               </button>
             </div>
-            {/* <button
+            <button
               className="btn btn-success custom-sm-btn-dangvien"
               onClick={openAddModal}
             >
               <i className="fas fa-plus me-2"></i>Thêm mới
-            </button> */}
-            {checkPermission() && (
-          <button
-            className="btn btn-success custom-sm-btn-dangvien"
-            onClick={openAddModal}
-          >
-            <i className="fas fa-plus me-2"></i>Thêm mới
-          </button>
-        )}
+            </button>
           </div>
         </div>
 
@@ -633,6 +614,7 @@ const handleExportExcel = (dangVien) => {
           openTheDangModal={openTheDangModal}
           openQuyetDinhModal={openQuyetDinhModal}
           handleExportExcel={handleExportExcel}
+          searchTerm={searchTerm}
         />
 
         <DangVienDetailModal
