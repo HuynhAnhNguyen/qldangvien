@@ -51,6 +51,7 @@ const Login = () => {
         localStorage.setItem("token", data.data.token);
         localStorage.setItem("fullname", data.data.fullname);
         localStorage.setItem("role", data.data.role);
+        localStorage.setItem("username", data.data.username);
 
         navigate("/"); // Chuyển hướng về trang chủ
       }

@@ -611,16 +611,12 @@ export const createPheDuyet = async (token, pheDuyetData) => {
 
 // Phê duyệt yêu cầu
 export const approvePheDuyet = async (token, pheduyetId) => {
-  const response = await axios.post(
-    `${REACT_APP_API_URL}/pheduyet/approval`,
-    {},
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/pheduyet/approval?pheduyetId=${pheduyetId}`,
     {
       headers: {
         Authorization: `${token}`,
         "Content-Type": "application/json",
-      },
-      params: {
-        pheduyetId,
       },
     }
   );
@@ -629,16 +625,12 @@ export const approvePheDuyet = async (token, pheduyetId) => {
 
 // Từ chối yêu cầu
 export const rejectPheDuyet = async (token, pheduyetId) => {
-  const response = await axios.post(
-    `${REACT_APP_API_URL}/pheduyet/reject`,
-    {},
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/pheduyet/reject?pheduyetId=${pheduyetId}`,
     {
       headers: {
         Authorization: `${token}`,
         "Content-Type": "application/json",
-      },
-      params: {
-        pheduyetId,
       },
     }
   );
