@@ -856,3 +856,59 @@ export const searchFilteredDangVien = async (token, searchTerm) => {
   // console.log(response);
   return response;
 };
+
+// Change role
+export const getPheDuyetDetail = async (token, pheduyetId) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/pheduyet/getDataByPheduyetId?pheduyetId=${pheduyetId}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
+
+// Fetch Hồ sơ đảng theo hosoId
+export const fetchHoSoById = async (token, hosoId) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/hoso/findByListHosodangId?listId=${hosoId}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
+
+// Fetch Tin tức theo id
+export const fetchTinTucById = async (token, tintucId) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/tintuc/findById?tintucId=${tintucId}`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
+
+// Fetch Tin tức theo id
+export const fetchThongKe = async (token) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/thongke`,
+    { 
+      headers: {
+        Authorization: `${token}`,
+        'Content-Type': 'application/json'
+      } 
+    }
+  );
+  return response.data;
+};
