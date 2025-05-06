@@ -64,7 +64,12 @@ const KyDangPhiTable = ({
                       VND
                     </td>
                     <td>{item.nguoitao}</td>
-                    <td>{item.thoigiantao}</td>
+                    {/* <td>{item.thoigiantao}</td> */}
+                    <td>
+                      {item.thoigiantao
+                        ? new Date(item.thoigiantao).toLocaleString()
+                        : "Chưa xác nhận"}
+                    </td>
                     <td>
                       <div className="d-flex gap-1">
                         <button

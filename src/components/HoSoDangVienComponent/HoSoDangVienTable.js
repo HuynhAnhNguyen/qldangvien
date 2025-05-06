@@ -97,7 +97,12 @@ const HoSoDangVienTable = ({
                           : "Chờ duyệt"}
                       </Badge>
                     </td>
-                    <td>{item.thoigiantao}</td>
+                    {/* <td>{item.thoigiantao}</td> */}
+                    <td>
+                      {item.thoigiantao
+                        ? new Date(item.thoigiantao).toLocaleString()
+                        : "Không có"}
+                    </td>
                     <td>{item.nguoipheduyet || "Chưa phê duyệt"}</td>
                     <td>
                       <div className="d-flex gap-1">
@@ -167,9 +172,7 @@ const HoSoDangVienTable = ({
                     <button
                       className="page-link"
                       onClick={() =>
-                        setCurrentPage((prev) =>
-                          Math.min(prev + 1, totalPages)
-                        )
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                       }
                       disabled={currentPage === totalPages}
                     >

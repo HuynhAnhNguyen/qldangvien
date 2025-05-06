@@ -19,7 +19,9 @@ const DangPhiTable = ({
   const filteredTrangThai = trangThaiList.filter((item) => {
     const hoten = item.hotenDangvien?.toLowerCase() || "";
     const tenKy =
-      kyDangPhiList.find((ky) => ky.id === item.kydangphiId)?.ten?.toLowerCase() || "";
+      kyDangPhiList
+        .find((ky) => ky.id === item.kydangphiId)
+        ?.ten?.toLowerCase() || "";
     return (
       hoten.includes(searchTerm.toLowerCase()) ||
       tenKy.includes(searchTerm.toLowerCase())
@@ -47,7 +49,8 @@ const DangPhiTable = ({
 
       {!selectedKyDangPhi && !selectedDangVien ? (
         <div className="text-center py-4 text-muted">
-          Vui lòng chọn {searchType === "ky" ? "kỳ Đảng phí" : "Đảng viên"} để xem danh sách
+          Vui lòng chọn {searchType === "ky" ? "kỳ Đảng phí" : "Đảng viên"} để
+          xem danh sách
         </div>
       ) : filteredTrangThai.length === 0 ? (
         <div className="text-center py-4 text-muted">
@@ -66,9 +69,9 @@ const DangPhiTable = ({
                   <th style={{ width: "20%" }}>Họ và tên</th>
                   <th style={{ width: "20%" }}>Kỳ Đảng phí</th>
                   <th style={{ width: "15%" }}>Số tiền</th>
-                  <th style={{ width: "15%" }}>Trạng thái</th>
+                  <th style={{ width: "10%" }}>Trạng thái</th>
                   <th style={{ width: "15%" }}>Người xác nhận</th>
-                  <th style={{ width: "15%" }}>Thời gian xác nhận</th>
+                  <th style={{ width: "20%" }}>Thời gian xác nhận</th>
                   <th style={{ width: "15%" }}>Thao tác</th>
                 </tr>
               </thead>
@@ -77,28 +80,36 @@ const DangPhiTable = ({
                   <tr key={index}>
                     <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                     <td>{item.hotenDangvien}</td>
-                    <td>
-                      {kyDangPhiList.find((ky) => ky.id === item.kydangphiId)?.ten || "N/A"}
-                    </td>
-                    <td>
-                      {kyDangPhiList.find((ky) => ky.id === item.kydangphiId)?.sotien?.toLocaleString() || "N/A"} VNĐ
-                    </td>
+                    <td>{item.tenkydangphi || "N/A"}</td>
+                    <td>{item.sotien.toLocaleString() || "N/A"} VNĐ</td>
                     <td>
                       <Badge
-                        bg={item.trangthai === "hoanthanh" ? "success" : "warning"}
+                        bg={
+                          item.trangthai === "hoanthanh" ? "success" : "warning"
+                        }
                       >
-                        {item.trangthai === "hoanthanh" ? "Hoàn thành" : "Chưa hoàn thành"}
+                        {item.trangthai === "hoanthanh"
+                          ? "Hoàn thành"
+                          : "Chưa hoàn thành"}
                       </Badge>
                     </td>
                     <td>{item.nguoixacnhan || "Chưa xác nhận"}</td>
-                    <td>{item.thoigianxacnhan || "N/A"}</td>
+                    {/* <td>{item.thoigianxacnhan || "Chưa xác nhận"}</td> */}
+                    <td>
+                      {item.thoigianxacnhan
+                        ? new Date(item.thoigianxacnhan).toLocaleString()
+                        : "Chưa xác nhận"}
+                    </td>
                     <td>
                       {item.trangthai !== "hoanthanh" && (
                         <Button
                           variant="outline-primary"
                           size="sm"
                           onClick={() =>
-                            handleConfirmDangPhi(item.kydangphiId, item.dangvienId)
+                            handleConfirmDangPhi(
+                              item.kydangphiId,
+                              item.dangvienId
+                            )
                           }
                           disabled={loading}
                           title="Xác nhận đóng Đảng phí"
@@ -119,31 +130,41 @@ const DangPhiTable = ({
               <nav aria-label="Page navigation">
                 <ul className="pagination justify-content-center mb-0">
                   <li
-                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                    className={`page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
                   >
                     <button
                       className="page-link"
-                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
                       disabled={currentPage === 1}
                     >
                       « Trước
                     </button>
                   </li>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <li
-                      key={page}
-                      className={`page-item ${page === currentPage ? "active" : ""}`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() => setCurrentPage(page)}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <li
+                        key={page}
+                        className={`page-item ${
+                          page === currentPage ? "active" : ""
+                        }`}
                       >
-                        {page}
-                      </button>
-                    </li>
-                  ))}
+                        <button
+                          className="page-link"
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </button>
+                      </li>
+                    )
+                  )}
                   <li
-                    className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
+                    className={`page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
                   >
                     <button
                       className="page-link"

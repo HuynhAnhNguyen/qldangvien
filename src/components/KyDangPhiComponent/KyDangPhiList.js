@@ -81,7 +81,12 @@ const KyDangPhiList = () => {
         setShowAddModal(false);
         setFormData({ ten: "", sotien: "" });
         fetchKyDangPhiList();
-      } else {
+      } if (response.resultCode === -1) {
+        Swal.fire("Thất bại", "Tên kỳ Đảng phí không được trùng", "error");
+        setShowAddModal(false);
+        setFormData({ ten: "", sotien: "" });
+        fetchKyDangPhiList();
+      }else {
         throw new Error(response.message || "Failed to create KyDangPhi");
       }
     } catch (error) {
