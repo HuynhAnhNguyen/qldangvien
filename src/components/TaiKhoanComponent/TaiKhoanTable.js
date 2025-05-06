@@ -126,13 +126,13 @@ const TaiKhoanTable = ({
                             <i className="fas fa-check"></i>
                           </button>
                         )}
-                        <button
+                        {/* <button
                           className="btn btn-sm btn-outline-warning"
                           onClick={() => openChangePwModal(item)}
                           title="Đổi mật khẩu"
                         >
                           <i className="fas fa-key"></i>
-                        </button>
+                        </button> */}
                         <button
                           className="btn btn-sm btn-outline-info"
                           onClick={() => openChangeRoleModal(item)}

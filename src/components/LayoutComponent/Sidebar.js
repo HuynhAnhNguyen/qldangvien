@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
+import TaiKhoanChangePwModal from "../TaiKhoanComponent/TaiKhoanChangePwModal";
+import { changePassword } from "../../services/apiService";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -8,6 +10,85 @@ const Sidebar = () => {
   const [fullname, setFullname] = useState("");
   const [role, setRole] = useState("");
   const [activePath, setActivePath] = useState("");
+  const [showChangePwModal, setShowChangePwModal] = useState(false);
+  const [changePwData, setChangePwData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [validationErrors, setValidationErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const token = localStorage.getItem("token");
+  const username = localStorage.getItem("username");
+
+  const handleShowChangePwModal = async () => {
+    const result = await Swal.fire({
+      title: "Xác nhận đổi mật khẩu",
+      text: "Bạn có chắc chắn muốn đổi mật khẩu?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Đổi mật khẩu",
+      cancelButtonText: "Hủy",
+    });
+    if (result.isConfirmed) {
+      setShowChangePwModal(true);
+      // Reset form khi mở modal
+      setChangePwData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setValidationErrors({});
+    }
+  };
+
+  // Validate change password form
+  const validateChangePassword = () => {
+    const errors = {};
+
+    if (!changePwData.currentPassword) {
+      errors.currentPassword = "Vui lòng nhập mật khẩu hiện tại";
+    }
+    if (!changePwData.newPassword) {
+      errors.newPassword = "Vui lòng nhập mật khẩu mới";
+    } else if (changePwData.newPassword.length < 6) {
+      errors.newPassword = "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+    if (!changePwData.confirmNewPassword) {
+      errors.confirmNewPassword = "Vui lòng xác nhận mật khẩu mới";
+    } else if (changePwData.newPassword !== changePwData.confirmNewPassword) {
+      errors.confirmNewPassword = "Mật khẩu không khớp";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Change password
+  const handleChangePassword = async () => {
+    if (!validateChangePassword()) {
+      Swal.fire("Lỗi!", "Vui lòng điền đầy đủ thông tin mật khẩu", "error");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const data = await changePassword(token, username, changePwData);
+      if (data.resultCode === 0) {
+        setShowChangePwModal(false);
+        Swal.fire("Thành công!", "Đổi mật khẩu thành công", "success");
+      } else {
+        throw new Error(data.message || "Đổi mật khẩu thất bại");
+      }
+    } catch (err) {
+      Swal.fire("Lỗi!", "Đổi mật khẩu thất bại", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Cập nhật active path khi location thay đổi
@@ -24,33 +105,27 @@ const Sidebar = () => {
     }
   }, [navigate, location]);
 
-  // const handleLogout = () => {
-  //   // Xóa tất cả dữ liệu trong localStorage
-  //   localStorage.clear();
-  //   // Chuyển hướng về trang đăng nhập
-  //   navigate("/dang-nhap");
-  // };
   const handleLogout = () => {
     Swal.fire({
-      title: 'Xác nhận đăng xuất',
-      text: 'Bạn có chắc chắn muốn đăng xuất?',
-      icon: 'question',
+      title: "Xác nhận đăng xuất",
+      text: "Bạn có chắc chắn muốn đăng xuất?",
+      icon: "question",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Đăng xuất',
-      cancelButtonText: 'Hủy'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Đăng xuất",
+      cancelButtonText: "Hủy",
     }).then((result) => {
       if (result.isConfirmed) {
         // Xóa tất cả dữ liệu trong localStorage
         localStorage.clear();
         // Hiển thị thông báo đăng xuất thành công
         Swal.fire({
-          title: 'Đã đăng xuất',
-          text: 'Bạn đã đăng xuất thành công',
-          icon: 'success',
+          title: "Đã đăng xuất",
+          text: "Bạn đã đăng xuất thành công",
+          icon: "success",
           timer: 1500, // Tự động đóng sau 1.5 giây
-          showConfirmButton: false
+          showConfirmButton: false,
         }).then(() => {
           // Chuyển hướng về trang đăng nhập sau khi hiển thị thông báo
           navigate("/dang-nhap");
@@ -202,6 +277,13 @@ const Sidebar = () => {
           </li>
 
           <li className="sidebar-item">
+            <a className="sidebar-link" onClick={handleShowChangePwModal}>
+              <i className="fa-solid fa-key"></i>
+              <span className="align-middle">Đổi mật khẩu</span>
+            </a>
+          </li>
+
+          <li className="sidebar-item">
             <a className="sidebar-link" onClick={handleLogout}>
               <i className="fa-solid fa-arrow-right-from-bracket"></i>
               <span className="align-middle">Đăng xuất</span>
@@ -209,6 +291,15 @@ const Sidebar = () => {
           </li>
         </ul>
       </div>
+      <TaiKhoanChangePwModal
+        show={showChangePwModal}
+        onHide={() => setShowChangePwModal(false)}
+        changePwData={changePwData}
+        setChangePwData={setChangePwData}
+        validationErrors={validationErrors}
+        handleChangePassword={handleChangePassword}
+        loading={loading}
+      />
     </nav>
   );
 };
