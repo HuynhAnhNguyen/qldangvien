@@ -79,14 +79,18 @@ const HoSoDangVienTable = ({
                     <td>
                       <Badge
                         bg={
-                          item.trangthai === "approved"
+                          item.trangthai === "saved"
+                            ? "info"
+                            : item.trangthai === "approved"
                             ? "success"
                             : item.trangthai === "rejected"
                             ? "danger"
                             : "warning"
                         }
                       >
-                        {item.trangthai === "approved"
+                        {item.trangthai === "saved"
+                          ? "Đã lưu"
+                          : item.trangthai === "approved"
                           ? "Đã duyệt"
                           : item.trangthai === "rejected"
                           ? "Từ chối"
