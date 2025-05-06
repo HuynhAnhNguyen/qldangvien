@@ -839,8 +839,8 @@ export const restoreDatabase = async (token, file) => {
       },
     }
   );
-  console.log(response);
-  return response;
+  // console.log(response);
+  return response.data;
 };
 
 export const searchFilteredDangVien = async (token, searchTerm) => {

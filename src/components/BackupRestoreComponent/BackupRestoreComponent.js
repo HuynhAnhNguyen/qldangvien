@@ -73,15 +73,13 @@ const BackupRestoreComponent = () => {
       formData.append("file", selectedFile);
 
       const response = await restoreDatabase(token, formData);
-      Swal.fire("Thành công!", response.data.message, "success");
-
-      // if (response.data.status === 200) {
-      //   setShowRestoreModal(false);
-      //   setSelectedFile(null);
-      //   Swal.fire("Thành công!", "Khôi phục dữ liệu thành công!", "success");
-      // } else {
-      //   throw new Error(response.data.message || "Khôi phục dữ liệu thất bại");
-      // }
+      if (response.resultCode === 0) {
+        setShowRestoreModal(false);
+        setSelectedFile(null);
+        Swal.fire("Thành công!", "Khôi phục dữ liệu thành công!", "success");
+      } else {
+        throw new Error(response.data.message || "Khôi phục dữ liệu thất bại");
+      }
     } catch (error) {
       Swal.fire(
         "Lỗi!",
