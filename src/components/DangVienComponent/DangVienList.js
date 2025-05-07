@@ -408,8 +408,8 @@ const handleExportExcel = (dangVien) => {
         }
 
         if(searchType === "all"){
-          const response = await searchFilteredDangVien(token, searchTerm);
-          const data = await response.json();
+          const data = await searchFilteredDangVien(token, searchTerm);
+          // const data = await response.json();
           if (data.resultCode === 0) {
             setFilteredDangVien(Array.isArray(data.data) ? data.data : []);
           } else {

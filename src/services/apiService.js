@@ -889,7 +889,7 @@ export const restoreDatabase = async (token, file) => {
 
 export const searchFilteredDangVien = async (token, searchTerm) => {
   const response = await axios.get(
-    `${REACT_APP_API_URL}/dangvien/restorefindByKeyword?keyword=${encodeURIComponent(
+    `${REACT_APP_API_URL}/dangvien/findByKeyword?keyword=${encodeURIComponent(
       searchTerm
     )}`,
     {
@@ -900,7 +900,7 @@ export const searchFilteredDangVien = async (token, searchTerm) => {
     }
   );
   // console.log(response);
-  return response;
+  return response.data;
 };
 
 // Change role
