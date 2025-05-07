@@ -10,6 +10,7 @@ import {
   deleteHoSo,
   uploadFile,
   downloadFile,
+  fetchHoSoById,
 } from "../services/apiService";
 
 const HoSoDangVien = () => {
@@ -28,6 +29,8 @@ const HoSoDangVien = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedHoSo, setSelectedHoSo] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [hoSoDetail, setHoSoDetail] = useState(null);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -36,6 +39,26 @@ const HoSoDangVien = () => {
     fileUrl: "",
     ghichu: "",
   });
+
+  // Add this new function to fetch detail
+  const fetchHoSoDetail = async (hoSoId) => {
+    try {
+      setLoading(true);
+      const data = await fetchHoSoById(token, hoSoId);
+      // const data = await response.json();
+      if (data.resultCode === 0 && data.data && data.data.length > 0) {
+        setHoSoDetail(data.data[0]); // Assuming API returns array with one item
+        setShowDetailModal(true);
+      } else {
+        throw new Error(data.message || "Không thể tải chi tiết hồ sơ");
+      }
+    } catch (err) {
+      Swal.fire("Lỗi!", "Không thể tải chi tiết hồ sơ", "error");
+      console.error("Error fetching hoSo detail:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Get token from localStorage
   const token = localStorage.getItem("token");
@@ -63,16 +86,16 @@ const HoSoDangVien = () => {
 
     setLoading(true);
     try {
-      let response;
+      let data;
       if (searchType === "all") {
-        response = await fetchHoSoByDangVienId(token, selectedDangVien.id);
+        data = await fetchHoSoByDangVienId(token, selectedDangVien.id);
       } else {
-        response = await fetchHoSoApprovedByDangVienId(
+        data = await fetchHoSoApprovedByDangVienId(
           token,
           selectedDangVien.id
         );
       }
-      const data = await response.json();
+      // const data = await response.json();
       if (data.resultCode === 0) {
         setHoSoList(Array.isArray(data.data) ? data.data : []);
         setError(null);
@@ -111,55 +134,54 @@ const HoSoDangVien = () => {
   };
 
   const handleDownloadFile = async (filename) => {
-      try {
-        setLoading(true);
-        
-        // Get the file blob from API
-        const response = await downloadFile(token, filename);
-        
-        // Create download link
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        
-        // Try to get the original filename from headers
-        const contentDisposition = response.headers['content-disposition'];
-        let downloadFilename = filename;
-        
-        if (contentDisposition) {
-          const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-          if (filenameMatch && filenameMatch[1]) {
-            downloadFilename = filenameMatch[1];
-          }
+    try {
+      setLoading(true);
+
+      // Get the file blob from API
+      const response = await downloadFile(token, filename);
+
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Try to get the original filename from headers
+      const contentDisposition = response.headers["content-disposition"];
+      let downloadFilename = filename;
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch && filenameMatch[1]) {
+          downloadFilename = filenameMatch[1];
         }
-        
-        link.setAttribute('download', downloadFilename);
-        document.body.appendChild(link);
-        link.click();
-        Swal.fire({
-          icon: 'success',
-          title: 'Thành công',
-          text: 'Tải file thành công!',
-          confirmButtonText: 'Đóng'
-        });
-        // Clean up
-        setTimeout(() => {
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(link);
-        }, 100);
-        
-      } catch (error) {
-        console.error("Download failed:", error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Lỗi',
-          text: error.response?.data?.message || 'Tải file thất bại',
-          confirmButtonText: 'Đóng'
-        });
-      } finally {
-        setLoading(false);
       }
-    };
+
+      link.setAttribute("download", downloadFilename);
+      document.body.appendChild(link);
+      link.click();
+      Swal.fire({
+        icon: "success",
+        title: "Thành công",
+        text: "Tải file thành công!",
+        confirmButtonText: "Đóng",
+      });
+      // Clean up
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      }, 100);
+    } catch (error) {
+      console.error("Download failed:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: error.response?.data?.message || "Tải file thất bại",
+        confirmButtonText: "Đóng",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Create new hồ sơ
   const handleAddHoSo = async () => {
@@ -344,10 +366,10 @@ const HoSoDangVien = () => {
   );
 
   // Thêm hàm xử lý thay đổi search term
-const handleSearchChange = (e) => {
-  setSearchTerm(e.target.value);
-  setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
-};
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
+  };
 
   // Load data on component mount and when selectedDangVien or searchType changes
   useEffect(() => {
@@ -359,9 +381,9 @@ const handleSearchChange = (e) => {
   }, [selectedDangVien, searchType]);
 
   // Thêm useEffect để reset trang khi thay đổi loại tìm kiếm (all/approved)
-useEffect(() => {
-  setCurrentPage(1);
-}, [searchType]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchType]);
 
   return (
     <div className="container-fluid p-0 position-relative d-flex flex-column min-vh-100">
@@ -457,11 +479,13 @@ useEffect(() => {
                   {currentItems.map((item, index) => (
                     <tr key={index}>
                       <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                      <td>{item.taphoso === "tap1"
-                            ? "Tập 1"
-                            : item.taphoso === "tap2"
-                            ? "Tập 2"
-                            : "Tập 3"}</td>
+                      <td>
+                        {item.taphoso === "tap1"
+                          ? "Tập 1"
+                          : item.taphoso === "tap2"
+                          ? "Tập 2"
+                          : "Tập 3"}
+                      </td>
                       <td>{item.loaihoso}</td>
                       <td>
                         <Badge
@@ -484,6 +508,13 @@ useEffect(() => {
                       <td>{item.nguoipheduyet || "Chưa phê duyệt"}</td>
                       <td>
                         <div className="d-flex gap-1">
+                          <button
+                            className="btn btn-sm btn-outline-info"
+                            onClick={() => fetchHoSoDetail(item.id)}
+                            title="Xem chi tiết"
+                          >
+                            <i className="fas fa-eye"></i>
+                          </button>
                           <button
                             className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
                             onClick={() => openEditModal(item)}
@@ -566,6 +597,106 @@ useEffect(() => {
           </>
         )}
       </div>
+
+{/* Detail HoSo Modal */}
+<Modal
+    show={showDetailModal}
+    onHide={() => setShowDetailModal(false)}
+    size="lg"
+  >
+    <Modal.Header closeButton>
+      <Modal.Title>Chi tiết Hồ Sơ</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+      {hoSoDetail ? (
+        <div>
+          <Row className="mb-3">
+            <Col md={6}>
+              <h6>Tập hồ sơ:</h6>
+              <p>{hoSoDetail.taphoso === "tap1"
+                  ? "Tập 1"
+                  : hoSoDetail.taphoso === "tap2"
+                  ? "Tập 2"
+                  : "Tập 3"}</p>
+            </Col>
+            <Col md={6}>
+              <h6>Loại hồ sơ:</h6>
+              <p>{hoSoDetail.loaihoso}</p>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col md={12}>
+              <h6>File hồ sơ:</h6>
+              {hoSoDetail.fileUrl && (
+                <p>
+                  <a
+                    onClick={() => handleDownloadFile(hoSoDetail.fileUrl)}
+                    style={{ cursor: 'pointer', color: 'blue' }}
+                  >
+                    {hoSoDetail.fileUrl}
+                  </a>
+                </p>
+              )}
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col md={12}>
+              <h6>Ghi chú:</h6>
+              <p>{hoSoDetail.ghichu || "Không có ghi chú"}</p>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col md={6}>
+              <h6>Trạng thái:</h6>
+              <Badge
+                bg={
+                  hoSoDetail.trangthai === "approved"
+                    ? "success"
+                    : hoSoDetail.trangthai === "rejected"
+                    ? "danger"
+                    : "warning"
+                }
+              >
+                {hoSoDetail.trangthai === "approved"
+                  ? "Đã duyệt"
+                  : hoSoDetail.trangthai === "rejected"
+                  ? "Từ chối"
+                  : "Chờ duyệt"}
+              </Badge>
+            </Col>
+            <Col md={6}>
+              <h6>Thời gian tạo:</h6>
+              <p>{hoSoDetail.thoigiantao}</p>
+            </Col>
+          </Row>
+          {hoSoDetail.trangthai === "approved" && (
+            <Row className="mb-3">
+              <Col md={6}>
+                <h6>Người phê duyệt:</h6>
+                <p>{hoSoDetail.nguoipheduyet}</p>
+              </Col>
+              <Col md={6}>
+                <h6>Thời gian phê duyệt:</h6>
+                <p>{hoSoDetail.thoigianpheduyet}</p>
+              </Col>
+            </Row>
+          )}
+          <div className="mt-3">
+            <h6>Đảng viên: {selectedDangVien?.hoten}</h6>
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-4">
+          <Spinner animation="border" variant="primary" />
+        </div>
+      )}
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
+        Đóng
+      </Button>
+    </Modal.Footer>
+  </Modal>
 
       {/* Add HoSo Modal */}
       <Modal
@@ -700,9 +831,7 @@ useEffect(() => {
         size="lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title>
-            Cập nhật Hồ Sơ Đảng Viên
-          </Modal.Title>
+          <Modal.Title>Cập nhật Hồ Sơ Đảng Viên</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>

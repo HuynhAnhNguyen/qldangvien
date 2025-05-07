@@ -104,59 +104,44 @@ const HoSoDangVienTable = ({
                         : "Không có"}
                     </td>
                     <td>{item.nguoipheduyet || "Chưa phê duyệt"}</td>
-                    {/* <td>
+                    <td>
                       <div className="d-flex gap-1">
                         <button
-                          className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
-                          onClick={() => openEditModal(item)}
-                          title="Chỉnh sửa"
-                        >
-                          <i className="fas fa-edit"></i>
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() => handleDeleteHoSo(item.id)}
-                          title="Xóa"
-                        >
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
-                    </td> */}
-                    <td>
-                      {item.trangthai === "saved" ||
-                      item.trangthai === "reject" ? (
-                        <div className="d-flex gap-1">
-                          <button
-                            className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
-                            onClick={() => openDetailModal(item)}
-                            title="Xem chi tiết"
-                          >
-                            <i className="fas fa-eye"></i>
-                          </button>
-                          <button
-                            className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
-                            onClick={() => openEditModal(item)}
-                            title="Chỉnh sửa"
-                          >
-                            <i className="fas fa-edit"></i>
-                          </button>
-                          <button
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={() => handleDeleteHoSo(item.id)}
-                            title="Xóa"
-                          >
-                            <i className="fas fa-trash"></i>
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
+                          className="btn btn-sm btn-outline-info"
                           onClick={() => openDetailModal(item)}
                           title="Xem chi tiết"
                         >
                           <i className="fas fa-eye"></i>
                         </button>
-                      )}
+
+                        <button
+                          className="btn btn-sm btn-outline-warning"
+                          onClick={() => openEditModal(item)}
+                          title="Chỉnh sửa"
+                          disabled={
+                            !(
+                              item.trangthai === "saved" ||
+                              item.trangthai === "reject"
+                            )
+                          }
+                        >
+                          <i className="fas fa-edit"></i>
+                        </button>
+
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => handleDeleteHoSo(item.id)}
+                          title="Xóa"
+                          disabled={
+                            !(
+                              item.trangthai === "saved" ||
+                              item.trangthai === "reject"
+                            )
+                          }
+                        >
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

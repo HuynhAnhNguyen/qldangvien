@@ -10,10 +10,12 @@ import {
   deleteHoSo,
   uploadFile,
   downloadFile,
+  fetchHoSoById,
 } from "../../services/apiService";
 import HoSoDangVienTable from "./HoSoDangVienTable";
 import HoSoDangVienAddModal from "./HoSoDangVienAddModal";
 import HoSoDangVienEditModal from "./HoSoDangVienEditModal";
+import HoSoDetailModal from "./HoSoDetailModal";
 
 const HoSoDangVienList = () => {
   const [dangVienList, setDangVienList] = useState([]);
@@ -31,6 +33,8 @@ const HoSoDangVienList = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedHoSo, setSelectedHoSo] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [hoSoDetail, setHoSoDetail] = useState(null);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -69,10 +73,7 @@ const HoSoDangVienList = () => {
       if (searchType === "all") {
         data = await fetchHoSoByDangVienId(token, selectedDangVien.id);
       } else {
-        data = await fetchHoSoApprovedByDangVienId(
-          token,
-          selectedDangVien.id
-        );
+        data = await fetchHoSoApprovedByDangVienId(token, selectedDangVien.id);
       }
       // const data = await response.json();
       if (data.resultCode === 0) {
@@ -272,6 +273,25 @@ const HoSoDangVienList = () => {
     }
   };
 
+  const fetchHoSoDetail = async (hoSoId) => {
+    try {
+      setLoading(true);
+      const data = await fetchHoSoById(token, hoSoId);
+      // const data = await response.json();
+      if (data.resultCode === 0 && data.data && data.data.length > 0) {
+        setHoSoDetail(data.data[0]);
+        setShowDetailModal(true);
+      } else {
+        throw new Error(data.message || "Không thể tải chi tiết hồ sơ");
+      }
+    } catch (err) {
+      Swal.fire("Lỗi!", "Không thể tải chi tiết hồ sơ", "error");
+      console.error("Error fetching hoSo detail:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -314,15 +334,7 @@ const HoSoDangVienList = () => {
   };
 
   const openDetailModal = (hoSoItem) => {
-    setSelectedHoSo(hoSoItem);
-    setFormData({
-      taphoso: hoSoItem.taphoso,
-      loaihoso: hoSoItem.loaihoso,
-      fileUrl: hoSoItem.fileUrl,
-      ghichu: hoSoItem.ghichu || "",
-    });
-    setFile(null);
-    setShowEditModal(true);
+    fetchHoSoDetail(hoSoItem.id);
   };
 
   // Handle DangVien selection
@@ -439,6 +451,14 @@ const HoSoDangVienList = () => {
           selectedDangVien={selectedDangVien}
           selectedHoSo={selectedHoSo}
           loading={loading}
+          handleDownloadFile={handleDownloadFile}
+        />
+
+        <HoSoDetailModal
+          show={showDetailModal}
+          onHide={() => setShowDetailModal(false)}
+          hoSoDetail={hoSoDetail}
+          selectedDangVien={selectedDangVien}
           handleDownloadFile={handleDownloadFile}
         />
       </div>
