@@ -74,7 +74,7 @@ const App = () => {
           }
         /> */}
 
-        {/* <Route path="/quan-ly-tin-tuc" element={<QuanLyTinTuc />} /> */}
+        <Route path="/quan-ly-tin-tuc" element={<QuanLyTinTuc />} />
         <Route path="/quan-ly-dang-vien" element={<QuanLyDangVien />} />
         <Route path="/quan-ly-chi-bo" element={<QuanLyChiBo />} />
         <Route path="/quan-ly-ho-so" element={<QuanLyHoSo />} />
@@ -85,7 +85,7 @@ const App = () => {
         <Route path="/quan-ly-tai-khoan" element={<QuanLyTaiKhoan />} />
         <Route path="/bao-cao-thong-ke" element={<BaoCaoThongKe />} />
         {/* <Route path="/quan-ly-tin-tuc" element={<NewsManagement />} /> */}
-        {/* <Route path="/tintuc/:tintucId" element={<ChiTietTinTuc />} /> */}
+        <Route path="/tintuc/:tintucId" element={<ChiTietTinTuc />} />
       </Routes>
     </Router>
   );
