@@ -9,7 +9,6 @@ import Swal from "sweetalert2";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NewPage from "./pages/NewPage";
-import QuanLyTinTuc from "./pages/QuanLyTinTuc";
 import QuanLyChiBo from "./pages/QuanLyChiBo";
 import QuanLyDangVien from "./pages/QuanLyDangVien";
 import QuanLyHoSo from "./pages/QuanLyHoSo";
@@ -19,6 +18,8 @@ import SaoLuuKhoiPhuc from "./pages/SaoLuuKhoiPhuc";
 import QuanLyPheDuyet from "./pages/QuanLyPheDuyet";
 import QuanLyTaiKhoan from "./pages/QuanLyTaiKhoan";
 import BaoCaoThongKe from "./pages/BaoCaoThongKe";
+import QuanLyTinTuc from "./components/QuanLyTinTuc";
+import ChiTietTinTuc from "./components/ChiTietTinTuc";
 
 const App = () => {
   return (
@@ -73,7 +74,7 @@ const App = () => {
           }
         /> */}
 
-        <Route path="/quan-ly-tin-tuc" element={<QuanLyTinTuc />} />
+        {/* <Route path="/quan-ly-tin-tuc" element={<QuanLyTinTuc />} /> */}
         <Route path="/quan-ly-dang-vien" element={<QuanLyDangVien />} />
         <Route path="/quan-ly-chi-bo" element={<QuanLyChiBo />} />
         <Route path="/quan-ly-ho-so" element={<QuanLyHoSo />} />
@@ -83,6 +84,8 @@ const App = () => {
         <Route path="/quan-ly-phe-duyet" element={<QuanLyPheDuyet />} />
         <Route path="/quan-ly-tai-khoan" element={<QuanLyTaiKhoan />} />
         <Route path="/bao-cao-thong-ke" element={<BaoCaoThongKe />} />
+        {/* <Route path="/quan-ly-tin-tuc" element={<NewsManagement />} /> */}
+        {/* <Route path="/tintuc/:tintucId" element={<ChiTietTinTuc />} /> */}
       </Routes>
     </Router>
   );

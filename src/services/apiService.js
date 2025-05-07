@@ -1,14 +1,15 @@
 import axios from "axios";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 // Định nghĩa URL API (có thể thay đổi dễ dàng)
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL || "http://3.104.77.30:8080/api/v1/project";
+const REACT_APP_API_URL =
+  process.env.REACT_APP_API_URL || "http://3.104.77.30:8080/api/v1/project";
 
 // Cập nhật hàm login cho phù hợp với API yêu cầu
 export const login = async (userName, passWord) => {
   try {
     const response = await axios.post(`${REACT_APP_API_URL}/auth/signin`, {
-      userName, 
+      userName,
       passWord,
     });
     // console.log(response);
@@ -22,12 +23,12 @@ export const login = async (userName, passWord) => {
 export const sendChatMessage = async (token, message) => {
   const response = await axios.post(
     `${REACT_APP_API_URL}/chat/gemini`,
-    {message},
+    { message },
     {
       headers: {
-        Authorization: `${token}`,  // Thêm 'Bearer' phía trước token
-        'Content-Type': 'application/json'
-      }
+        Authorization: `${token}`, // Thêm 'Bearer' phía trước token
+        "Content-Type": "application/json",
+      },
     }
   );
   // console.log("token: "+ token);
@@ -40,34 +41,42 @@ export const fetchTinTuc = async (token) => {
   const response = await axios.get(`${REACT_APP_API_URL}/tintuc/findAll`, {
     headers: {
       Authorization: `${token}`,
-      'Content-Type': 'application/json'
-    }
+      "Content-Type": "application/json",
+    },
   });
   return response.data;
 };
 
 // Thêm tin tức mới
 export const createTinTuc = async (token, newsData) => {
-  const response = await axios.post(`${REACT_APP_API_URL}/tintuc/create`, newsData, {
-    headers: {
-      Authorization: `${token}`,
-      'Content-Type': 'application/json'
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/tintuc/create`,
+    newsData,
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
     }
-  });
+  );
   return response.data;
 };
 
 // Cập nhật tin tức
 export const updateTinTuc = async (token, newsId, newsData) => {
-  const response = await axios.put(`${REACT_APP_API_URL}/tintuc/update`, {
-    ...newsData,
-    tintucId: newsId
-  }, {
-    headers: {
-      Authorization: `${token}`,
-      'Content-Type': 'application/json'
+  const response = await axios.put(
+    `${REACT_APP_API_URL}/tintuc/update`,
+    {
+      ...newsData,
+      tintucId: newsId,
+    },
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
     }
-  });
+  );
   return response.data;
 };
 
@@ -77,8 +86,8 @@ export const deleteTinTuc = async (token, newsId) => {
     params: { tintucId: newsId },
     headers: {
       Authorization: `${token}`,
-      'Content-Type': 'application/json'
-    }
+      "Content-Type": "application/json",
+    },
   });
   return response.data;
 };
@@ -86,14 +95,18 @@ export const deleteTinTuc = async (token, newsId) => {
 // Upload hình ảnh
 export const uploadImage = async (token, file) => {
   const formData = new FormData();
-  formData.append('file', file);
-  
-  const response = await axios.post(`${REACT_APP_API_URL}/file/uploadImage`, formData, {
-    headers: {
-      Authorization: `${token}`,
-      'Content-Type': 'multipart/form-data'
+  formData.append("file", file);
+
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/file/uploadImage`,
+    formData,
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "multipart/form-data",
+      },
     }
-  });
+  );
   return response.data;
 };
 
@@ -102,57 +115,69 @@ export const fetchChiBo = async (token) => {
   const response = await axios.get(`${REACT_APP_API_URL}/chibo/findAll`, {
     headers: {
       Authorization: `${token}`,
-      'Content-Type': 'application/json'
-    }
+      "Content-Type": "application/json",
+    },
   });
   return response.data;
 };
 
 // Thêm chi bộ mới
 export const createChiBo = async (token, formData) => {
-  const response = await axios.post(`${REACT_APP_API_URL}/chibo/create`, formData, {
-    headers: {
-      Authorization: `${token}`,
-      'Content-Type': 'application/json'
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/chibo/create`,
+    formData,
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
     }
-  });
+  );
   return response.data;
 };
 
 // Cập nhật chi bộ
 export const updateChiBo = async (token, chiboId, formData) => {
-  const response = await axios.put(`${REACT_APP_API_URL}/chibo/update?chiboId=${chiboId}`, {
-    ...formData,
-  }, {
-    headers: {
-      Authorization: `${token}`,
-      'Content-Type': 'application/json'
+  const response = await axios.put(
+    `${REACT_APP_API_URL}/chibo/update?chiboId=${chiboId}`,
+    {
+      ...formData,
+    },
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
     }
-  });
+  );
   return response.data;
 };
 
 // Fetch XepLoai by ChiBoId
 export const fetchXepLoaiByChiBoId = async (token, chiboId) => {
-  const response = await axios.get(`${REACT_APP_API_URL}/xeploai/findByChiBoId`, {
-    params: { chiboId },
-    headers: {
-      Authorization: `${token}`,
-      'Content-Type': 'application/json'
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/xeploai/findByChiBoId`,
+    {
+      params: { chiboId },
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
     }
-  });
+  );
   return await response.data;
 };
 
 // Create new XepLoai
 export const createXepLoai = async (token, chiboId, nam, xeploai) => {
-  const response = await axios.post(`${REACT_APP_API_URL}/xeploai/create?chiboId=${chiboId}&nam=${nam}&xeploai=${xeploai}`, 
-    { },
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/xeploai/create?chiboId=${chiboId}&nam=${nam}&xeploai=${xeploai}`,
+    {},
     {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -160,13 +185,14 @@ export const createXepLoai = async (token, chiboId, nam, xeploai) => {
 
 // Update XepLoai
 export const updateXepLoai = async (token, xeploaiId, xeploai) => {
-  const response = await axios.put(`${REACT_APP_API_URL}/xeploai/update?xeploaiId=${xeploaiId}&xeploai=${xeploai}`, 
+  const response = await axios.put(
+    `${REACT_APP_API_URL}/xeploai/update?xeploaiId=${xeploaiId}&xeploai=${xeploai}`,
     {},
     {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -177,8 +203,8 @@ export const fetchChiBoDangHoatDong = async (token) => {
   const response = await fetch(`${REACT_APP_API_URL}/chibo/chiBoDangHoatDong`, {
     headers: {
       Authorization: `${token}`,
-      'Content-Type': 'application/json'
-    }
+      "Content-Type": "application/json",
+    },
   });
   return await response;
 };
@@ -196,7 +222,7 @@ export const fetchChiBoDangHoatDong = async (token) => {
 //     Authorization: `${token}`,
 //     'Content-Type': 'application/json'
 //   } });
-  
+
 //   return await response;
 // };
 export const fetchDangVien = async (token, searchType, selectedChiBoId) => {
@@ -207,50 +233,60 @@ export const fetchDangVien = async (token, searchType, selectedChiBoId) => {
     url = `${REACT_APP_API_URL}/dangvien/findByChiBoId?chiboId=${selectedChiBoId}`;
   }
 
-  const response = await fetch(url, { headers: {
-    Authorization: `${token}`,
-    'Content-Type': 'application/json'
-  } });
-  
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
   if (!response.ok) {
     const errorData = await response.json();
-    
+
     // Nếu lỗi 401 (Unauthorized) thì xóa token và chuyển hướng
     if (response.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      window.location.href = '/dang-nhap';
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.location.href = "/dang-nhap";
     }
-    
-    throw new Error(errorData.message || 'Lỗi khi tải danh sách Đảng viên');
+
+    throw new Error(errorData.message || "Lỗi khi tải danh sách Đảng viên");
   }
 
   return await response;
 };
 
 // Thêm Đảng viên mới
-export const createDangVien  = async (token, chiboId, formData) => {
-  const response = await axios.post(`${REACT_APP_API_URL}/dangvien/create?chiboId=${chiboId}`, {
-    ...formData
-  }, {
-    headers: {
-      Authorization: `${token}`,
-      'Content-Type': 'application/json'
+export const createDangVien = async (token, chiboId, formData) => {
+  const response = await axios.post(
+    `${REACT_APP_API_URL}/dangvien/create?chiboId=${chiboId}`,
+    {
+      ...formData,
+    },
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
     }
-  });
+  );
   return await response.data;
 };
 
 // Cập nhật Đảng viên
 export const updateDangVien = async (token, dangvienId, formData) => {
-  const response = await axios.put(`${REACT_APP_API_URL}/dangvien/update?dangvienId=${dangvienId}`, {
-    ...formData
-  }, {
-    headers: {
-      Authorization: `${token}`,
-      'Content-Type': 'application/json'
+  const response = await axios.put(
+    `${REACT_APP_API_URL}/dangvien/update?dangvienId=${dangvienId}`,
+    {
+      ...formData,
+    },
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
     }
-  });
+  );
   return await response.data;
 };
 
@@ -259,10 +295,12 @@ export const createTheDang = async (token, dangvienId, theDangData) => {
   const response = await axios.post(
     `${REACT_APP_API_URL}/thedang/create?dangvienId=${dangvienId}`,
     theDangData,
-    { headers: {
-      Authorization: `${token}`,
-    'Content-Type': 'application/json'
-   } }
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+    }
   );
   return await response.data;
 };
@@ -275,10 +313,12 @@ export const updateTheDang = async (token, thedangId, theDangData) => {
       ngaycap: theDangData.ngaycap,
       noicapthe: theDangData.noicapthe,
     },
-    { headers: {
-      Authorization: `${token}`,
-    'Content-Type': 'application/json'
-   } }
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+    }
   );
   return await response.data;
 };
@@ -286,10 +326,12 @@ export const updateTheDang = async (token, thedangId, theDangData) => {
 export const deleteTheDang = async (token, thedangId) => {
   const response = await axios.delete(
     `${REACT_APP_API_URL}/thedang/delete?thedangId=${thedangId}`,
-    { headers: {
-      Authorization: `${token}`,
-    'Content-Type': 'application/json'
-   } }
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+    }
   );
   return await response.data;
 };
@@ -297,24 +339,25 @@ export const deleteTheDang = async (token, thedangId) => {
 export const fetchTheDang = async (token, dangvienId) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/thedang/findDetailByDangvienId?dangvienId=${dangvienId}`,
-    { headers: {
-      Authorization: `${token}`,
-    'Content-Type': 'application/json'
-   }  }
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+    }
   );
   // console.log(response.data);
   return await response.data;
 };
 
-
 export const fetchQuyetDinhByDangVien = async (token, dangvienId) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/quyetdinh/findByDangvienId?dangvienId=${dangvienId}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   // console.log(response.data);
@@ -325,11 +368,11 @@ export const createQuyetDinh = async (token, dangvienId, quyetDinhData) => {
   const response = await axios.post(
     `${REACT_APP_API_URL}/quyetdinh/create?dangvienId=${dangvienId}`,
     quyetDinhData,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   // console.log(response.data);
@@ -340,11 +383,11 @@ export const updateQuyetDinh = async (token, quyetDinhId, quyetDinhData) => {
   const response = await axios.put(
     `${REACT_APP_API_URL}/quyetdinh/update?quyedinhId=${quyetDinhId}`,
     quyetDinhData,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   // console.log(response.data);
@@ -354,11 +397,11 @@ export const updateQuyetDinh = async (token, quyetDinhId, quyetDinhData) => {
 export const deleteQuyetDinh = async (token, quyetDinhId) => {
   const response = await axios.delete(
     `${REACT_APP_API_URL}/quyetdinh/delete?quyetdinhId=${quyetDinhId}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   // console.log(response.data);
@@ -368,19 +411,19 @@ export const deleteQuyetDinh = async (token, quyetDinhId) => {
 export const uploadFile = async (token, file) => {
   try {
     const response = await axios.post(
-      `${REACT_APP_API_URL}/file/uploadFile`, 
-      file, 
+      `${REACT_APP_API_URL}/file/uploadFile`,
+      file,
       {
         headers: {
           Authorization: `${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       }
     );
-    
+
     return await response.data;
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error("Error uploading file:", error);
     throw error;
   }
 };
@@ -393,20 +436,20 @@ export const downloadFile = async (token, filename) => {
         headers: {
           Authorization: `${token}`,
         },
-        responseType: 'blob' // This is crucial for file downloads
+        responseType: "blob", // This is crucial for file downloads
       }
     );
     return response;
   } catch (error) {
-    console.error('API Error downloading file:', error);
+    console.error("API Error downloading file:", error);
     throw error;
   }
 };
 
-export const exportDangVienToExcel = (dangVienData) => {
+export const exportDangVienToExcel = (dangVienData, theDangData) => {
   // Tạo workbook mới
   const workbook = XLSX.utils.book_new();
-  
+
   // Chuẩn bị dữ liệu
   const excelData = [
     ["Họ và tên", dangVienData.hoten || "Không có"],
@@ -425,42 +468,52 @@ export const exportDangVienToExcel = (dangVienData) => {
     ["Người giới thiệu 1", dangVienData.nguoigioithieu1 || "Không có"],
     ["Người giới thiệu 2", dangVienData.nguoigioithieu2 || "Không có"],
     ["Nơi sinh hoạt Đảng", dangVienData.noisinhhoatdang || "Không có"],
-    ["Trạng thái",  dangVienData.trangthaidangvien === "chinhthuc" ? "Chính thức" : dangVienData.trangthaidangvien === "dubi" ? "Dự bị" : 
-      dangVienData.trangthaidangvien === "khaitru" ? "Khai trừ" : "Khác"],
+    [
+      "Trạng thái",
+      dangVienData.trangthaidangvien === "chinhthuc"
+        ? "Chính thức"
+        : dangVienData.trangthaidangvien === "dubi"
+        ? "Dự bị"
+        : dangVienData.trangthaidangvien === "khaitru"
+        ? "Khai trừ"
+        : "Khác",
+    ],
     ["Chức vụ chính quyền", dangVienData.chucvuchinhquyen || "Không có"],
     ["Chức vụ chi bộ", dangVienData.chucvuchibo || "Không có"],
     ["Chức vụ Đảng ủy", dangVienData.chucvudanguy || "Không có"],
     ["Chức vụ đoàn thể", dangVienData.chucvudoanthe || "Không có"],
-    ["Chức danh", dangVienData.chucdanh || "Không có"]
+    ["Chức danh", dangVienData.chucdanh || "Không có"],
+    ["Số thẻ Đảng", theDangData.mathe || "Không có"],
+    ["Ngày cấp thẻ", theDangData.ngaycap || "Không có"],
+    ["Nơi cấp thẻ", theDangData.noicapthe || "Không có"],
   ];
 
   // Tạo worksheet
   const worksheet = XLSX.utils.aoa_to_sheet(excelData);
-  
+
   // Điều chỉnh độ rộng cột
-  worksheet['!cols'] = [
+  worksheet["!cols"] = [
     { width: 25 }, // Cột tiêu đề
-    { width: 40 }  // Cột giá trị
+    { width: 40 }, // Cột giá trị
   ];
 
   // Thêm worksheet vào workbook
   XLSX.utils.book_append_sheet(workbook, worksheet, "Thông tin Đảng viên");
 
   // Xuất file
-  const fileName = `DangVien_${dangVienData.hoten.replace(/\s+/g, '_')}.xlsx`;
+  const fileName = `DangVien_${dangVienData.hoten.replace(/\s+/g, "_")}.xlsx`;
   XLSX.writeFile(workbook, fileName);
 };
-
 
 // Fetch hồ sơ theo Đảng viên ID
 export const fetchHoSoByDangVienId = async (token, dangvienId) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/hoso/findByDangvienId?dangvienId=${dangvienId}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -470,11 +523,11 @@ export const fetchHoSoByDangVienId = async (token, dangvienId) => {
 export const fetchHoSoApprovedByDangVienId = async (token, dangvienId) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/hoso/findApprovedByDangvienId?dangvienId=${dangvienId}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -485,11 +538,11 @@ export const createHoSo = async (token, dangvienId, hoSoData) => {
   const response = await axios.post(
     `${REACT_APP_API_URL}/hoso/create?dangvienId=${dangvienId}`,
     hoSoData,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -500,11 +553,11 @@ export const updateHoSo = async (token, hoSoId, hoSoData) => {
   const response = await axios.put(
     `${REACT_APP_API_URL}/hoso/update?hosoId=${hoSoId}`,
     hoSoData,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -514,11 +567,11 @@ export const updateHoSo = async (token, hoSoId, hoSoData) => {
 export const deleteHoSo = async (token, hoSoId) => {
   const response = await axios.delete(
     `${REACT_APP_API_URL}/hoso/delete?hosoid=${hoSoId}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -526,15 +579,12 @@ export const deleteHoSo = async (token, hoSoId) => {
 
 // Fetch kỳ đảng phí
 export const fetchKyDangPhi = async (token) => {
-  const response = await axios.get(
-    `${REACT_APP_API_URL}/kydangphi/findAll`,
-    { 
-      headers: {
-        Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
-    }
-  );
+  const response = await axios.get(`${REACT_APP_API_URL}/kydangphi/findAll`, {
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
   return response.data;
 };
 
@@ -692,29 +742,23 @@ export const confirmDangPhi = async (token, kydangphiId, dangvienId) => {
 
 // Fetch all accounts
 export const fetchAllAccounts = async (token) => {
-  const response = await axios.get(
-    `${REACT_APP_API_URL}/account/findAll`,
-    { 
-      headers: {
-        Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
-    }
-  );
+  const response = await axios.get(`${REACT_APP_API_URL}/account/findAll`, {
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
   return response.data;
 };
 
 // Fetch all roles
 export const fetchAllRoles = async (token) => {
-  const response = await axios.get(
-    `${REACT_APP_API_URL}/account/findAllRole`,
-    { 
-      headers: {
-        Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
-    }
-  );
+  const response = await axios.get(`${REACT_APP_API_URL}/account/findAllRole`, {
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
   return response.data;
 };
 
@@ -722,11 +766,11 @@ export const fetchAllRoles = async (token) => {
 export const activateAccount = async (token, username) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/account/activeAccount?username=${username}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -736,11 +780,11 @@ export const activateAccount = async (token, username) => {
 export const deactivateAccount = async (token, username) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/account/deactiveAccount?username=${username}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -755,20 +799,20 @@ export const createAccount = async (token, formData) => {
       passWord: formData.passWord,
       email: formData.email,
       phoneNumber: formData.phoneNumber,
-      fullname: formData.fullname
+      fullname: formData.fullname,
     },
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
 };
 
 // Change password
-export const changePassword = async (token, username, passwordData ) => {
+export const changePassword = async (token, username, passwordData) => {
   const response = await axios.post(
     `${REACT_APP_API_URL}/account/changePw`,
     {
@@ -776,11 +820,11 @@ export const changePassword = async (token, username, passwordData ) => {
       currentPassword: passwordData.currentPassword,
       newPassword: passwordData.newPassword,
     },
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -790,11 +834,11 @@ export const changePassword = async (token, username, passwordData ) => {
 export const changeRole = async (token, username, roleName) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/account/changeRole?username=${username}&role=${roleName}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -804,11 +848,11 @@ export const changeRole = async (token, username, roleName) => {
 export const deleteAccount = async (token, username) => {
   const response = await axios.delete(
     `${REACT_APP_API_URL}/account/delete?username=${username}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -845,7 +889,9 @@ export const restoreDatabase = async (token, file) => {
 
 export const searchFilteredDangVien = async (token, searchTerm) => {
   const response = await axios.get(
-    `${REACT_APP_API_URL}/dangvien/restorefindByKeyword?keyword=${encodeURIComponent(searchTerm)}`,
+    `${REACT_APP_API_URL}/dangvien/restorefindByKeyword?keyword=${encodeURIComponent(
+      searchTerm
+    )}`,
     {
       headers: {
         Authorization: `${token}`,
@@ -861,11 +907,11 @@ export const searchFilteredDangVien = async (token, searchTerm) => {
 export const getPheDuyetDetail = async (token, pheduyetId) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/pheduyet/getDataByPheduyetId?pheduyetId=${pheduyetId}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -875,11 +921,11 @@ export const getPheDuyetDetail = async (token, pheduyetId) => {
 export const fetchHoSoById = async (token, hosoId) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/hoso/findByListHosodangId?listId=${hosoId}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -889,11 +935,11 @@ export const fetchHoSoById = async (token, hosoId) => {
 export const fetchTinTucById = async (token, tintucId) => {
   const response = await axios.get(
     `${REACT_APP_API_URL}/tintuc/findById?tintucId=${tintucId}`,
-    { 
+    {
       headers: {
         Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
+        "Content-Type": "application/json",
+      },
     }
   );
   return response.data;
@@ -901,14 +947,11 @@ export const fetchTinTucById = async (token, tintucId) => {
 
 // Fetch Tin tức theo id
 export const fetchThongKe = async (token) => {
-  const response = await axios.get(
-    `${REACT_APP_API_URL}/thongke`,
-    { 
-      headers: {
-        Authorization: `${token}`,
-        'Content-Type': 'application/json'
-      } 
-    }
-  );
+  const response = await axios.get(`${REACT_APP_API_URL}/thongke`, {
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
   return response.data;
 };

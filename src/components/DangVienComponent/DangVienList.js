@@ -58,7 +58,7 @@ const DangVienList = () => {
 const handleExportExcel = (dangVien) => {
   try {
     setLoading(true);
-    exportDangVienToExcel(dangVien);
+    exportDangVienToExcel(dangVien, theDangData);
     Swal.fire({
       icon: 'success',
       title: 'Thành công',

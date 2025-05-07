@@ -13,6 +13,7 @@ const HoSoDangVienTable = ({
   openEditModal,
   handleDeleteHoSo,
   searchType,
+  openDetailModal,
 }) => {
   // Filter hồ sơ based on search term
   const filteredHoSo = hoSoList.filter(
@@ -103,7 +104,7 @@ const HoSoDangVienTable = ({
                         : "Không có"}
                     </td>
                     <td>{item.nguoipheduyet || "Chưa phê duyệt"}</td>
-                    <td>
+                    {/* <td>
                       <div className="d-flex gap-1">
                         <button
                           className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
@@ -120,6 +121,42 @@ const HoSoDangVienTable = ({
                           <i className="fas fa-trash"></i>
                         </button>
                       </div>
+                    </td> */}
+                    <td>
+                      {item.trangthai === "saved" ||
+                      item.trangthai === "reject" ? (
+                        <div className="d-flex gap-1">
+                          <button
+                            className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
+                            onClick={() => openDetailModal(item)}
+                            title="Xem chi tiết"
+                          >
+                            <i className="fas fa-eye"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
+                            onClick={() => openEditModal(item)}
+                            title="Chỉnh sửa"
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDeleteHoSo(item.id)}
+                            title="Xóa"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
+                          onClick={() => openDetailModal(item)}
+                          title="Xem chi tiết"
+                        >
+                          <i className="fas fa-eye"></i>
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

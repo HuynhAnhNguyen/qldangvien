@@ -313,6 +313,18 @@ const HoSoDangVienList = () => {
     setShowEditModal(true);
   };
 
+  const openDetailModal = (hoSoItem) => {
+    setSelectedHoSo(hoSoItem);
+    setFormData({
+      taphoso: hoSoItem.taphoso,
+      loaihoso: hoSoItem.loaihoso,
+      fileUrl: hoSoItem.fileUrl,
+      ghichu: hoSoItem.ghichu || "",
+    });
+    setFile(null);
+    setShowEditModal(true);
+  };
+
   // Handle DangVien selection
   const handleDangVienSelect = (dangVien) => {
     setSelectedDangVien(dangVien);
@@ -401,6 +413,7 @@ const HoSoDangVienList = () => {
           openEditModal={openEditModal}
           handleDeleteHoSo={handleDeleteHoSo}
           searchType={searchType}
+          openDetailModal={openDetailModal}
         />
 
         <HoSoDangVienAddModal
