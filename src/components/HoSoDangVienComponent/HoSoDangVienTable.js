@@ -83,7 +83,7 @@ const HoSoDangVienTable = ({
                             ? "info"
                             : item.trangthai === "approved"
                             ? "success"
-                            : item.trangthai === "rejected"
+                            : item.trangthai === "reject"
                             ? "danger"
                             : "warning"
                         }
@@ -92,12 +92,11 @@ const HoSoDangVienTable = ({
                           ? "Đã lưu"
                           : item.trangthai === "approved"
                           ? "Đã duyệt"
-                          : item.trangthai === "rejected"
+                          : item.trangthai === "reject"
                           ? "Từ chối"
                           : "Chờ duyệt"}
                       </Badge>
                     </td>
-                    {/* <td>{item.thoigiantao}</td> */}
                     <td>
                       {item.thoigiantao
                         ? new Date(item.thoigiantao).toLocaleString()

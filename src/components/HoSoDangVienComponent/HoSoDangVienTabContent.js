@@ -1,11 +1,7 @@
 import React from "react";
 import { Table, Alert, Spinner, Badge } from "react-bootstrap";
 
-const HoSoDangVienTabContent = ({
-  hoSoList,
-  onDownload,
-  loading
-}) => {
+const HoSoDangVienTabContent = ({ hoSoList, onDownload, loading }) => {
   return (
     <div className="p-3">
       {loading ? (
@@ -43,19 +39,25 @@ const HoSoDangVienTabContent = ({
                     bg={
                       item.trangthai === "approved"
                         ? "success"
-                        : item.trangthai === "rejected"
+                        : item.trangthai === "reject"
                         ? "danger"
                         : "warning"
                     }
                   >
                     {item.trangthai === "approved"
                       ? "Đã duyệt"
-                      : item.trangthai === "rejected"
+                      : item.trangthai === "reject"
                       ? "Từ chối"
                       : "Chờ duyệt"}
                   </Badge>
                 </td>
-                <td>{item.thoigiantao}</td>
+                <td>
+                  {" "}
+                  {item.thoigiantao
+                    ? new Date(item.thoigiantao).toLocaleString()
+                    : "Không có"}
+                </td>
+
                 <td>
                   {item.fileUrl ? (
                     <button
@@ -74,9 +76,7 @@ const HoSoDangVienTabContent = ({
         </Table>
       ) : (
         <div className="text-center py-4">
-          <Alert variant="info">
-            Đảng viên chưa có hồ sơ nào
-          </Alert>
+          <Alert variant="info">Đảng viên chưa có hồ sơ nào</Alert>
         </div>
       )}
     </div>
