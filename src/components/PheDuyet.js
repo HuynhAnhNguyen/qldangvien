@@ -593,33 +593,34 @@ const PheDuyet = () => {
                       </td>
                       <td>{item.ghichu || ""}</td>
                       <td>
-                        {item.trangthai === "pending" && (
-                          <div className="d-flex gap-1">
-                            <button
-                              className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
-                              onClick={() =>
-                                handleViewDetail(item.id, item.loaipheduyet)
-                              }
-                              title="Xem chi tiết"
-                            >
-                              <i className="fas fa-eye"></i>
-                            </button>
-                            <button
-                              className="btn btn-sm btn-outline-success"
-                              onClick={() => handleApprovePheDuyet(item.id)}
-                              title="Phê duyệt"
-                            >
-                              <i className="fas fa-check"></i>
-                            </button>
-                            <button
-                              className="btn btn-sm btn-outline-danger"
-                              onClick={() => handleRejectPheDuyet(item.id)}
-                              title="Từ chối"
-                            >
-                              <i className="fas fa-times"></i>
-                            </button>
-                          </div>
-                        )}
+                        <div className="d-flex gap-1">
+                          <button
+                            className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
+                            onClick={() =>
+                              handleViewDetail(item.id, item.loaipheduyet)
+                            }
+                            title="Xem chi tiết"
+                          >
+                            <i className="fas fa-eye"></i>
+                          </button>
+
+                          <button
+                            className="btn btn-sm btn-outline-success"
+                            onClick={() => handleApprovePheDuyet(item.id)}
+                            title="Phê duyệt"
+                            disabled={item.trangthai !== "pending"}
+                          >
+                            <i className="fas fa-check"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleRejectPheDuyet(item.id)}
+                            title="Từ chối"
+                            disabled={item.trangthai !== "pending"}
+                          >
+                            <i className="fas fa-times"></i>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
