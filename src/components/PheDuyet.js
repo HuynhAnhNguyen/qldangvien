@@ -1056,10 +1056,6 @@ const PheDuyet = () => {
                               </td>
                             </tr>
                             <tr>
-                              <th>Nơi vào Đảng</th>
-                              <td>{detailData.noivaodang || "N/A"}</td>
-                            </tr>
-                            <tr>
                               <th>Ngày chính thức</th>
                               <td>
                                 {detailData.ngaychinhthuc
@@ -1122,10 +1118,7 @@ const PheDuyet = () => {
                               <th>Chức danh</th>
                               <td>{detailData.chucdanh || "N/A"}</td>
                             </tr>
-                            <tr>
-                              <th>Đơn vị công tác</th>
-                              <td>{detailData.donvicongtac || "N/A"}</td>
-                            </tr>
+                            
                           </tbody>
                         </table>
                       </div>
