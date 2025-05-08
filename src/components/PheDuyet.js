@@ -21,6 +21,7 @@ import {
   getPheDuyetDetail,
   fetchAllAccounts,
   downloadFile,
+  fetchDanhSachTinTuc,
 } from "../services/apiService";
 
 const PheDuyet = () => {
@@ -82,7 +83,7 @@ const PheDuyet = () => {
 
   const loadTinTuc = async () => {
     try {
-      const data = await fetchTinTuc(token);
+      const data = await fetchDanhSachTinTuc(token);
       if (data.resultCode === 0) {
         setTinTucList(Array.isArray(data.data) ? data.data : []);
       } else {
@@ -141,14 +142,6 @@ const PheDuyet = () => {
         const filtered = allHoSoData.filter((hs) => hs.trangthai === "saved");
         setFilteredHoSo(filtered);
         setFormData((prev) => ({ ...prev, listHosoId: [] }));
-        // // Hiển thị thông báo nếu không có hồ sơ nào ở trạng thái "saved"
-        // if (filtered.length === 0) {
-        //   Swal.fire({
-        //     icon: "info",
-        //     title: "Thông báo",
-        //     text: 'Không có hồ sơ nào ở trạng thái "Đã lưu" cho Đảng viên này',
-        //   });
-        // }
       } else {
         throw new Error(data.message);
       }
@@ -548,100 +541,6 @@ const PheDuyet = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* {currentItems.map((item, index) => {
-                    if (!item) return null;
-                    return (
-                      <tr key={item.id}>
-                        <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                        <td>
-                          {item.loaipheduyet === "thongtin"
-                            ? "Thông tin Đảng viên"
-                            : item.loaipheduyet === "hoso"
-                            ? "Hồ sơ Đảng"
-                            : "Tin tức"}
-                        </td>
-                        <td>
-                          {item.loaipheduyet === "thongtin" &&
-                            (dangVienList.find(
-                              (dv) => dv.id === item.dangvienId
-                            )?.hoten ||
-                              "N/A")}
-                          {item.loaipheduyet === "hoso" && (
-                            <div className="d-flex flex-column gap-1">
-                              {item.listHosoId && item.listHosoId.length > 0
-                                ? item.listHosoId.map((id) => {
-                                    const hoso = allHoSo.find(
-                                      (hs) => hs.id === id
-                                    );
-                                    return hoso ? (
-                                      <div key={id}>
-                                        {`Tập ${
-                                          hoso.taphoso?.replace("tap", "") || ""
-                                        } - ${hoso.loaihoso || "N/A"}`}
-                                      </div>
-                                    ) : (
-                                      <div key={id}>ID {id} (Đang tải...)</div>
-                                    );
-                                  })
-                                : "N/A"}
-                            </div>
-                          )}
-                          {item.loaipheduyet === "tintuc" &&
-                            (tinTucList.find((tt) => tt.id === item.tintucId)
-                              ?.tieude ||
-                              "N/A")}
-                        </td>
-                        <td>
-                          {new Date(item.thoigianguipheduyet).toLocaleString()}
-                        </td>
-                        <td>
-                          <Badge
-                            bg={
-                              item.trangthai === "approved"
-                                ? "success"
-                                : item.trangthai === "reject"
-                                ? "danger"
-                                : "warning"
-                            }
-                          >
-                            {item.trangthai === "approved"
-                              ? "Đã duyệt"
-                              : item.trangthai === "reject"
-                              ? "Từ chối"
-                              : "Chờ duyệt"}
-                          </Badge>
-                        </td>
-                        <td>{item.ghichu || ""}</td>
-                        <td>
-                          {item.trangthai === "pending" && (
-                            <div className="d-flex gap-1">
-                              <button
-                                className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
-                                onClick={() => handleViewDetail(item.id, item.loaipheduyet)}
-                                title="Xem chi tiết"
-                              >
-                                <i className="fas fa-eye"></i>
-                              </button>
-                              <button
-                                className="btn btn-sm btn-outline-success"
-                                onClick={() =>  handleApprovePheDuyet(item.id)}
-                                title="Phê duyệt"
-                              >
-                                <i className="fas fa-check"></i>
-                              </button>
-                              <button
-                                className="btn btn-sm btn-outline-danger"
-                                onClick={() =>  handleRejectPheDuyet(item.id)}
-                                title="Từ chối"
-                              >
-                                <i className="fas fa-times"></i>
-                              </button>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })} */}
                   {currentItems.map((item, index) => (
                     <tr key={item.id}>
                       <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
@@ -924,14 +823,14 @@ const PheDuyet = () => {
               <Row className="mb-3">
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>Tin tức</Form.Label>
+                    <Form.Label>Tin tức <span className="text-danger">*</span></Form.Label>
                     <Form.Select
                       name="tintucId"
                       value={formData.tintucId}
                       onChange={handleInputChange}
                     >
                       <option value="">
-                        Chọn tin tức <span className="text-danger">*</span>
+                        Chọn tin tức
                       </option>
                       {filteredTinTuc.map((tt) => (
                         <option key={tt.id} value={tt.id}>

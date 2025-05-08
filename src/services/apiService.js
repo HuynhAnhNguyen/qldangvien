@@ -37,7 +37,7 @@ export const sendChatMessage = async (token, message) => {
 };
 
 // Lấy danh sách tin tức
-export const fetchTinTuc = async (token) => {
+export const fetchDanhSachTinTuc = async (token) => {
   const response = await axios.get(`${REACT_APP_API_URL}/tintuc/findAll`, {
     headers: {
       Authorization: `${token}`,
@@ -45,6 +45,23 @@ export const fetchTinTuc = async (token) => {
     },
   });
   return response.data;
+};
+
+// Lấy danh sách tin tức
+export const fetchTinTuc = async (token, searchType) => {
+  let url = `${REACT_APP_API_URL}/tintuc/findAll`;
+  if (searchType === "approved") {
+    url = `${REACT_APP_API_URL}/auth/tintuc/findApproved`;
+  }
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  return await response;
 };
 
 // Thêm tin tức mới
@@ -66,9 +83,7 @@ export const createTinTuc = async (token, newsData) => {
 export const updateTinTuc = async (token, newsId, newsData) => {
   const response = await axios.put(
     `${REACT_APP_API_URL}/tintuc/update?tintucId=${newsId}`,
-    {
-      newsData,
-    },
+    newsData,
     {
       headers: {
         Authorization: `${token}`,
@@ -955,7 +970,7 @@ export const fetchThongKe = async (token) => {
 // fetchApprovedNews
 export const fetchApprovedNews = async () => {
   const response = await axios.get(
-    `${REACT_APP_API_URL}/tintuc/findApproved`,
+    `${REACT_APP_API_URL}/auth/tintuc/findApproved`,
   );
   return response.data;
 };
@@ -963,7 +978,13 @@ export const fetchApprovedNews = async () => {
 // GetImage
 export const getImage = async (filename) => {
   const response = await axios.get(
-    `${REACT_APP_API_URL}/file/getImage/${filename}`,
+    `${REACT_APP_API_URL}/auth/file/getImage/${filename}`,
+    {
+      responseType: "blob",
+    }
   );
-  return response.data;
+  return URL.createObjectURL(response.data);
 };
+
+export const getImageLink = (imageName) =>
+  `${REACT_APP_API_URL}/auth/file/getImage/${imageName}`;

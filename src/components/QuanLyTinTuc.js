@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import Swal from "sweetalert2";
 import { Editor } from "@tinymce/tinymce-react";
+import { useNavigate } from "react-router-dom";
 import {
   uploadImage,
-  getImage,
   createTinTuc,
   updateTinTuc,
   fetchTinTuc,
   deleteTinTuc,
   fetchTinTucById,
+  getImageLink,
 } from "../services/apiService";
 
 const QuanLyTinTuc = () => {
@@ -19,6 +20,7 @@ const QuanLyTinTuc = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
+  const [imageUrl, setImageUrl] = useState(null);
   const itemsPerPage = 10;
 
   // Modal states
@@ -155,17 +157,17 @@ const QuanLyTinTuc = () => {
       if (data.resultCode === 0) {
         setNewsList(
           newsList.map((item) =>
-            item.id === selectedNews.id ? { ...item, ...data.data } : item
+            item.id === selectedNews.id ? { 
+              ...item, 
+              tieude: formData.tieude,
+              noidungtin: formData.noidungtin,
+              url: formData.url
+            } : item
           )
         );
         setShowEditModal(false);
-        setFormData({
-          tieude: "",
-          noidungtin: "",
-          url: "",
-        });
         setValidationErrors({});
-        Swal.fire("Thành công!", "Cập nhật tin tức thành công", "success");
+      Swal.fire("Thành công!", "Cập nhật tin tức thành công", "success");
       } else {
         throw new Error(data.message || "Cập nhật tin tức thất bại");
       }
@@ -271,6 +273,12 @@ const handleEditorChange = (content) => {
     currentPage * itemsPerPage
   );
 
+  const navigate = useNavigate();
+
+  const handleViewDetail = (newsId) => {
+    navigate(`/tintuc/${newsId}`);
+  };
+
   // Render form
   const renderNewsForm = (isEdit = false) => (
     <Form>
@@ -311,7 +319,7 @@ const handleEditorChange = (content) => {
             {formData.url && (
               <div className="mt-2">
                 <img
-                  src={`http://3.104.77.30:8080/api/v1/project/auth/file/getImage/${formData.url}`}
+                  src={getImageLink(formData.url)}
                   alt="Preview"
                   className="img-thumbnail"
                   style={{ maxWidth: "200px", maxHeight: "200px" }}
@@ -446,7 +454,7 @@ const handleEditorChange = (content) => {
                       <td>
                         {item.url && (
                           <img
-                            src={`http://3.104.77.30:8080/api/v1/project/auth/file/getImage/${item.url}`}
+                            src={getImageLink(item.url)}
                             alt={item.tieude}
                             className="img-thumbnail"
                             style={{ maxWidth: "100px", maxHeight: "100px" }}
@@ -464,6 +472,14 @@ const handleEditorChange = (content) => {
                       ></td>
                       <td>
                         <div className="d-flex gap-1">
+                        <Button
+                            variant="info"
+                            size="sm"
+                            onClick={() => handleViewDetail(item.id)}
+                            title="Xem chi tiết"
+                          >
+                            <i className="fas fa-eye"></i>
+                          </Button>
                           <button
                             className="btn btn-sm btn-outline-warning"
                             onClick={() => openEditModal(item)}

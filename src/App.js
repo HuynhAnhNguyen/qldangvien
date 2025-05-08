@@ -18,11 +18,10 @@ import SaoLuuKhoiPhuc from "./pages/SaoLuuKhoiPhuc";
 import QuanLyPheDuyet from "./pages/QuanLyPheDuyet";
 import QuanLyTaiKhoan from "./pages/QuanLyTaiKhoan";
 import BaoCaoThongKe from "./pages/BaoCaoThongKe";
-import QuanLyTinTuc from "./components/QuanLyTinTuc";
 import ChiTietTinTuc from "./components/ChiTietTinTuc";
 import DanhSachTinTuc from "./components/DanhSachTinTuc";
-import ThemTinTuc from "./components/ThemTinTuc";
-import ChinhSuaTinTuc from "./components/ChinhSuaTinTuc";
+import QuanLyTinTuc from "./pages/QuanLyTinTuc";
+import ChiTietTin from "./pages/ChiTietTin";
 
 const App = () => {
   return (
@@ -77,10 +76,7 @@ const App = () => {
           }
         /> */}
 
-        {/* <Route path="/quan-ly-tin-tuc" element={<QuanLyTinTuc />} /> */}
         <Route path="/quan-ly-tin-tuc" element={<QuanLyTinTuc />} />
-      <Route path="add" element={<ThemTinTuc />} />
-      <Route path="edit/:id" element={<ChinhSuaTinTuc />} />
         <Route path="/quan-ly-dang-vien" element={<QuanLyDangVien />} />
         <Route path="/quan-ly-chi-bo" element={<QuanLyChiBo />} />
         <Route path="/quan-ly-ho-so" element={<QuanLyHoSo />} />
@@ -90,8 +86,7 @@ const App = () => {
         <Route path="/quan-ly-phe-duyet" element={<QuanLyPheDuyet />} />
         <Route path="/quan-ly-tai-khoan" element={<QuanLyTaiKhoan />} />
         <Route path="/bao-cao-thong-ke" element={<BaoCaoThongKe />} />
-        {/* <Route path="/quan-ly-tin-tuc" element={<NewsManagement />} /> */}
-        <Route path="/tintuc/:tintucId" element={<ChiTietTinTuc />} />
+        <Route path="/chi-tiet-tin-tuc/:tintucId" element={<ChiTietTin />} />
       </Routes>
     </Router>
   );
