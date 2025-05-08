@@ -65,10 +65,9 @@ export const createTinTuc = async (token, newsData) => {
 // Cập nhật tin tức
 export const updateTinTuc = async (token, newsId, newsData) => {
   const response = await axios.put(
-    `${REACT_APP_API_URL}/tintuc/update`,
+    `${REACT_APP_API_URL}/tintuc/update?tintucId=${newsId}`,
     {
-      ...newsData,
-      tintucId: newsId,
+      newsData,
     },
     {
       headers: {
@@ -82,13 +81,14 @@ export const updateTinTuc = async (token, newsId, newsData) => {
 
 // Xóa tin tức
 export const deleteTinTuc = async (token, newsId) => {
-  const response = await axios.delete(`${REACT_APP_API_URL}/tintuc/delete`, {
-    params: { tintucId: newsId },
-    headers: {
-      Authorization: `${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await axios.delete(`${REACT_APP_API_URL}/tintuc/delete?tintucId=${newsId}`,
+    {
+      headers: {
+        Authorization: `${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
   return response.data;
 };
 
@@ -107,6 +107,7 @@ export const uploadImage = async (token, file) => {
       },
     }
   );
+  console.log(response.data);
   return response.data;
 };
 
@@ -932,15 +933,9 @@ export const fetchHoSoById = async (token, hosoId) => {
 };
 
 // Fetch Tin tức theo id
-export const fetchTinTucById = async (token, tintucId) => {
+export const fetchTinTucById = async (tintucId) => {
   const response = await axios.get(
-    `${REACT_APP_API_URL}/tintuc/findById?tintucId=${tintucId}`,
-    {
-      headers: {
-        Authorization: `${token}`,
-        "Content-Type": "application/json",
-      },
-    }
+    `${REACT_APP_API_URL}/auth/tintuc/findById?tintucId=${tintucId}`,
   );
   return response.data;
 };
@@ -953,5 +948,22 @@ export const fetchThongKe = async (token) => {
       "Content-Type": "application/json",
     },
   });
+  return response.data;
+};
+
+
+// fetchApprovedNews
+export const fetchApprovedNews = async () => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/tintuc/findApproved`,
+  );
+  return response.data;
+};
+
+// GetImage
+export const getImage = async (filename) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/file/getImage/${filename}`,
+  );
   return response.data;
 };

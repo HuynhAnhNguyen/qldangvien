@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Form } from "react-bootstrap";
 import Swal from "sweetalert2";
-import { createKyDangPhi, fetchKyDangPhi, updateKyDangPhi } from "../../services/apiService";
+import {
+  createKyDangPhi,
+  fetchKyDangPhi,
+  updateKyDangPhi,
+} from "../../services/apiService";
 import KyDangPhiTable from "./KyDangPhiTable";
 import KyDangPhiAddModal from "./KyDangPhiAddModal";
 import KyDangPhiEditModal from "./KyDangPhiEditModal";
@@ -75,19 +79,18 @@ const KyDangPhiList = () => {
 
     try {
       setLoading(true);
-      const response = await createKyDangPhi(token, formData.ten, formData.sotien);
+      const response = await createKyDangPhi(
+        token,
+        formData.ten,
+        formData.sotien
+      );
       if (response.resultCode === 0) {
         Swal.fire("Thành công", "Thêm kỳ đảng phí thành công", "success");
         setShowAddModal(false);
         setFormData({ ten: "", sotien: "" });
         fetchKyDangPhiList();
-      } if (response.resultCode === -1) {
-        Swal.fire("Thất bại", "Tên kỳ Đảng phí không được trùng", "error");
-        setShowAddModal(false);
-        setFormData({ ten: "", sotien: "" });
-        fetchKyDangPhiList();
-      }else {
-        throw new Error(response.message || "Failed to create KyDangPhi");
+      } else {
+        throw new Error(response.message || "Failed to update KyDangPhi");
       }
     } catch (error) {
       Swal.fire("Lỗi", error.message || "Thêm kỳ đảng phí thất bại", "error");
@@ -112,11 +115,21 @@ const KyDangPhiList = () => {
         Swal.fire("Thành công", "Cập nhật kỳ đảng phí thành công", "success");
         setShowEditModal(false);
         fetchKyDangPhiList();
-      } else {
+      } if(response.resultCode === -1){
+        Swal.fire(
+          "Lỗi",
+          "Cập nhật kỳ đảng phí thất bại",
+          "error"
+        );
+      }else {
         throw new Error(response.message || "Failed to update KyDangPhi");
       }
     } catch (error) {
-      Swal.fire("Lỗi", error.message || "Cập nhật kỳ đảng phí thất bại", "error");
+      Swal.fire(
+        "Lỗi",
+        error.message || "Cập nhật kỳ đảng phí thất bại",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -160,7 +173,10 @@ const KyDangPhiList = () => {
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
           <h1 className="h3 mb-3 mb-md-0">Quản lý Kỳ Đảng phí</h1>
           <div className="d-flex gap-2 align-items-center">
-            <div className="d-flex" style={{ width: "100%", maxWidth: "450px" }}>
+            <div
+              className="d-flex"
+              style={{ width: "100%", maxWidth: "450px" }}
+            >
               <input
                 type="text"
                 className="form-control custom-sm-input"

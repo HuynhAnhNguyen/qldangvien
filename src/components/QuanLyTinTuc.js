@@ -1,456 +1,592 @@
-// NewsManagement.js
-import React, { useState, useEffect } from 'react';
-import { Button, Table, Modal, Form, Alert, Spinner, Badge } from 'react-bootstrap';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
-
-const token = localStorage.getItem('token');
-
-class MyUploadAdapter {
-  constructor(loader) {
-    this.loader = loader;
-  }
-
-  async upload() {
-    try {
-      const file = await this.loader.file;
-      if (!file) {
-        throw new Error('Không có tệp để tải lên');
-      }
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await axios.post(
-        'http://3.104.77.30:8080/api/v1/project/file/uploadImage',
-        formData,
-        {
-          headers: {
-            Authorization: `${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      const filename = response.data?.data;
-      if (!filename) {
-        throw new Error('Tải lên hình ảnh thất bại');
-      }
-
-      return {
-        default: `http://3.104.77.30:8080/api/v1/project/file/getImage/${filename}`
-      };
-    } catch (error) {
-      console.error('Lỗi tải lên:', error);
-      throw error;
-    }
-  }
-
-  abort() {
-    console.log('Đã hủy tải lên');
-  }
-}
-
-function MyCustomUploadAdapterPlugin(editor) {
-  editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-    return new MyUploadAdapter(loader);
-  };
-}
+import React, { useState, useEffect } from "react";
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import Swal from "sweetalert2";
+import { Editor } from "@tinymce/tinymce-react";
+import {
+  uploadImage,
+  getImage,
+  createTinTuc,
+  updateTinTuc,
+  fetchTinTuc,
+  deleteTinTuc,
+  fetchTinTucById,
+} from "../services/apiService";
 
 const QuanLyTinTuc = () => {
   const [newsList, setNewsList] = useState([]);
-  const [filteredNews, setFilteredNews] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [currentNews, setCurrentNews] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [newsToDelete, setNewsToDelete] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const navigate = useNavigate();
+  const [validationErrors, setValidationErrors] = useState({});
+  const itemsPerPage = 10;
 
-  // Form state
+  // Modal states
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedNews, setSelectedNews] = useState(null);
+
+  // Form data
   const [formData, setFormData] = useState({
-    tieude: '',
-    noidung: '',
-    imageUrl: ''
+    tieude: "",
+    noidungtin: "",
+    url: "",
   });
 
-  const fetchNews = async () => {
+  const token = localStorage.getItem("token");
+
+  // Validate form data
+  const validateForm = () => {
+    const errors = {};
+
+    if (!formData.tieude.trim()) {
+      errors.tieude = "Tiêu đề là bắt buộc";
+    }
+    if (!formData.noidungtin.trim()) {
+      errors.noidungtin = "Nội dung tin là bắt buộc";
+    }
+    if (!formData.url) {
+      errors.url = "Ảnh đại diện là bắt buộc";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Fetch all news
+  const loadNews = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await axios.get('http://3.104.77.30:8080/api/v1/project/tintuc/findAll', {
-        headers: { Authorization: `${token}`, }
-      });
-      setNewsList(response.data.data);
-      setFilteredNews(response.data.data);
+      const data = await fetchTinTuc(token);
+      // console.log(data);
+      if (data.resultCode === 0) {
+        setNewsList(data.data);
+        setError(null);
+      } else {
+        throw new Error(data.message || "Không thể tải danh sách tin tức");
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Lỗi khi tải danh sách tin tức');
+      setError("Không thể tải danh sách tin tức");
+      console.error("Error loading news:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchApprovedNews = async () => {
+  // Handle image upload
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
     try {
       setLoading(true);
-      const response = await axios.get('http://3.104.77.30:8080/api/v1/project/tintuc/findAllApproved', {
-        headers: { Authorization: `${token}`, }
-      });
-      setNewsList(response.data.data);
-      setFilteredNews(response.data.data);
+      const uploadResponse = await uploadImage(token, file);
+      if (uploadResponse.resultCode === 0) {
+        setFormData((prev) => ({
+          ...prev,
+          url: uploadResponse.data,
+        }));
+        setValidationErrors((prev) => ({ ...prev, url: "" }));
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Lỗi khi tải tin tức đã duyệt');
+      setValidationErrors((prev) => ({
+        ...prev,
+        url: "Không thể tải lên ảnh",
+      }));
+      console.error("Error uploading image:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  // Add news
+  const handleAddNews = async () => {
+    if (!validateForm()) {
+      Swal.fire("Lỗi!", "Vui lòng điền đầy đủ các trường bắt buộc!", "error");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const data = await createTinTuc(token, {
+        tieude: formData.tieude,
+        noidungtin: formData.noidungtin,
+        url: formData.url,
+      });
+
+      if (data.resultCode === 0) {
+        setNewsList([...newsList, data.data]);
+        setShowAddModal(false);
+        setFormData({
+          tieude: "",
+          noidungtin: "",
+          url: "",
+        });
+        setValidationErrors({});
+        Swal.fire("Thành công!", "Thêm tin tức thành công", "success");
+      } else {
+        throw new Error(data.message || "Thêm tin tức thất bại");
+      }
+    } catch (err) {
+      Swal.fire("Lỗi!", "Thêm tin tức thất bại", "error");
+      console.error("Error adding news:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Edit news
+  const handleEditNews = async () => {
+    if (!validateForm()) {
+      Swal.fire("Lỗi!", "Vui lòng điền đầy đủ các trường bắt buộc!", "error");
+      return;
+    }
+
+    if (!selectedNews) return;
+
+    try {
+      setLoading(true);
+      const data = await updateTinTuc(token, selectedNews.id, {
+        tieude: formData.tieude,
+        noidungtin: formData.noidungtin,
+        url: formData.url,
+      });
+
+      if (data.resultCode === 0) {
+        setNewsList(
+          newsList.map((item) =>
+            item.id === selectedNews.id ? { ...item, ...data.data } : item
+          )
+        );
+        setShowEditModal(false);
+        setFormData({
+          tieude: "",
+          noidungtin: "",
+          url: "",
+        });
+        setValidationErrors({});
+        Swal.fire("Thành công!", "Cập nhật tin tức thành công", "success");
+      } else {
+        throw new Error(data.message || "Cập nhật tin tức thất bại");
+      }
+    } catch (err) {
+      Swal.fire("Lỗi!", "Cập nhật tin tức thất bại", "error");
+      console.error("Error updating news:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // Delete news
+  const handleDeleteNews = async (newsId) => {
+    const result = await Swal.fire({
+      title: "Xác nhận xóa?",
+      text: "Bạn có chắc chắn muốn xóa tin tức này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        setLoading(true);
+        const data = await deleteTinTuc(token, newsId);
+        if (data.resultCode === 0) {
+          setNewsList(newsList.filter((item) => item.tintucId !== newsId));
+          Swal.fire("Thành công!", "Xóa tin tức thành công", "success");
+        } else {
+          throw new Error(data.message || "Xóa tin tức thất bại");
+        }
+      } catch (err) {
+        Swal.fire("Lỗi!", "Xóa tin tức thất bại", "error");
+        console.error("Error deleting news:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+// Open edit modal
+const openEditModal = async (news) => {
+  setSelectedNews(news);
+  try {
+    setLoading(true);
+    const data = await fetchTinTucById(news.id);
+    if (data.resultCode === 0) {
+      setFormData({
+        tieude: data.data.tieude,
+        noidungtin: data.data.noidungtin,
+        url: data.data.url,
+      });
+      setShowEditModal(true);
+    } else {
+      throw new Error(data.message || "Không thể tải tin tức");
+    }
+  } catch (err) {
+    Swal.fire("Lỗi!", "Không thể tải tin tức", "error");
+    console.error("Error loading news:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Handle input changes
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+  setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+};
+
+// Handle TinyMCE content change
+const handleEditorChange = (content) => {
+  setFormData((prev) => ({
+    ...prev,
+    noidungtin: content,
+  }));
+  setValidationErrors((prev) => ({ ...prev, noidungtin: "" }));
+};
+
+  // Load news on mount
   useEffect(() => {
-    fetchNews();
+    loadNews();
   }, []);
 
-  useEffect(() => {
-    let result = newsList;
-    
-    if (searchTerm) {
-      result = result.filter(news => 
-        news.tieude.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    if (statusFilter !== 'all') {
-      result = result.filter(news => news.trangthai === statusFilter);
-    }
-    
-    setFilteredNews(result);
-  }, [searchTerm, statusFilter, newsList]);
+  // Pagination and search
+  const filteredNews = newsList.filter(
+    (item) =>
+      item.tieude?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      item.noidungtin?.toLowerCase()?.includes(searchTerm.toLowerCase())
+  );
 
-  const handleEditorChange = (event, editor) => {
-    const data = editor.getData();
-    setFormData({ ...formData, noidung: data });
-  };
+  const totalPages = Math.ceil(filteredNews.length / itemsPerPage);
+  const currentItems = filteredNews.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleImageUpload = async (e) => {
-    try {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await axios.post(
-        'http://3.104.77.30:8080/api/v1/project/file/uploadImage',
-        formData,
-        {
-          headers: {
-            Authorization: `${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      setFormData({ ...formData, imageUrl: response.data.data });
-    } catch (err) {
-      setError('Lỗi khi tải lên hình ảnh');
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      
-      if (currentNews) {
-        // Update existing news
-        await axios.put(
-          `http://3.104.77.30:8080/api/v1/project/tintuc/update/${currentNews.id}`,
-          formData,
-          { headers: { Authorization: `${token}`, } }
-        );
-      } else {
-        // Create new news
-        await axios.post(
-          'http://3.104.77.30:8080/api/v1/project/tintuc/create',
-          formData,
-          { headers: { Authorization: `${token}`, } }
-        );
-      }
-      
-      setShowModal(false);
-      fetchNews();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Lỗi khi lưu tin tức');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      setLoading(true);
-      await axios.delete(
-        `http://3.104.77.30:8080/api/v1/project/tintuc/delete/${newsToDelete.id}`,
-        { headers: { Authorization: `${token}`, } }
-      );
-      setShowDeleteModal(false);
-      fetchNews();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Lỗi khi xóa tin tức');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const openEditModal = (news) => {
-    setCurrentNews(news);
-    setFormData({
-      tieude: news.tieude,
-      noidung: news.noidung,
-      imageUrl: news.imageUrl
-    });
-    setShowModal(true);
-  };
-
-  const openCreateModal = () => {
-    setCurrentNews(null);
-    setFormData({
-      tieude: '',
-      noidung: '',
-      imageUrl: ''
-    });
-    setShowModal(true);
-  };
-
-  const openDeleteModal = (news) => {
-    setNewsToDelete(news);
-    setShowDeleteModal(true);
-  };
-
-  const viewNewsDetail = (id) => {
-    navigate(`/tintuc/${id}`);
-  };
-
-  const approveNews = async (id) => {
-    try {
-      setLoading(true);
-      await axios.put(
-        `http://3.104.77.30:8080/api/v1/project/tintuc/approve/${id}`,
-        {},
-        { headers: { Authorization: `${token}`,} }
-      );
-      fetchNews();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Lỗi khi duyệt tin tức');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Render form
+  const renderNewsForm = (isEdit = false) => (
+    <Form>
+      <Row className="mb-3">
+        <Col>
+          <Form.Group>
+            <Form.Label>
+              Tiêu đề <span className="text-danger">*</span>
+            </Form.Label>
+            <Form.Control
+              type="text"
+              name="tieude"
+              value={formData.tieude}
+              onChange={handleInputChange}
+              isInvalid={!!validationErrors.tieude}
+            />
+            <Form.Control.Feedback type="invalid">
+              {validationErrors.tieude}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+      </Row>
+      <Row className="mb-3">
+        <Col>
+          <Form.Group>
+            <Form.Label>
+              Ảnh đại diện <span className="text-danger">*</span>
+            </Form.Label>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              isInvalid={!!validationErrors.url}
+            />
+            <Form.Control.Feedback type="invalid">
+              {validationErrors.url}
+            </Form.Control.Feedback>
+            {formData.url && (
+              <div className="mt-2">
+                <img
+                  src={`http://3.104.77.30:8080/api/v1/project/auth/file/getImage/${formData.url}`}
+                  alt="Preview"
+                  className="img-thumbnail"
+                  style={{ maxWidth: "200px", maxHeight: "200px" }}
+                />
+              </div>
+            )}
+          </Form.Group>
+        </Col>
+      </Row>
+      <Row className="mb-3">
+        <Col>
+          <Form.Group>
+            <Form.Label>
+              Nội dung <span className="text-danger">*</span>
+            </Form.Label>
+            <Editor
+              apiKey="81nqqgdcskujwzivy6b4lbzypp8y7wtxz8vd9njh5hdoevil"
+              value={formData.noidungtin}
+              onEditorChange={handleEditorChange}
+              init={{
+                height: 500,
+                plugins: [
+                  "a11ychecker",
+                  "advlist",
+                  "anchor",
+                  "autolink",
+                  "autosave",
+                  "charmap",
+                  "code",
+                  "codesample",
+                  "directionality",
+                  "emoticons",
+                  "fullscreen",
+                  "help",
+                  "image",
+                  "insertdatetime",
+                  "link",
+                  "lists",
+                  "media",
+                  "preview",
+                  "searchreplace",
+                  "table",
+                  "visualblocks",
+                  "wordcount",
+                ],
+                toolbar:
+                  "undo redo | formatselect | bold italic underline strikethrough | " +
+                  "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | " +
+                  "link image media | forecolor backcolor removeformat | preview code",
+                menubar: "file edit view insert format tools table help",
+              }}
+            />
+            {validationErrors.noidungtin && (
+              <div className="text-danger mt-1">{validationErrors.noidungtin}</div>
+            )}
+          </Form.Group>
+        </Col>
+      </Row>
+    </Form>
+  );
 
   return (
-    <div className="container-fluid p-4">
-      <h2 className="mb-4">Quản lý Tin tức</h2>
-
-      {error && <Alert variant="danger">{error}</Alert>}
-
-      <div className="d-flex justify-content-between mb-3">
-        <div className="d-flex gap-2">
-          <Form.Control
-            type="text"
-            placeholder="Tìm kiếm theo tiêu đề..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ width: '300px' }}
-          />
-          <Form.Select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            style={{ width: '200px' }}
-          >
-            <option value="all">Tất cả trạng thái</option>
-            <option value="pending">Chờ duyệt</option>
-            <option value="approved">Đã duyệt</option>
-            <option value="rejected">Từ chối</option>
-          </Form.Select>
+    <div className="container-fluid p-0 position-relative d-flex flex-column min-vh-100">
+      <div className="p-4 flex-grow-1">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+          <h1 className="h3 mb-3 mb-md-0">Danh sách tin tức</h1>
+          <div className="d-flex gap-2 align-items-center">
+            <div
+              className="d-flex"
+              style={{ width: "100%", maxWidth: "450px" }}
+            >
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Tìm kiếm tin tức..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button className="btn btn-primary">
+                <i className="fas fa-search"></i>
+              </button>
+            </div>
+            <button
+              className="btn btn-success"
+              onClick={() => {
+                setFormData({
+                  tieude: "",
+                  noidungtin: "",
+                  url: "",
+                });
+                setValidationErrors({});
+                setShowAddModal(true);
+              }}
+            >
+              <i className="fas fa-plus me-2"></i>Thêm mới
+            </button>
+          </div>
         </div>
-        <Button variant="primary" onClick={openCreateModal}>
-          <i className="fas fa-plus me-2"></i>Thêm tin mới
-        </Button>
+
+        {loading && (
+          <div className="text-center py-4">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        )}
+
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        {currentItems.length === 0 ? (
+          <div className="text-center py-4">
+            Không tìm thấy tin tức nào phù hợp!
+          </div>
+        ) : (
+          <>
+            <div className="table-responsive mb-4">
+              <table className="table table-hover">
+                <thead className="table-light">
+                  <tr>
+                    <th style={{ width: "5%" }}>STT</th>
+                    <th style={{ width: "25%" }}>Tiêu đề</th>
+                    <th style={{ width: "20%" }}>Ảnh đại diện</th>
+                    <th style={{ width: "40%" }}>Nội dung</th>
+                    <th style={{ width: "10%" }}>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((item, index) => (
+                    <tr key={index}>
+                      <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                      <td>{item.tieude}</td>
+                      <td>
+                        {item.url && (
+                          <img
+                            src={`http://3.104.77.30:8080/api/v1/project/auth/file/getImage/${item.url}`}
+                            alt={item.tieude}
+                            className="img-thumbnail"
+                            style={{ maxWidth: "100px", maxHeight: "100px" }}
+                          />
+                        )}
+                      </td>
+                      <td
+                        dangerouslySetInnerHTML={{
+                          __html: item.noidungtin
+                            ? item.noidungtin.length > 100
+                              ? `${item.noidungtin.substring(0, 100)}...`
+                              : item.noidungtin
+                            : "Không có nội dung",
+                        }}
+                      ></td>
+                      <td>
+                        <div className="d-flex gap-1">
+                          <button
+                            className="btn btn-sm btn-outline-warning"
+                            onClick={() => openEditModal(item)}
+                            title="Sửa tin tức"
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDeleteNews(item.id)}
+                            title="Xóa tin tức"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="d-flex justify-content-center">
+                <nav aria-label="Page navigation">
+                  <ul className="pagination">
+                    <li
+                      className={`page-item ${
+                        currentPage === 1 ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        disabled={currentPage === 1}
+                      >
+                        &laquo;
+                      </button>
+                    </li>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <li
+                          key={page}
+                          className={`page-item ${
+                            page === currentPage ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      )
+                    )}
+                    <li
+                      className={`page-item ${
+                        currentPage === totalPages ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
+                        disabled={currentPage === totalPages}
+                      >
+                        &raquo;
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
-      {loading ? (
-        <div className="text-center py-4">
-          <Spinner animation="border" />
-        </div>
-      ) : (
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Tiêu đề</th>
-              <th>Hình ảnh</th>
-              <th>Trạng thái</th>
-              <th>Ngày tạo</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredNews.map((news, index) => (
-              <tr key={news.id}>
-                <td>{index + 1}</td>
-                <td>{news.tieude}</td>
-                <td>
-                  {news.imageUrl && (
-                    <img 
-                      src={news.imageUrl} 
-                      alt={news.tieude} 
-                      style={{ width: '100px', height: 'auto' }} 
-                    />
-                  )}
-                </td>
-                <td>
-                  <Badge 
-                    bg={
-                      news.trangthai === 'approved' ? 'success' : 
-                      news.trangthai === 'rejected' ? 'danger' : 'warning'
-                    }
-                  >
-                    {news.trangthai === 'approved' ? 'Đã duyệt' : 
-                     news.trangthai === 'rejected' ? 'Từ chối' : 'Chờ duyệt'}
-                  </Badge>
-                </td>
-                <td>{new Date(news.thoigiantao).toLocaleDateString()}</td>
-                <td>
-                  <div className="d-flex gap-2">
-                    <Button 
-                      variant="info" 
-                      size="sm" 
-                      onClick={() => viewNewsDetail(news.id)}
-                    >
-                      <i className="fas fa-eye"></i>
-                    </Button>
-                    <Button 
-                      variant="primary" 
-                      size="sm" 
-                      onClick={() => openEditModal(news)}
-                    >
-                      <i className="fas fa-edit"></i>
-                    </Button>
-                    <Button 
-                      variant="danger" 
-                      size="sm" 
-                      onClick={() => openDeleteModal(news)}
-                    >
-                      <i className="fas fa-trash"></i>
-                    </Button>
-                    {news.trangthai === 'pending' && (
-                      <Button 
-                        variant="success" 
-                        size="sm" 
-                        onClick={() => approveNews(news.id)}
-                      >
-                        <i className="fas fa-check"></i>
-                      </Button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
-
-      {/* Add/Edit Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+      {/* Add Modal */}
+      <Modal
+        show={showAddModal}
+        onHide={() => setShowAddModal(false)}
+        size="lg"
+      >
         <Modal.Header closeButton>
-          <Modal.Title>{currentNews ? 'Chỉnh sửa Tin tức' : 'Thêm Tin tức mới'}</Modal.Title>
+          <Modal.Title>Thêm tin tức</Modal.Title>
         </Modal.Header>
-        <Form onSubmit={handleSubmit}>
-          <Modal.Body>
-            <Form.Group className="mb-3">
-              <Form.Label>Tiêu đề</Form.Label>
-              <Form.Control
-                type="text"
-                name="tieude"
-                value={formData.tieude}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Hình ảnh đại diện</Form.Label>
-              <Form.Control
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-              {formData.imageUrl && (
-                <img 
-                  src={formData.imageUrl} 
-                  alt="Preview" 
-                  className="mt-2" 
-                  style={{ maxWidth: '200px', maxHeight: '200px' }} 
-                />
-              )}
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Nội dung</Form.Label>
-              <CKEditor
-                editor={ClassicEditor}
-                data={formData.noidung}
-                onChange={handleEditorChange}
-                config={{
-                  extraPlugins: [MyCustomUploadAdapterPlugin],
-                  toolbar: [
-                    'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 
-                    'numberedList', '|', 'imageUpload', 'blockQuote', 
-                    'insertTable', 'mediaEmbed', '|', 'undo', 'redo'
-                  ]
-                }}
-              />
-            </Form.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowModal(false)}>
-              Hủy
-            </Button>
-            <Button variant="primary" type="submit" disabled={loading}>
-              {loading ? 'Đang lưu...' : 'Lưu'}
-            </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal>
-
-      {/* Delete Confirmation Modal */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Xác nhận xóa</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Bạn có chắc chắn muốn xóa tin tức "{newsToDelete?.tieude}"?
-        </Modal.Body>
+        <Modal.Body>{renderNewsForm()}</Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+          <Button variant="secondary" onClick={() => setShowAddModal(false)}>
             Hủy
           </Button>
-          <Button variant="danger" onClick={handleDelete} disabled={loading}>
-            {loading ? 'Đang xóa...' : 'Xóa'}
+          <Button variant="primary" onClick={handleAddNews} disabled={loading}>
+            {loading ? "Đang xử lý..." : "Thêm mới"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Edit Modal */}
+      <Modal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Sửa tin tức</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{renderNewsForm(true)}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+            Hủy
+          </Button>
+          <Button variant="primary" onClick={handleEditNews} disabled={loading}>
+            {loading ? "Đang xử lý..." : "Cập nhật"}
           </Button>
         </Modal.Footer>
       </Modal>
     </div>
   );
 };
-
 export default QuanLyTinTuc;
