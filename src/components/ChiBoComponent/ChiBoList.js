@@ -471,6 +471,7 @@ const ChiBoList = () => {
           handleUpdateXepLoai={handleUpdateXepLoai}
           validationErrors={validationErrors}
           loading={loading}
+          setXepLoaiForm={setXepLoaiForm}
         />
       </div>
     </div>
