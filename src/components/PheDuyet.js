@@ -823,18 +823,20 @@ const PheDuyet = () => {
               <Row className="mb-3">
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>Tin tức <span className="text-danger">*</span></Form.Label>
+                    <Form.Label>
+                      Tin tức <span className="text-danger">*</span>
+                    </Form.Label>
                     <Form.Select
                       name="tintucId"
                       value={formData.tintucId}
                       onChange={handleInputChange}
                     >
-                      <option value="">
-                        Chọn tin tức
-                      </option>
+                      <option value="">Chọn tin tức</option>
                       {filteredTinTuc.map((tt) => (
                         <option key={tt.id} value={tt.id}>
-                          {tt.tieude}
+                          {tt.tieude.length > 90
+                            ? tt.tieude.slice(0, 90) + "..."
+                            : tt.tieude}
                         </option>
                       ))}
                     </Form.Select>
@@ -1017,7 +1019,6 @@ const PheDuyet = () => {
                               <th>Chức danh</th>
                               <td>{detailData.chucdanh || "N/A"}</td>
                             </tr>
-                            
                           </tbody>
                         </table>
                       </div>
@@ -1109,7 +1110,7 @@ const PheDuyet = () => {
                           <button
                             className="btn btn-primary btn-sm"
                             onClick={() =>
-                              (window.location.href = `/tintuc/${detailData.id}`)
+                              (window.location.href = `/chi-tiet-tin-tuc/${detailData.id}`)
                             }
                           >
                             <i className="fas fa-external-link-alt me-1"></i>

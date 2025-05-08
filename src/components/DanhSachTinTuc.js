@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Row, Col, Badge } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import Swal from "sweetalert2";
 import { Editor } from "@tinymce/tinymce-react";
 import { useNavigate } from "react-router-dom";
@@ -121,13 +121,9 @@ const DanhSachTinTuc = () => {
       if (data.resultCode === 0) {
         setTinTuc([...tinTuc, data.data]);
         setShowAddModal(false);
-        // setFormData({
-        //   tieude: "",
-        //   noidungtin: "",
-        //   url: "",
-        // });
         setValidationErrors({});
         Swal.fire("Thành công!", "Thêm tin tức thành công", "success");
+        await loadTinTuc();
       } else {
         throw new Error(data.message || "Thêm tin tức thất bại");
       }
@@ -163,6 +159,7 @@ const DanhSachTinTuc = () => {
         setShowEditModal(false);
         setValidationErrors({});
         Swal.fire("Thành công!", "Cập nhật tin tức thành công", "success");
+        await loadTinTuc();
       } else {
         throw new Error(data.message || "Cập nhật tin tức thất bại");
       }
@@ -194,6 +191,7 @@ const DanhSachTinTuc = () => {
         if (data.resultCode === 0) {
           setTinTuc(tinTuc.filter((item) => item.tintucId !== newsId));
           Swal.fire("Thành công!", "Xóa tin tức thành công", "success");
+          await loadTinTuc();
         } else {
           throw new Error(data.message || "Xóa tin tức thất bại");
         }
@@ -241,7 +239,7 @@ const DanhSachTinTuc = () => {
   };
 
   // Handle TinyMCE content change
-  const handleEditorChange = (content) => {
+  const handleEditorChange = async (content) => {
     setFormData((prev) => ({
       ...prev,
       noidungtin: content,
@@ -500,21 +498,19 @@ const DanhSachTinTuc = () => {
                             : "Chưa xác nhận"}
                         </td>
                         <td>
-                          <Badge
-                            bg={
-                              item.trangthai === "approved"
-                                ? "success"
-                                : item.trangthai === "reject"
-                                ? "danger"
-                                : "warning"
-                            }
-                          >
-                            {item.trangthai === "approved"
-                              ? "Đã duyệt"
-                              : item.trangthai === "reject"
-                              ? "Từ chối"
-                              : "Chờ duyệt"}
-                          </Badge>
+                          {item.trangthai === "approved" ? (
+                            <span className="badge bg-success">
+                              Đã được duyệt
+                            </span>
+                          ) : item.trangthai === "pending" ? (
+                            <span className="badge bg-warning text-dark">
+                              Chờ phê duyệt
+                            </span>
+                          ) : item.trangthai === "saved" ? (
+                            <span className="badge bg-primary">Đã lưu</span>
+                          ) : (
+                            <span className="badge bg-danger">Từ chối</span>
+                          )}
                         </td>
                         <td>{item.nguoipheduyet || "Chưa phê duyệt"}</td>
                         <td>
@@ -613,7 +609,7 @@ const DanhSachTinTuc = () => {
       <Modal
         show={showAddModal}
         onHide={() => setShowAddModal(false)}
-        size="lg"
+        size="xl"
       >
         <Modal.Header closeButton>
           <Modal.Title>Thêm tin tức</Modal.Title>
@@ -637,7 +633,7 @@ const DanhSachTinTuc = () => {
       <Modal
         show={showEditModal}
         onHide={() => setShowEditModal(false)}
-        size="lg"
+        size="xl"
       >
         <Modal.Header closeButton>
           <Modal.Title>Sửa tin tức</Modal.Title>
