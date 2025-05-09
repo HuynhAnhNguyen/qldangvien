@@ -1,14 +1,14 @@
 import React from "react";
 import Layout from "../components/LayoutComponent/Layout";
-import ChiTietTinTuc from "../components/ChiTietTinTuc";
+import ChiTietTinTucHome from "../components/ChiTietTinTucHome";
 import LayoutHome from "../components/LayoutComponent/LayoutHome";
-const ChiTietTin = () => {
+const ChiTietTinHome = () => {
     return (
       <>
-       <Layout Component={ChiTietTinTuc} />
+       <LayoutHome Component={ChiTietTinTucHome} />
       </>
     
     );
   };
-  export default ChiTietTin;
+  export default ChiTietTinHome;
   

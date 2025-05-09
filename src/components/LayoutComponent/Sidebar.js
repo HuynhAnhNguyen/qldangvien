@@ -128,7 +128,7 @@ const Sidebar = () => {
           showConfirmButton: false,
         }).then(() => {
           // Chuyển hướng về trang đăng nhập sau khi hiển thị thông báo
-          navigate("/dang-nhap");
+          navigate("/");
         });
       }
     });
@@ -169,8 +169,8 @@ const Sidebar = () => {
           </li>
 
           <hr />
-          <li className={`sidebar-item ${isActive("/")}`}>
-            <a className="sidebar-link" onClick={() => navigate("/")}>
+          <li className={`sidebar-item ${isActive("/trang-chu")}`}>
+            <a className="sidebar-link" onClick={() => navigate("/trang-chu")}>
               <i className="fa-solid fa-home"></i>
               <span className="align-middle">Trang chủ</span>
             </a>

@@ -25,11 +25,7 @@ const ChatBot = () => {
     setMessage("");
 
     try {
-      const token = localStorage.getItem("token"); // 🛠 Lấy token ngay tại thời điểm gửi
-      if (!token) {
-        throw new Error("Token không tồn tại, vui lòng đăng nhập lại.");
-      }
-      const data = await sendChatMessage(token, message);
+      const data = await sendChatMessage(message);
       //   console.log(token);
       //   console.log(message);
       //   console.log(data);

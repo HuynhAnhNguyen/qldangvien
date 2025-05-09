@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { login } from "../services/apiService";
 
 const Login = () => {
@@ -9,6 +9,8 @@ const Login = () => {
   const [loginInputError, setLoginInputError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -28,41 +30,48 @@ const Login = () => {
     }
 
     if (!isValid) return;
-    // toast.success("Đăng nhập thành công!");
 
     try {
       const data = await login(loginInput, password);
-      if(data.resultCode === -1){
+      if (data.resultCode === -1) {
         Swal.fire({
           title: "Lỗi!",
-          text: 'Tên đăng nhập hoặc mật khẩu không đúng!',
+          text: "Tên đăng nhập hoặc mật khẩu không đúng!",
           icon: "error",
           confirmButtonText: "OK",
         });
-      }else{
-        Swal.fire({
-          title: "Thành công!",
-          text: "Đăng nhập thành công!",
-          icon: "success",
-          timer: 1000, // Tự động đóng sau 1.5 giây
-          showConfirmButton: false
-        });
-        // Lưu token vào localStorage
-        localStorage.setItem("token", data.data.token);
-        localStorage.setItem("fullname", data.data.fullname);
-        localStorage.setItem("role", data.data.role);
-        localStorage.setItem("username", data.data.username);
-
-        navigate("/"); // Chuyển hướng về trang chủ
       }
+
+      // Kiểm tra role hợp lệ
+      if (!["ROLE_ADMIN", "ROLE_USER"].includes(data.data.role)) {
+        Swal.fire("Lỗi!", "Tài khoản không có quyền truy cập!", "error");
+        return;
+      }
+      // Lưu token vào localStorage
+      localStorage.setItem("token", data.data.token);
+      localStorage.setItem("fullname", data.data.fullname);
+      localStorage.setItem("role", data.data.role);
+      localStorage.setItem("username", data.data.username);
+
+      // Kiểm tra redirect từ trang tin tức
+      const from = location.state?.from || "/trang-chu";
+
+      Swal.fire({
+        title: "Thành công!",
+        text: "Đăng nhập thành công!",
+        icon: "success",
+        timer: 1000,
+      }).then(() => {
+        navigate(from, { replace: true });
+      });
     } catch (err) {
-        Swal.fire({
-          title: "Lỗi!",
-          text: err.message,
-          icon: "error",
-          confirmButtonText: "OK",
-        });
-        console.log(err.message);
+      Swal.fire({
+        title: "Lỗi!",
+        text: err.message,
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      console.log(err.message);
     }
   };
 
@@ -101,8 +110,10 @@ const Login = () => {
                             placeholder="Tên đăng nhập"
                           />
                           {loginInputError && (
-                          <div className="text-danger mt-1">{loginInputError}</div>
-                        )}
+                            <div className="text-danger mt-1">
+                              {loginInputError}
+                            </div>
+                          )}
                         </div>
                         <div className="mb-3">
                           <label className="form-label">Mật khẩu</label>
@@ -111,12 +122,14 @@ const Login = () => {
                             type="password"
                             name="password"
                             value={password}
-                          onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => setPassword(e.target.value)}
                             placeholder="Mật khẩu"
                           />
                           {passwordError && (
-                          <div className="text-danger mt-1">{passwordError}</div>
-                        )}
+                            <div className="text-danger mt-1">
+                              {passwordError}
+                            </div>
+                          )}
                         </div>
 
                         <div className="text-center mt-3">
@@ -141,13 +154,15 @@ const Login = () => {
         <div className="container-fluid">
           <div className="row text-muted small">
             <div className="col-4 text-start">
-              <i className="fa-solid fa-location-dot me-1"></i> Địa chỉ: Phường Hồ, Thị xã Thuận Thành, tỉnh Bắc Ninh
+              <i className="fa-solid fa-location-dot me-1"></i> Địa chỉ: Phường
+              Hồ, Thị xã Thuận Thành, tỉnh Bắc Ninh
             </div>
             <div className="col-4 text-center">
               <i className="fa-solid fa-phone me-1"></i> Hotline: 0987654321
             </div>
             <div className="col-4 text-end">
-              <i className="fa-solid fa-envelope me-1"></i> Email: admin@dhkthc.edu.vn
+              <i className="fa-solid fa-envelope me-1"></i> Email:
+              admin@dhkthc.edu.vn
             </div>
           </div>
         </div>

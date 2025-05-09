@@ -20,16 +20,10 @@ export const login = async (userName, passWord) => {
 };
 
 // Hàm gọi API ChatBot
-export const sendChatMessage = async (token, message) => {
+export const sendChatMessage = async (message) => {
   const response = await axios.post(
     `${REACT_APP_API_URL}/auth/chat/gemini`,
     { message },
-    {
-      headers: {
-        Authorization: `${token}`, // Thêm 'Bearer' phía trước token
-        "Content-Type": "application/json",
-      },
-    }
   );
   // console.log("token: "+ token);
   // console.log(response.data);
