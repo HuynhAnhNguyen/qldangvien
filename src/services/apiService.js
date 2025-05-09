@@ -3,7 +3,7 @@ import * as XLSX from "xlsx";
 
 // Định nghĩa URL API (có thể thay đổi dễ dàng)
 const REACT_APP_API_URL =
-  process.env.REACT_APP_API_URL || "http://3.104.77.30:8080/api/v1/project";
+  process.env.REACT_APP_API_URL || "http://3.25.84.77:8080/api/v1/project";
 
 // Cập nhật hàm login cho phù hợp với API yêu cầu
 export const login = async (userName, passWord) => {

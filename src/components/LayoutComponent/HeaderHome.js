@@ -4,33 +4,45 @@ import { useNavigate } from "react-router-dom";
 const HeaderHome = () => {
   const navigate = useNavigate();
   return (
-    <nav className="navbar navbar-expand navbar-light navbar-bg px-3" style={{ height: "80px" }}>
+    <nav
+      className="navbar navbar-expand navbar-light navbar-bg px-3"
+      style={{ height: "80px" }}
+    >
       {/* Phần bên trái - logo và tiêu đề */}
       <div className="d-flex align-items-center" style={{ gap: "15px" }}>
         {/* Logo */}
         <img
           src="/assets/images/logo/logo.png"
           alt="Logo"
-          style={{ 
+          style={{
             height: "80px",
-            cursor: "pointer"
+            cursor: "pointer",
           }}
           onClick={() => navigate("/")}
         />
-        
+
         {/* Tiêu đề */}
-        <span className="header-title"  style={{ fontSize: "20px" }}>
+        <span className="header-title" style={{ fontSize: "20px" }}>
           TRƯỜNG ĐẠI HỌC KỸ THUẬT - HẬU CẦN CÔNG AN NHÂN DÂN
         </span>
       </div>
 
-      {/* Phần bên phải - logo cờ đảng */}
+      {/* Phần bên phải - điều khiển đăng nhập */}
       <div className="ms-auto d-flex align-items-center">
-        <img
-          style={{ height: "50px" }}
-          src="/assets/images/logo/codang.webp"
-          alt="CoDang"
-        />
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/dang-nhap")}
+          style={{
+            borderRadius: "4px",
+            padding: "8px 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <i className="fas fa-sign-in-alt"></i>
+          <span>Đăng nhập</span>
+        </button>
       </div>
     </nav>
   );
