@@ -60,6 +60,7 @@ const PheDuyet = () => {
     setFilteredDangVien(
       dangVienList.filter((dv) => dv.trangthaithongtin === "saved")
     );
+    setFilteredHoSo(hoSoList.filter(hs => hs.trangthai === "saved"));
     setFilteredTinTuc(tinTucList.filter((tt) => tt.trangthai === "saved"));
   };
 
@@ -85,7 +86,15 @@ const PheDuyet = () => {
     try {
       const data = await fetchDanhSachTinTuc(token);
       if (data.resultCode === 0) {
-        setTinTucList(Array.isArray(data.data) ? data.data : []);
+        // setTinTucList(Array.isArray(data.data) ? data.data : []);
+        const allTinTucData = Array.isArray(data.data) ? data.data : [];
+        setTinTucList(allTinTucData);
+
+        // Lọc tin tức ở trạng thái "saved"
+        const savedTinTuc = allTinTucData.filter(
+          (tt) => tt.trangthai === "saved"
+        );
+        setFilteredTinTuc(savedTinTuc);
       } else {
         throw new Error(data.message);
       }
@@ -833,16 +842,36 @@ const PheDuyet = () => {
                       onChange={handleInputChange}
                     >
                       <option value="">Chọn tin tức</option>
-                      {filteredTinTuc.map((tt) => (
+                      {/* {filteredTinTuc.map((tt) => (
                         <option key={tt.id} value={tt.id}>
                           {tt.tieude.length > 90
                             ? tt.tieude.slice(0, 90) + "..."
                             : tt.tieude}
                         </option>
-                      ))}
+                      ))} */}
+                      {filteredTinTuc.length > 0 ? (
+                        filteredTinTuc.map((tt) => (
+                          <option key={tt.id} value={tt.id}>
+                            {tt.tieude.length > 100
+                              ? `${tt.tieude.substring(0, 100)}...`
+                              : tt.tieude}
+                          </option>
+                        ))
+                      ) : (
+                        <option disabled value="">
+                          Không có tin tức nào ở trạng thái "Đã lưu"
+                        </option>
+                      )}
                     </Form.Select>
                   </Form.Group>
                 </Col>
+                {!loading &&
+                  formData.tintucId &&
+                  filteredTinTuc.length === 0 && (
+                    <div className="alert alert-danger">
+                      Không có tin tức nào ở trạng thái "Đã lưu".
+                    </div>
+                  )}
               </Row>
             )}
             <Row className="mb-3">

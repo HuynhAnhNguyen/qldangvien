@@ -22,7 +22,7 @@ export const login = async (userName, passWord) => {
 // Hàm gọi API ChatBot
 export const sendChatMessage = async (token, message) => {
   const response = await axios.post(
-    `${REACT_APP_API_URL}/chat/gemini`,
+    `${REACT_APP_API_URL}/auth/chat/gemini`,
     { message },
     {
       headers: {
