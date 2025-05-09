@@ -342,7 +342,7 @@ const DanhSachTinTuc = () => {
               Nội dung <span className="text-danger">*</span>
             </Form.Label>
             <Editor
-              apiKey="81nqqgdcskujwzivy6b4lbzypp8y7wtxz8vd9njh5hdoevil"
+              apiKey="do7vpq16o5mqvc4ydixhfvs9wa9igibrs84ibhu1mmt1108t"
               value={formData.noidungtin}
               onEditorChange={handleEditorChange}
               init={{
