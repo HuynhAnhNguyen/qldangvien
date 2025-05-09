@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const FileNotFound = () => {
-    
   const navigate = useNavigate();
   return (
     <>
@@ -21,12 +20,10 @@ const FileNotFound = () => {
             <div className="row">
               <div className="col-md-12 col-xl-12">
                 <div className="card">
-                  <div className="card-header">
-                    <h1 className="h3 d-inline align-middle">Không tìm thấy trang</h1>
-                  </div>
-
                   <div className="card-body">
-                    <div>Không tìm thấy trang</div>
+                    <div className="news-content text-danger text-center">
+                      Trang bạn truy cập không tồn tại hoặc đã bị xóa!
+                    </div>
                   </div>
                 </div>
               </div>

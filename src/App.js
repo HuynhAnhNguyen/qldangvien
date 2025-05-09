@@ -28,7 +28,7 @@ import AdminHome from "./pages/AdminHome";
 import ChiTietTinHome from "./pages/ChiTietTinHome";
 import NotFound from "./pages/NotFound";
 
-// Component kiểm tra đăng nhập
+// Component kiểm tra đăng nhập và phân quyền
 const ProtectedRoute = ({ roles }) => {
   const userRole = localStorage.getItem("role");
   const isAuthenticated = !!localStorage.getItem("token");
@@ -70,6 +70,7 @@ const NewsRoute = () => {
   const [error, setError] = useState(null);
   const { tintucId } = useParams();
   const isAuthenticated = !!localStorage.getItem("token");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchNewsData = async () => {
@@ -81,21 +82,32 @@ const NewsRoute = () => {
         }
         setNewsData(response.data);
       } catch (err) {
-        setError('Không tìm thấy tin tức');
+        Swal.fire({
+          title: "Lỗi",
+          text: "Tin tức không tồn tại hoặc đã bị xóa",
+          icon: "error",
+          confirmButtonText: "OK",
+        }).then(() => {
+          navigate(isAuthenticated ? "/quan-ly-tin-tuc" : "/", { replace: true });
+        });
+        // setError('Không tìm thấy tin tức');
       } finally {
         setLoading(false);
       }
     };
 
     fetchNewsData();
-  }, [tintucId]);
+  }, [tintucId, isAuthenticated, navigate]);
 
   if (loading) {
     return <div className="text-center py-5">Đang tải...</div>;
   }
 
-  if (error || !newsData) {
-    return <Navigate to="/not-found" replace />;
+  // if (error || !newsData) {
+  //   return <Navigate to="/not-found" replace />;
+  // }
+  if (!newsData) {
+    return null; // Đã xử lý chuyển hướng trong useEffect
   }
 
   // Tin đã phê duyệt - hiển thị cho tất cả
@@ -112,7 +124,23 @@ const NewsRoute = () => {
   return <Navigate to="/dang-nhap" state={{ from: `/chi-tiet-tin-tuc/${tintucId}` }} />;
 };
 
-// Component kiểm tra đăng nhập và phân quyền
+// Component xử lý các route không tồn tại khi đã đăng nhập
+const AuthenticatedNotFound = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    Swal.fire({
+      title: "Lỗi",
+      text: "Trang bạn truy cập không tồn tại",
+      icon: "error",
+      confirmButtonText: "OK",
+    }).then(() => {
+      navigate("/trang-chu", { replace: true });
+    });
+  }, [navigate]);
+
+  return null;
+};
 
 
 const App = () => {
@@ -145,7 +173,14 @@ const App = () => {
         </Route>
 
         {/* 404 page */}
-        <Route path="*" element={<NotFound />} />
+        {/* Xử lý route không tồn tại khi đã đăng nhập */}
+        <Route 
+          path="*" 
+          element={
+            localStorage.getItem("token") ? <AuthenticatedNotFound /> : <NotFound /> 
+          } 
+        />
+        {/* <Route path="*" element={<NotFound />} /> */}
 
         {/* <Route path="/" element={<Home />} />
         <Route path="/dang-nhap" element={<Login />} />
