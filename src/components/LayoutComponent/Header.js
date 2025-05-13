@@ -35,8 +35,11 @@ const Navbar = () => {
       </a>
       
       <div>
-        <span className="header-title">
-          PHẦN MỀM QUẢN LÝ HỒ SƠ ĐẢNG VIÊN - TRƯỜNG ĐẠI HỌC KỸ THUẬT - HẬU CẦN CAND
+        <span style={{ display: 'block' }} className="header-title">
+          PHẦN MỀM QUẢN LÝ HỒ SƠ ĐẢNG VIÊN
+        </span>
+        <span style={{ display: 'block' }} className="header-title">
+           TRƯỜNG ĐẠI HỌC KỸ THUẬT - HẬU CẦN CAND
         </span>
       </div>
       
