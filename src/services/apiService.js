@@ -1007,7 +1007,7 @@ export const fetchDangbo = async (token) => {
 };
 
 // Lấy danh sách Chi bộ
-export const fetchChibo = async (token) => {
+export const fetchAllChibo = async (token) => {
   const response = await axios.get(`${REACT_APP_API_URL}/chibo/findAllChibo`, {
     headers: {
       Authorization: `${token}`,

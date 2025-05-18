@@ -16,6 +16,7 @@ import {
   deleteTheDang,
   exportDangVienToExcel,
   searchFilteredDangVien,
+  fetchAllChibo,
 } from "../../services/apiService";
 import TheDangModal from "../TheDangComponent/TheDangModal";
 import QuyetDinhModal from "../QuyetDinhComponent/QuyetDinhModal";
@@ -267,8 +268,8 @@ const handleExportExcel = (dangVien) => {
 
   const loadChiBo = async () => {
     try {
-      const response = await fetchChiBoDangHoatDong(token);
-      const data = await response.json();
+      const data = await fetchAllChibo(token);
+      // const data = await response.json();
       if (data.resultCode === 0) {
         setChiBoList(Array.isArray(data.data) ? data.data : []);
       } else {
@@ -387,18 +388,6 @@ const handleExportExcel = (dangVien) => {
     setSearchTerm("");
     setFilteredDangVien(dangVien);
   };
-
-  // const filteredDangVien =
-  //   searchType === "all"
-  //     ? dangVien.filter(
-  //         (item) =>
-  //           item.hoten?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-  //           item.ngaysinh?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-  //           item.noisinhhoatdang
-  //             ?.toLowerCase()
-  //             ?.includes(searchTerm.toLowerCase())
-  //       )
-  //     : dangVien;
 
   const handleSearch = async () => {
     try {
