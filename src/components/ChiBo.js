@@ -1001,3 +1001,607 @@ const ChiBo = () => {
 };
 
 export default ChiBo;
+
+// import React, { useState, useEffect } from "react";
+// import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+// import {
+//   fetchAllDangUy,
+//   fetchAllDangBo,
+//   fetchDangBoByDangUyId,
+//   fetchAllChiBo,
+//   fetchChiBoByDangBoId,
+//   createChiBo,
+//   updateChiBo,
+//   createXepLoai,
+//   updateXepLoai,
+//   fetchXepLoaiByChiBoId,
+//   fetchDanguy,
+// } from "../services/apiService";
+// import Swal from "sweetalert2";
+
+// const CoSoDang = () => {
+//   const [dangUyList, setDangUyList] = useState([]);
+//   const [dangBoList, setDangBoList] = useState([]);
+//   const [chiBoList, setChiBoList] = useState([]);
+//   const [currentView, setCurrentView] = useState("danguy"); // 'danguy', 'dangbo', 'chibo'
+//   const [selectedDangUy, setSelectedDangUy] = useState(null);
+//   const [selectedDangBo, setSelectedDangBo] = useState(null);
+//   const [selectedChiBo, setSelectedChiBo] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(null);
+//   const [showDetailModal, setShowDetailModal] = useState(false);
+//   const [showXepLoaiModal, setShowXepLoaiModal] = useState(false);
+//   const [xepLoaiList, setXepLoaiList] = useState([]);
+//   const [xepLoaiForm, setXepLoaiForm] = useState({
+//     nam: "",
+//     xeploai: "",
+//   });
+
+//   const token = localStorage.getItem("token");
+
+//   // Load initial data
+//   useEffect(() => {
+//     loadDangUyList();
+//   }, []);
+
+//   const loadDangUyList = async () => {
+//     setLoading(true);
+//     try {
+//       const response = await fetchDanguy(token);
+//       if (response.resultCode === 0) {
+//         setDangUyList(response.data || []);
+//       } else {
+//         throw new Error(response.message || "Không thể tải danh sách đảng ủy");
+//       }
+//     } catch (err) {
+//       setError(err.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const loadDangBoByDangUy = async (dangUyId) => {
+//     setLoading(true);
+//     try {
+//       const response = await fetchDangBoByDangUyId(token, dangUyId);
+//       if (response.resultCode === 0) {
+//         setDangBoList(response.data || []);
+//         setCurrentView("dangbo");
+//       } else {
+//         throw new Error(response.message || "Không thể tải danh sách đảng bộ");
+//       }
+//     } catch (err) {
+//       setError(err.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const loadChiBoByDangBo = async (dangBoId) => {
+//     setLoading(true);
+//     try {
+//       const response = await fetchChiBoByDangBoId(token, dangBoId);
+//       if (response.resultCode === 0) {
+//         setChiBoList(response.data || []);
+//         setCurrentView("chibo");
+//       } else {
+//         throw new Error(response.message || "Không thể tải danh sách chi bộ");
+//       }
+//     } catch (err) {
+//       setError(err.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const handleSelectDangUy = (dangUy) => {
+//     setSelectedDangUy(dangUy);
+//     setSelectedDangBo(null);
+//     setSelectedChiBo(null);
+//     loadDangBoByDangUy(dangUy.id);
+//   };
+
+//   const handleSelectDangBo = (dangBo) => {
+//     setSelectedDangBo(dangBo);
+//     setSelectedChiBo(null);
+//     loadChiBoByDangBo(dangBo.id);
+//   };
+
+//   const handleSelectChiBo = (chiBo) => {
+//     setSelectedChiBo(chiBo);
+//     loadXepLoai(chiBo.id);
+//     setShowDetailModal(true);
+//   };
+
+//   const loadXepLoai = async (chiBoId) => {
+//     try {
+//       const response = await fetchXepLoaiByChiBoId(token, chiBoId);
+//       if (response.resultCode === 0) {
+//         setXepLoaiList(response.data || []);
+//       }
+//     } catch (err) {
+//       console.error("Error loading xep loai:", err);
+//     }
+//   };
+
+//   const handleBackToDangUy = () => {
+//     setCurrentView("danguy");
+//     setSelectedDangUy(null);
+//     setSelectedDangBo(null);
+//   };
+
+//   const handleBackToDangBo = () => {
+//     setCurrentView("dangbo");
+//     setSelectedDangBo(null);
+//   };
+
+//   return (
+//     <div className="container-fluid p-0 position-relative d-flex flex-column min-vh-100">
+//       <div className="p-4 flex-grow-1">
+//         <div className="d-flex justify-content-between align-items-center mb-4">
+//           <h1 className="h3 mb-0">Cơ sở Đảng</h1>
+//         </div>
+
+//         {/* Breadcrumb navigation */}
+//         <nav aria-label="breadcrumb" className="mb-4">
+//           <ol className="breadcrumb">
+//             <li
+//               // className={`breadcrumb-item ${
+//               //   currentView === "danguy" ? "breadcrumb-active" : ""
+//               // }`}
+//               className="breadcrumb-item"
+//               onClick={handleBackToDangUy}
+//               style={{ cursor: "pointer" }}
+//             >
+//               {/* Đảng ủy */}
+//               <span
+//                 className={currentView === "danguy" ? "breadcrumb-active" : ""}
+//               >
+//                 Đảng ủy
+//               </span>
+//             </li>
+//             {currentView !== "danguy" && (
+//               <li
+//                 // className={`breadcrumb-item ${
+//                 //   currentView === "dangbo" ? "breadcrumb-active" : ""
+//                 // }`}
+//                 className="breadcrumb-item"
+//                 onClick={handleBackToDangBo}
+//                 style={{ cursor: selectedDangUy ? "pointer" : "default" }}
+//               >
+//                 {/* {selectedDangUy ? selectedDangUy.tenchibo : 'Đảng bộ'} */}
+//                 <span
+//                   className={
+//                     currentView === "dangbo" ? "breadcrumb-active" : ""
+//                   }
+//                 >
+//                   {selectedDangUy ? selectedDangUy.tenchibo : "Đảng bộ"}
+//                 </span>
+//               </li>
+//             )}
+//             {currentView === "chibo" && (
+//               <li className="breadcrumb-item">
+//                 {/* {selectedDangBo?.tenchibo || 'Chi bộ'} */}
+//                 <span className="breadcrumb-active">
+//                   {selectedDangBo?.tenchibo || "Chi bộ"}
+//                 </span>
+//               </li>
+//             )}
+//           </ol>
+//         </nav>
+
+//         {/* Đảng ủy view */}
+//         {currentView === "danguy" && (
+//           <div className="table-responsive">
+//             <table className="table table-hover">
+//               <thead className="table-light">
+//                 <tr>
+//                   <th>STT</th>
+//                   <th>Tên Đảng ủy</th>
+//                   <th>Địa chỉ</th>
+//                   <th>Trạng thái</th>
+//                   <th>Thao tác</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {dangUyList.map((dangUy, index) => (
+//                   <tr key={dangUy.id}>
+//                     <td>{index + 1}</td>
+//                     <td>{dangUy.tenchibo}</td>
+//                     <td>{dangUy.diachi}</td>
+//                     {/* <td>
+//                       {dangUy.trangthai === "hoatdong"
+//                         ? "Hoạt động"
+//                         : "Không hoạt động"}
+//                     </td> */}
+//                     <td className={`status-cell ${dangUy.trangthai}`}>
+//                      {dangUy.trangthai === "hoatdong"
+//                        ? "Hoạt động"
+//                        : dangUy.trangthai === "giaithe"
+//                        ? "Giải thể"
+//                        : dangUy.trangthai === "tamdung"
+//                        ? "Tạm dừng"
+//                       : "Không xác định"}
+//                    </td>
+//                     <td>
+//                       <button
+//                         className="btn btn-sm btn-primary"
+//                         onClick={() => handleSelectDangUy(dangUy)}
+//                       >
+//                         Xem Đảng bộ
+//                       </button>
+//                     </td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+//         )}
+
+//         {/* Đảng bộ view */}
+//         {currentView === "dangbo" && (
+//           <div className="table-responsive">
+//             <table className="table table-hover">
+//               <thead className="table-light">
+//                 <tr>
+//                   <th>STT</th>
+//                   <th>Tên Đảng bộ</th>
+//                   <th>Đảng ủy cấp trên</th>
+//                   <th>Trạng thái</th>
+//                   <th>Thao tác</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {dangBoList.map((dangBo, index) => (
+//                   <tr key={dangBo.id}>
+//                     <td>{index + 1}</td>
+//                     <td>{dangBo.tenchibo}</td>
+//                     <td>{dangBo.danguycaptren}</td>
+//                     {/* <td>
+//                       {dangBo.trangthai === "hoatdong"
+//                         ? "Hoạt động"
+//                         : "Không hoạt động"}
+//                     </td> */}
+//                     <td className={`status-cell ${dangBo.trangthai}`}>
+//                      {dangBo.trangthai === "hoatdong"
+//                        ? "Hoạt động"
+//                        : dangBo.trangthai === "giaithe"
+//                        ? "Giải thể"
+//                        : dangBo.trangthai === "tamdung"
+//                        ? "Tạm dừng"
+//                       : "Không xác định"}
+//                    </td>
+//                     <td>
+//                       <button
+//                         className="btn btn-sm btn-primary"
+//                         onClick={() => handleSelectDangBo(dangBo)}
+//                       >
+//                         Xem Chi bộ
+//                       </button>
+//                     </td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+//         )}
+
+//         {/* Chi bộ view */}
+//         {currentView === "chibo" && (
+//           <div className="table-responsive">
+//             <table className="table table-hover">
+//               <thead className="table-light">
+//                 <tr>
+//                   <th>STT</th>
+//                   <th>Tên Chi bộ</th>
+//                   <th>Đảng bộ cấp trên</th>
+//                   <th>Bí thư</th>
+//                   <th>Trạng thái</th>
+//                   <th>Thao tác</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {chiBoList.map((chiBo, index) => (
+//                   <tr key={chiBo.id}>
+//                     <td>{index + 1}</td>
+//                     <td>{chiBo.tenchibo}</td>
+//                     <td>{chiBo.danguycaptren}</td>
+//                     <td>{chiBo.bithu || "Chưa có"}</td>
+//                     {/* <td>
+//                       {chiBo.trangthai === "hoatdong"
+//                         ? "Hoạt động"
+//                         : "Không hoạt động"}
+//                     </td> */}
+//                     <td className={`status-cell ${chiBo.trangthai}`}>
+//                      {chiBo.trangthai === "hoatdong"
+//                        ? "Hoạt động"
+//                        : chiBo.trangthai === "giaithe"
+//                        ? "Giải thể"
+//                        : chiBo.trangthai === "tamdung"
+//                        ? "Tạm dừng"
+//                       : "Không xác định"}
+//                    </td>
+//                     <td>
+//                       <button
+//                         className="btn btn-sm btn-info me-2"
+//                         onClick={() => handleSelectChiBo(chiBo)}
+//                       >
+//                         <i className="fas fa-eye"></i>
+//                       </button>
+//                       <button
+//                         className="btn btn-sm btn-warning"
+//                         onClick={() => {
+//                           setSelectedChiBo(chiBo);
+//                           setShowXepLoaiModal(true);
+//                           loadXepLoai(chiBo.id);
+//                         }}
+//                       >
+//                         <i className="fas fa-star"></i>
+//                       </button>
+//                     </td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+//         )}
+
+//         {loading && (
+//           <div className="text-center py-4">
+//             <div className="spinner-border text-primary" role="status">
+//               <span className="visually-hidden">Loading...</span>
+//             </div>
+//           </div>
+//         )}
+
+//         {error && <div className="alert alert-danger">{error}</div>}
+//       </div>
+
+//       {/* Chi tiết Chi bộ Modal */}
+//       <Modal
+//         show={showDetailModal}
+//         onHide={() => setShowDetailModal(false)}
+//         size="lg"
+//       >
+//         <Modal.Header closeButton>
+//           <Modal.Title>Chi tiết Chi bộ</Modal.Title>
+//         </Modal.Header>
+//         <Modal.Body>
+//           {selectedChiBo && (
+//             <div>
+//               <Row className="mb-3">
+//                 <Col md={6}>
+//                   <Form.Group>
+//                     <Form.Label>Tên Chi bộ</Form.Label>
+//                     <Form.Control
+//                       plaintext
+//                       readOnly
+//                       value={selectedChiBo.tenchibo}
+//                     />
+//                   </Form.Group>
+//                 </Col>
+//                 <Col md={6}>
+//                   <Form.Group>
+//                     <Form.Label>Đảng bộ cấp trên</Form.Label>
+//                     <Form.Control
+//                       plaintext
+//                       readOnly
+//                       value={selectedChiBo.danguycaptren}
+//                     />
+//                   </Form.Group>
+//                 </Col>
+//               </Row>
+
+//               <Row className="mb-3">
+//                 <Col md={6}>
+//                   <Form.Group>
+//                     <Form.Label>Bí thư</Form.Label>
+//                     <Form.Control
+//                       plaintext
+//                       readOnly
+//                       value={selectedChiBo.bithu || "Chưa có"}
+//                     />
+//                   </Form.Group>
+//                 </Col>
+//                 <Col md={6}>
+//                   <Form.Group>
+//                     <Form.Label>Phó bí thư</Form.Label>
+//                     <Form.Control
+//                       plaintext
+//                       readOnly
+//                       value={selectedChiBo.phobithu || "Chưa có"}
+//                     />
+//                   </Form.Group>
+//                 </Col>
+//               </Row>
+
+//               <Row className="mb-3">
+//                 <Col md={6}>
+//                   <Form.Group>
+//                     <Form.Label>Ngày thành lập</Form.Label>
+//                     <Form.Control
+//                       plaintext
+//                       readOnly
+//                       value={
+//                         selectedChiBo.ngaythanhlap
+//                           ? new Date(
+//                               selectedChiBo.ngaythanhlap
+//                             ).toLocaleDateString()
+//                           : "Chưa có"
+//                       }
+//                     />
+//                   </Form.Group>
+//                 </Col>
+//                 <Col md={6}>
+//                   <Form.Group>
+//                     <Form.Label>Trạng thái</Form.Label>
+//                     <Form.Control
+//                       plaintext
+//                       readOnly
+//                       value={
+//                         selectedChiBo.trangthai === "hoatdong"
+//                           ? "Hoạt động"
+//                           : selectedChiBo.trangthai === "giaithe"
+//                           ? "Giải thể"
+//                           : selectedChiBo.trangthai === "tamdung"
+//                           ? "Tạm dừng"
+//                           : "Không xác định"
+//                       }
+//                     />
+//                   </Form.Group>
+//                 </Col>
+//               </Row>
+
+//               <Form.Group className="mb-3">
+//                 <Form.Label>Địa chỉ</Form.Label>
+//                 <Form.Control
+//                   plaintext
+//                   readOnly
+//                   value={selectedChiBo.diachi || "Chưa có"}
+//                 />
+//               </Form.Group>
+
+//               <Form.Group className="mb-3">
+//                 <Form.Label>Ghi chú</Form.Label>
+//                 <Form.Control
+//                   as="textarea"
+//                   rows={3}
+//                   plaintext
+//                   readOnly
+//                   value={selectedChiBo.ghichu || "Không có ghi chú"}
+//                 />
+//               </Form.Group>
+
+//               <h5>Xếp loại Chi bộ</h5>
+//               {xepLoaiList.length > 0 ? (
+//                 <div className="table-responsive">
+//                   <table className="table table-bordered">
+//                     <thead>
+//                       <tr>
+//                         <th>Năm</th>
+//                         <th>Xếp loại</th>
+//                       </tr>
+//                     </thead>
+//                     <tbody>
+//                       {xepLoaiList.map((xeploai) => (
+//                         <tr key={xeploai.id}>
+//                           <td>{xeploai.nam}</td>
+//                           <td>
+//                             {xeploai.xeploai === "xuatsac"
+//                               ? "Xuất sắc"
+//                               : xeploai.xeploai === "tot"
+//                               ? "Tốt"
+//                               : xeploai.xeploai === "hoanthanh"
+//                               ? "Hoàn thành"
+//                               : "Không hoàn thành"}
+//                           </td>
+//                         </tr>
+//                       ))}
+//                     </tbody>
+//                   </table>
+//                 </div>
+//               ) : (
+//                 <div className="alert alert-info">Chi bộ chưa có xếp loại</div>
+//               )}
+//             </div>
+//           )}
+//         </Modal.Body>
+//         <Modal.Footer>
+//           <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
+//             Đóng
+//           </Button>
+//         </Modal.Footer>
+//       </Modal>
+
+//       {/* Xếp loại Modal */}
+//       <Modal show={showXepLoaiModal} onHide={() => setShowXepLoaiModal(false)}>
+//         <Modal.Header closeButton>
+//           <Modal.Title>Xếp loại Chi bộ</Modal.Title>
+//         </Modal.Header>
+//         <Modal.Body>
+//           <Form>
+//             <Form.Group className="mb-3">
+//               <Form.Label>Năm</Form.Label>
+//               <Form.Control
+//                 type="text"
+//                 placeholder="Nhập năm"
+//                 value={xepLoaiForm.nam}
+//                 onChange={(e) =>
+//                   setXepLoaiForm({ ...xepLoaiForm, nam: e.target.value })
+//                 }
+//               />
+//             </Form.Group>
+
+//             <Form.Group className="mb-3">
+//               <Form.Label>Xếp loại</Form.Label>
+//               <Form.Select
+//                 value={xepLoaiForm.xeploai}
+//                 onChange={(e) =>
+//                   setXepLoaiForm({ ...xepLoaiForm, xeploai: e.target.value })
+//                 }
+//               >
+//                 <option value="">Chọn xếp loại</option>
+//                 <option value="xuatsac">Xuất sắc</option>
+//                 <option value="tot">Tốt</option>
+//                 <option value="hoanthanh">Hoàn thành</option>
+//                 <option value="khonghoanthanh">Không hoàn thành</option>
+//               </Form.Select>
+//             </Form.Group>
+//           </Form>
+
+//           <div className="mt-4">
+//             <h6>Lịch sử xếp loại</h6>
+//             {xepLoaiList.length > 0 ? (
+//               <ul className="list-group">
+//                 {xepLoaiList.map((xeploai) => (
+//                   <li
+//                     key={xeploai.id}
+//                     className="list-group-item d-flex justify-content-between align-items-center"
+//                   >
+//                     {xeploai.nam}:{" "}
+//                     {xeploai.xeploai === "xuatsac"
+//                       ? "Xuất sắc"
+//                       : xeploai.xeploai === "tot"
+//                       ? "Tốt"
+//                       : xeploai.xeploai === "hoanthanh"
+//                       ? "Hoàn thành"
+//                       : "Không hoàn thành"}
+//                     <button
+//                       className="btn btn-sm btn-outline-danger"
+//                       onClick={() => {
+//                         // Handle delete xep loai
+//                       }}
+//                     >
+//                       <i className="fas fa-trash"></i>
+//                     </button>
+//                   </li>
+//                 ))}
+//               </ul>
+//             ) : (
+//               <div className="alert alert-info">Chưa có xếp loại nào</div>
+//             )}
+//           </div>
+//         </Modal.Body>
+//         <Modal.Footer>
+//           <Button
+//             variant="secondary"
+//             onClick={() => setShowXepLoaiModal(false)}
+//           >
+//             Đóng
+//           </Button>
+//           <Button
+//             variant="primary"
+//             onClick={() => {
+//               // Handle save xep loai
+//               setShowXepLoaiModal(false);
+//             }}
+//           >
+//             Lưu
+//           </Button>
+//         </Modal.Footer>
+//       </Modal>
+//     </div>
+//   );
+// };
+
+// export default CoSoDang;

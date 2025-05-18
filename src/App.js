@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 import { fetchTinTucById } from "./services/apiService";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import QuanLyChiBo from "./pages/QuanLyChiBo";
+import QuanLyCoSoDang from "./pages/QuanLyCoSoDang";
 import QuanLyDangVien from "./pages/QuanLyDangVien";
 import QuanLyHoSo from "./pages/QuanLyHoSo";
 import QuanLyKyDangPhi from "./pages/QuanLyKyDangPhi";
@@ -158,7 +158,7 @@ const App = () => {
           <Route path="/trang-chu" element={<AdminHome />} />
           <Route path="/quan-ly-tin-tuc" element={<QuanLyTinTuc />} />
           <Route path="/quan-ly-dang-vien" element={<QuanLyDangVien />} />
-          <Route path="/quan-ly-chi-bo" element={<QuanLyChiBo />} />
+          <Route path="/quan-ly-co-so-dang" element={<QuanLyCoSoDang />} />
           <Route path="/quan-ly-ho-so" element={<QuanLyHoSo />} />
           <Route path="/quan-ly-ky-dang-phi" element={<QuanLyKyDangPhi />} />
           <Route path="/quan-ly-dang-phi" element={<QuanLyDangPhi />} />

@@ -982,3 +982,63 @@ export const getImage = async (filename) => {
 
 export const getImageLink = (imageName) =>
   `${REACT_APP_API_URL}/auth/file/getImage/${imageName}`;
+
+
+// Lấy danh sách Đảng ủy
+export const fetchDanguy = async (token) => {
+  const response = await axios.get(`${REACT_APP_API_URL}/chibo/findAllDanguy`, {
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
+
+// Lấy danh sách Đảng bộ
+export const fetchDangbo = async (token) => {
+  const response = await axios.get(`${REACT_APP_API_URL}/chibo/findAllDangbo`, {
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
+
+// Lấy danh sách Chi bộ
+export const fetchChibo = async (token) => {
+  const response = await axios.get(`${REACT_APP_API_URL}/chibo/findAllChibo`, {
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response.data;
+};
+
+// fetchChiBoByDangBoId
+export const fetchChiBoByDangBoId = async (token, dangboCaptrenId) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/chibo/findChiboByDangboCaptrenId?dangboCaptrenId=${dangboCaptrenId}`,{
+      headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+    }
+  );
+  return response.data;
+};
+
+// fetchDangBoByDangUyId
+export const fetchDangBoByDangUyId = async (token, danguyCaptrenId) => {
+  const response = await axios.get(
+    `${REACT_APP_API_URL}/chibo/findDangboByDangUyCaptrenId?danguyCaptrenId=${danguyCaptrenId}`,{
+      headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+    }
+  );
+  return response.data;
+};

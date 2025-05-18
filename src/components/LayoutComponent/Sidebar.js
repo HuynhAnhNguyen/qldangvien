@@ -216,13 +216,13 @@ const Sidebar = () => {
             </a>
           </li>
 
-          <li className={`sidebar-item ${isActive("/quan-ly-chi-bo")}`}>
+          <li className={`sidebar-item ${isActive("/quan-ly-co-so-dang")}`}>
             <a
               className="sidebar-link"
-              onClick={() => navigate("/quan-ly-chi-bo")}
+              onClick={() => navigate("/quan-ly-co-so-dang")}
             >
               <i className="fa-solid fa-users"></i>
-              <span className="align-middle">Quản lý chi bộ</span>
+              <span className="align-middle">Quản lý cơ sở Đảng</span>
             </a>
           </li>
 
