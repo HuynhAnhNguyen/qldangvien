@@ -186,6 +186,16 @@ const Sidebar = () => {
             </a>
           </li>
 
+           <li className={`sidebar-item ${isActive("/quan-ly-co-so-dang")}`}>
+            <a
+              className="sidebar-link"
+              onClick={() => navigate("/quan-ly-co-so-dang")}
+            >
+              <i className="fa-solid fa-users"></i>
+              <span className="align-middle">Quản lý chi bộ</span>
+            </a>
+          </li>
+
           <li className={`sidebar-item ${isActive("/quan-ly-ho-so")}`}>
             <a
               className="sidebar-link"
@@ -216,15 +226,7 @@ const Sidebar = () => {
             </a>
           </li>
 
-          <li className={`sidebar-item ${isActive("/quan-ly-co-so-dang")}`}>
-            <a
-              className="sidebar-link"
-              onClick={() => navigate("/quan-ly-co-so-dang")}
-            >
-              <i className="fa-solid fa-users"></i>
-              <span className="align-middle">Quản lý cơ sở Đảng</span>
-            </a>
-          </li>
+        
 
           <li className={`sidebar-item ${isActive("/quan-ly-tin-tuc")}`}>
             <a
