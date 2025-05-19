@@ -9,6 +9,7 @@ import {
   createXepLoai,
   updateXepLoai,
   fetchXepLoaiByChiBoId,
+  fetchDangVienByChiBo,
 } from "../services/apiService";
 import Swal from "sweetalert2";
 
@@ -16,6 +17,7 @@ const CoSoDang = () => {
   const [dangUyList, setDangUyList] = useState([]);
   const [dangBoList, setDangBoList] = useState([]);
   const [chiBoList, setChiBoList] = useState([]);
+  const [dangVienList, setDangVienList] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDangUyId, setSelectedDangUyId] = useState("alldanguy");
   const [selectedDangBoId, setSelectedDangBoId] = useState("");
@@ -30,6 +32,7 @@ const CoSoDang = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showXepLoaiModal, setShowXepLoaiModal] = useState(false);
+  const [showDangVienModal, setShowDangVienModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [xepLoaiList, setXepLoaiList] = useState([]);
   const [xepLoaiForm, setXepLoaiForm] = useState({
@@ -217,6 +220,27 @@ const CoSoDang = () => {
       }
     } catch (err) {
       setError("Không thể tải danh sách xếp loại");
+      console.error("Error loading xepLoai:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch Dangvien By ChiBoId
+  const loadDangVienByChiBoId = async (chiboId) => {
+    setLoading(true);
+    try {
+      const response = await fetchDangVienByChiBo(token, chiboId);
+      if (response.resultCode === 0) {
+        setDangVienList(Array.isArray(response.data) ? response.data : []);
+        setError(null);
+      } else {
+        throw new Error(
+          response.message || "Không thể tải danh sách Đảng viên"
+        );
+      }
+    } catch (err) {
+      setError("Không thể tải danh sách Đảng viên");
       console.error("Error loading xepLoai:", err);
     } finally {
       setLoading(false);
@@ -623,6 +647,12 @@ const CoSoDang = () => {
     setEditXepLoaiId(null);
     loadXepLoai(item.id);
     setShowXepLoaiModal(true);
+  };
+
+  const openDangVienModal = (item) => {
+    setSelectedItem(item);
+    loadDangVienByChiBoId(item.id);
+    setShowDangVienModal(true);
   };
 
   // Open detail modal and load XepLoai
@@ -1298,6 +1328,13 @@ const CoSoDang = () => {
                 >
                   <i className="fa-solid fa-code-branch"></i>
                 </button>
+                <button
+                  className="btn btn-sm btn-outline-success"
+                  onClick={() => openDangVienModal(item)}
+                  title="Danh sách Đảng viên"
+                >
+                  <i className="fa-solid fa-user-tie"></i>
+                </button>
               </div>
             </td>
           </tr>
@@ -1791,6 +1828,79 @@ const CoSoDang = () => {
           <Button
             variant="secondary"
             onClick={() => setShowXepLoaiModal(false)}
+          >
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* DangVien Modal */}
+      <Modal
+        show={showDangVienModal}
+        onHide={() => setShowDangVienModal(false)}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Danh sách Đảng viên thuộc chi bộ <strong>{selectedItem?.tenchibo || ""}</strong>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {dangVienList.length === 0 ? (
+            <div className="alert alert-info">
+              Không có Đảng viên nào thuộc chi bộ này
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Họ tên</th>
+                    <th>Ngày sinh</th>
+                    <th>Giới tính</th>
+                    <th>Quê quán</th>
+                    <th>Ngày vào Đảng</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dangVienList.map((dangVien, index) => (
+                    <tr key={dangVien.id}>
+                      <td>{index + 1}</td>
+                      <td>{dangVien.hoten}</td>
+                      <td>
+                        {new Date(dangVien.ngaysinh).toLocaleDateString()}
+                      </td>
+                      <td>{dangVien.gioitinh}</td>
+                      <td>{dangVien.quequan}</td>
+                      <td>
+                        {new Date(dangVien.ngayvaodang).toLocaleDateString()}
+                      </td>
+                      <td>
+                        <span
+                          className={`badge ${
+                            dangVien.trangthaidangvien === "chinhthuc"
+                              ? "bg-success"
+                              : "bg-warning text-dark"
+                          }`}
+                        >
+                          {dangVien.trangthaidangvien === "chinhthuc"
+                            ? "Chính thức"
+                            : "Dự bị"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowDangVienModal(false)}
           >
             Đóng
           </Button>

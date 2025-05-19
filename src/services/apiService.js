@@ -1042,3 +1042,14 @@ export const fetchDangBoByDangUyId = async (token, danguyCaptrenId) => {
   );
   return response.data;
 };
+
+export const fetchDangVienByChiBo = async (token, selectedChiBoId) => {
+  const response = await axios.get(`${REACT_APP_API_URL}/dangvien/findByChiBoId?chiboId=${selectedChiBoId}`, {
+    headers: {
+      Authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  return await response.data;
+};
