@@ -6,25 +6,29 @@ const DangVienForm = ({
   validationErrors,
   chiBoList,
   handleInputChange,
+  setFormData,
 }) => {
+  // Tự động điền "Nơi sinh hoạt Đảng" khi chọn Chi bộ
   useEffect(() => {
-  const selectedChiBo = chiBoList.find(chiBo => chiBo.id === formData.chiboId);
-  if (selectedChiBo) {
-    handleInputChange({
-      target: {
-        name: "noisinhhoatdang",
-        value: selectedChiBo.tenchibo
+    if (formData.chiboId) {
+      const selectedChiBo = chiBoList.find(chiBo => chiBo.id.toString() === formData.chiboId.toString());
+      if (selectedChiBo) {
+        setFormData(prev => ({
+          ...prev,
+          noisinhhoatdang: selectedChiBo.tenchibo
+        }));
       }
-    });
-  }
-}, [formData.chiboId, chiBoList]);
+    }
+  }, [formData.chiboId, chiBoList, setFormData]);
 
   return (
     <Form>
       <Row className="mb-3">
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Họ và tên Đảng viên <span className="text-danger">*</span></Form.Label>
+            <Form.Label>
+              Họ và tên Đảng viên <span className="text-danger">*</span>
+            </Form.Label>
             <Form.Control
               type="text"
               name="hoten"
@@ -39,7 +43,9 @@ const DangVienForm = ({
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Ngày sinh <span className="text-danger">*</span></Form.Label>
+            <Form.Label>
+              Ngày sinh <span className="text-danger">*</span>
+            </Form.Label>
             <Form.Control
               type="date"
               name="ngaysinh"
@@ -56,7 +62,9 @@ const DangVienForm = ({
       <Row className="mb-3">
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Giới tính <span className="text-danger">*</span></Form.Label>
+            <Form.Label>
+              Giới tính <span className="text-danger">*</span>
+            </Form.Label>
             <Form.Select
               name="gioitinh"
               value={formData.gioitinh}
@@ -72,6 +80,27 @@ const DangVienForm = ({
             </Form.Control.Feedback>
           </Form.Group>
         </Col>
+        {/* <Col md={6}>
+          <Form.Group>
+            <Form.Label>Chi bộ <span className="text-danger">*</span></Form.Label>
+            <Form.Select
+              name="chiboId"
+              value={formData.chiboId}
+              onChange={handleInputChange}
+              isInvalid={!!validationErrors.chiboId}
+            >
+              <option value="">Chọn chi bộ</option>
+              {chiBoList.map((chiBo) => (
+                <option key={chiBo.id} value={chiBo.id}>
+                  {chiBo.tenchibo}
+                </option>
+              ))}
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {validationErrors.chiboId}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col> */}
         <Col md={6}>
           <Form.Group>
             <Form.Label>Chi bộ <span className="text-danger">*</span></Form.Label>
@@ -159,10 +188,11 @@ const DangVienForm = ({
         </Col>
       </Row>
       <Row className="mb-3">
-        
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Ngày vào Đảng <span className="text-danger">*</span></Form.Label>
+            <Form.Label>
+              Ngày vào Đảng <span className="text-danger">*</span>
+            </Form.Label>
             <Form.Control
               type="date"
               name="ngayvaodang"
@@ -192,7 +222,6 @@ const DangVienForm = ({
         </Col>
       </Row>
       <Row className="mb-3">
-        
         <Col md={6}>
           <Form.Group>
             <Form.Label>Người giới thiệu 1</Form.Label>
@@ -217,7 +246,6 @@ const DangVienForm = ({
         </Col>
       </Row>
       <Row className="mb-3">
-        
         <Col md={6}>
           <Form.Group>
             <Form.Label>Chức vụ chính quyền</Form.Label>
@@ -242,7 +270,6 @@ const DangVienForm = ({
         </Col>
       </Row>
       <Row className="mb-3">
-        
         <Col md={6}>
           <Form.Group>
             <Form.Label>Chức vụ Đảng ủy</Form.Label>
@@ -267,7 +294,7 @@ const DangVienForm = ({
         </Col>
       </Row>
       <Row className="mb-3">
-      <Col md={6}>
+        <Col md={6}>
           <Form.Group>
             <Form.Label>Chức danh của Đảng viên</Form.Label>
             <Form.Control
@@ -278,29 +305,38 @@ const DangVienForm = ({
             />
           </Form.Group>
         </Col>
-        <Col md={6}>
+        {/* <Col md={6}>
           <Form.Group>
             <Form.Label>Nơi sinh hoạt Đảng</Form.Label>
-            {/* <Form.Control
+            <Form.Control
               type="text"
               name="noisinhhoatdang"
               value={formData.noisinhhoatdang}
               onChange={handleInputChange}
-            /> */}
+            />
             <Form.Control
-  type="text"
-  name="noisinhhoatdang"
-  value={formData.noisinhhoatdang}
-  onChange={handleInputChange}
-  disabled
-/>
-
+              type="text"
+              name="noisinhhoatdang"
+              value={formData.noisinhhoatdang}
+              onChange={handleInputChange}
+              disabled
+            />
+          </Form.Group>
+        </Col> */}
+        <Col md={6}>
+          <Form.Group>
+            <Form.Label>Nơi sinh hoạt Đảng</Form.Label>
+            <Form.Control
+              type="text"
+              name="noisinhhoatdang"
+              value={formData.noisinhhoatdang || ""}
+              onChange={handleInputChange}
+              readOnly
+            />
           </Form.Group>
         </Col>
-        
       </Row>
       <Row className="mb-3">
-        
         <Col md={6}>
           <Form.Group>
             <Form.Label>Trình độ chuyên môn</Form.Label>
@@ -327,7 +363,6 @@ const DangVienForm = ({
             />
           </Form.Group>
         </Col>
-        
       </Row>
       <Row className="mb-3">
         <Col md={6}>
@@ -343,7 +378,9 @@ const DangVienForm = ({
         </Col>
         <Col md={6}>
           <Form.Group>
-            <Form.Label>Trạng thái Đảng viên <span className="text-danger">*</span></Form.Label>
+            <Form.Label>
+              Trạng thái Đảng viên <span className="text-danger">*</span>
+            </Form.Label>
             <Form.Select
               name="trangthaidangvien"
               value={formData.trangthaidangvien}

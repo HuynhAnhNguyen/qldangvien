@@ -1,17 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import DangVienForm from "./DangVienForm";
 
 const DangVienAddModal = ({
   show,
   onHide,
-  formData,
-  validationErrors,
   chiBoList,
-  handleInputChange,
   handleAddDangVien,
   loading,
 }) => {
+  const [formData, setFormData] = useState({
+    hoten: "",
+    ngaysinh: "",
+    gioitinh: "",
+    chiboId: "",
+    quequan: "",
+    dantoc: "",
+    trinhdovanhoa: "",
+    noihiennay: "",
+    ngayvaodang: "",
+    ngaychinhthuc: "",
+    nguoigioithieu1: "",
+    nguoigioithieu2: "",
+    chucvuchinhquyen: "",
+    chucvuchibo: "",
+    chucvudanguy: "",
+    chucvudoanthe: "",
+    chucdanh: "",
+    noisinhhoatdang: "",
+    chuyennmon: "",
+    trinhdongoaingu: "",
+    trinhdochinhtri: "",
+    trangthaidangvien: "",
+  });
+
+  const [validationErrors, setValidationErrors] = useState({});
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
@@ -23,6 +55,7 @@ const DangVienAddModal = ({
           validationErrors={validationErrors}
           chiBoList={chiBoList}
           handleInputChange={handleInputChange}
+          setFormData={setFormData}
         />
       </Modal.Body>
       <Modal.Footer>
