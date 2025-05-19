@@ -22,9 +22,20 @@ const HeaderHome = () => {
         />
 
         {/* Tiêu đề */}
-        <span className="header-title" style={{ fontSize: "20px" }}>
-          TRƯỜNG ĐẠI HỌC KỸ THUẬT - HẬU CẦN CÔNG AN NHÂN DÂN
-        </span>
+        <div>
+          <span
+            style={{ display: "block", fontSize: "20px" }}
+            className="header-title"
+          >
+            ĐẢNG BỘ TRƯỜNG ĐẠI HỌC KỸ THUẬT - HẬU CẦN CAND
+          </span>
+          <span
+            style={{ display: "block", fontSize: "20px" }}
+            className="header-title"
+          >
+            PHẦN MỀM QUẢN LÝ HỒ SƠ ĐẢNG VIÊN
+          </span>
+        </div>
       </div>
 
       {/* Phần bên phải - điều khiển đăng nhập */}
