@@ -5,7 +5,7 @@ import HoSoDangVienList from "../components/HoSoDangVienComponent/HoSoDangVienLi
 const QuanLyHoSo = () => {
     return (
       <>
-       <Layout Component={HoSoDangVienList} />
+       <Layout Component={HoSoDangVien} />
       </>
     
     );

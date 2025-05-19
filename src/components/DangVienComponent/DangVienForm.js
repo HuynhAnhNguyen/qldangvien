@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import { Form, Row, Col } from "react-bootstrap";
 
 const DangVienForm = ({
@@ -7,6 +7,18 @@ const DangVienForm = ({
   chiBoList,
   handleInputChange,
 }) => {
+  useEffect(() => {
+  const selectedChiBo = chiBoList.find(chiBo => chiBo.id === formData.chiboId);
+  if (selectedChiBo) {
+    handleInputChange({
+      target: {
+        name: "noisinhhoatdang",
+        value: selectedChiBo.tenchibo
+      }
+    });
+  }
+}, [formData.chiboId, chiBoList]);
+
   return (
     <Form>
       <Row className="mb-3">
@@ -269,12 +281,20 @@ const DangVienForm = ({
         <Col md={6}>
           <Form.Group>
             <Form.Label>Nơi sinh hoạt Đảng</Form.Label>
-            <Form.Control
+            {/* <Form.Control
               type="text"
               name="noisinhhoatdang"
               value={formData.noisinhhoatdang}
               onChange={handleInputChange}
-            />
+            /> */}
+            <Form.Control
+  type="text"
+  name="noisinhhoatdang"
+  value={formData.noisinhhoatdang}
+  onChange={handleInputChange}
+  disabled
+/>
+
           </Form.Group>
         </Col>
         

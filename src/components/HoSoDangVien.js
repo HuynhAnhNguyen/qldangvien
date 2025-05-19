@@ -11,6 +11,10 @@ import {
   uploadFile,
   downloadFile,
   fetchHoSoById,
+  fetchDanguy,
+  fetchDangBoByDangUyId,
+  fetchChiBoByDangBoId,
+  fetchDangVienByChiBo,
 } from "../services/apiService";
 
 const HoSoDangVien = () => {
@@ -18,12 +22,19 @@ const HoSoDangVien = () => {
   const [hoSoList, setHoSoList] = useState([]);
   const [selectedDangVien, setSelectedDangVien] = useState(null);
   const [searchType, setSearchType] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [file, setFile] = useState(null);
   const itemsPerPage = 10;
+
+  // Các state mới cho Đảng ủy, Đảng bộ, Chi bộ
+  const [dangUyList, setDangUyList] = useState([]);
+  const [dangBoList, setDangBoList] = useState([]);
+  const [chiBoList, setChiBoList] = useState([]);
+  const [selectedDangUyId, setSelectedDangUyId] = useState("");
+  const [selectedDangBoId, setSelectedDangBoId] = useState("");
+  const [selectedChiBoId, setSelectedChiBoId] = useState("");
 
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -40,12 +51,56 @@ const HoSoDangVien = () => {
     ghichu: "",
   });
 
+  // Load danh sách Đảng ủy
+  const loadDangUy = async () => {
+    try {
+      const data = await fetchDanguy(token);
+      if (data.resultCode === 0) {
+        setDangUyList(Array.isArray(data.data) ? data.data : []);
+      } else {
+        throw new Error(data.message || "Không thể tải danh sách Đảng ủy");
+      }
+    } catch (err) {
+      setError("Không thể tải danh sách Đảng ủy");
+      console.error("Error loading dangUy:", err);
+    }
+  };
+
+  // Load danh sách Đảng bộ theo Đảng ủy
+  const loadDangBo = async (dangUyId) => {
+    try {
+      const data = await fetchDangBoByDangUyId(token, dangUyId);
+      if (data.resultCode === 0) {
+        setDangBoList(Array.isArray(data.data) ? data.data : []);
+      } else {
+        throw new Error(data.message || "Không thể tải danh sách Đảng bộ");
+      }
+    } catch (err) {
+      setError("Không thể tải danh sách Đảng bộ");
+      console.error("Error loading dangBo:", err);
+    }
+  };
+
+  // Load danh sách Chi bộ theo Đảng bộ
+  const loadChiBo = async (dangBoId) => {
+    try {
+      const data = await fetchChiBoByDangBoId(token, dangBoId);
+      if (data.resultCode === 0) {
+        setChiBoList(Array.isArray(data.data) ? data.data : []);
+      } else {
+        throw new Error(data.message || "Không thể tải danh sách Chi bộ");
+      }
+    } catch (err) {
+      setError("Không thể tải danh sách Chi bộ");
+      console.error("Error loading chiBo:", err);
+    }
+  };
+
   // Add this new function to fetch detail
   const fetchHoSoDetail = async (hoSoId) => {
     try {
       setLoading(true);
       const data = await fetchHoSoById(token, hoSoId);
-      // const data = await response.json();
       if (data.resultCode === 0 && data.data && data.data.length > 0) {
         setHoSoDetail(data.data[0]); // Assuming API returns array with one item
         setShowDetailModal(true);
@@ -64,10 +119,9 @@ const HoSoDangVien = () => {
   const token = localStorage.getItem("token");
 
   // Fetch danh sách Đảng viên
-  const loadDangVien = async () => {
+  const loadDangVien = async (chiBoId) => {
     try {
-      const response = await fetchDangVien(token);
-      const data = await response.json();
+      const data = await fetchDangVienByChiBo(token, chiBoId);
       if (data.resultCode === 0) {
         setDangVienList(Array.isArray(data.data) ? data.data : []);
       } else {
@@ -77,6 +131,48 @@ const HoSoDangVien = () => {
       setError("Không thể tải danh sách Đảng viên");
       console.error("Error loading dangVien:", err);
       // Swal.fire("Lỗi!", "Không thể tải danh sách Đảng viên", "error");
+    }
+  };
+
+  // Xử lý khi chọn Đảng ủy
+  const handleDangUyChange = (e) => {
+    const dangUyId = e.target.value;
+    setSelectedDangUyId(dangUyId);
+    setSelectedDangBoId("");
+    setSelectedChiBoId("");
+    setSelectedDangVien(null);
+    setDangBoList([]);
+    setChiBoList([]);
+    setDangVienList([]);
+
+    if (dangUyId && dangUyId !== "alldanguy") {
+      loadDangBo(dangUyId);
+    }
+  };
+
+  // Xử lý khi chọn Đảng bộ
+  const handleDangBoChange = (e) => {
+    const dangBoId = e.target.value;
+    setSelectedDangBoId(dangBoId);
+    setSelectedChiBoId("");
+    setSelectedDangVien(null);
+    setChiBoList([]);
+    setDangVienList([]);
+
+    if (dangBoId && dangBoId !== "alldangbo") {
+      loadChiBo(dangBoId);
+    }
+  };
+
+  // Xử lý khi chọn Chi bộ
+  const handleChiBoChange = (e) => {
+    const chiBoId = e.target.value;
+    setSelectedChiBoId(chiBoId);
+    setSelectedDangVien(null);
+    setDangVienList([]);
+
+    if (chiBoId && chiBoId !== "allchibo") {
+      loadDangVien(chiBoId);
     }
   };
 
@@ -90,10 +186,7 @@ const HoSoDangVien = () => {
       if (searchType === "all") {
         data = await fetchHoSoByDangVienId(token, selectedDangVien.id);
       } else {
-        data = await fetchHoSoApprovedByDangVienId(
-          token,
-          selectedDangVien.id
-        );
+        data = await fetchHoSoApprovedByDangVienId(token, selectedDangVien.id);
       }
       // const data = await response.json();
       if (data.resultCode === 0) {
@@ -348,33 +441,49 @@ const HoSoDangVien = () => {
   const handleDangVienSelect = (dangVien) => {
     setSelectedDangVien(dangVien);
     setCurrentPage(1);
-    setSearchTerm("");
+    // setSearchTerm("");
   };
 
-  // Filter hồ sơ based on search term
-  const filteredHoSo = hoSoList.filter(
-    (item) =>
-      item.taphoso?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
-      item.loaihoso?.toLowerCase()?.includes(searchTerm.toLowerCase())
-  );
+  // // Filter hồ sơ based on search term
+  // const filteredHoSo = hoSoList.filter(
+  //   (item) =>
+  //     item.taphoso?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+  //     item.loaihoso?.toLowerCase()?.includes(searchTerm.toLowerCase())
+  // );
+
+  // // Pagination
+  // const totalPages = Math.ceil(filteredHoSo.length / itemsPerPage);
+  // const currentItems = filteredHoSo.slice(
+  //   (currentPage - 1) * itemsPerPage,
+  //   currentPage * itemsPerPage
+  // );
+  // Load data on component mount
+  useEffect(() => {
+    loadDangUy();
+  }, []);
+
+  // Load hồ sơ khi selectedDangVien hoặc searchType thay đổi
+  useEffect(() => {
+    loadHoSo();
+  }, [selectedDangVien, searchType]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredHoSo.length / itemsPerPage);
-  const currentItems = filteredHoSo.slice(
+  const totalPages = Math.ceil(hoSoList.length / itemsPerPage);
+  const currentItems = hoSoList.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   // Thêm hàm xử lý thay đổi search term
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
-  };
+  // const handleSearchChange = (e) => {
+  //   setSearchTerm(e.target.value);
+  //   setCurrentPage(1); // Reset về trang 1 khi tìm kiếm
+  // };
 
   // Load data on component mount and when selectedDangVien or searchType changes
-  useEffect(() => {
-    loadDangVien();
-  }, []);
+  // useEffect(() => {
+  //   loadDangVien();
+  // }, []);
 
   useEffect(() => {
     loadHoSo();
@@ -392,7 +501,7 @@ const HoSoDangVien = () => {
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
           <h1 className="h3 mb-3 mb-md-0">Quản lý Hồ Sơ Đảng Viên</h1>
           <div className="d-flex gap-2 align-items-center">
-            <Form.Select
+            {/* <Form.Select
               value={searchType}
               onChange={(e) => setSearchType(e.target.value)}
               style={{ width: "200px" }}
@@ -415,8 +524,91 @@ const HoSoDangVien = () => {
                   {dangVien.hoten}
                 </option>
               ))}
+            </Form.Select> */}
+
+            {/* Đảng ủy - luôn hiển thị */}
+            <Form.Select
+              value={selectedDangUyId}
+              onChange={handleDangUyChange}
+              style={{ width: "150px" }}
+            >
+              <option value="alldanguy">Tất cả Đảng ủy</option>
+              {dangUyList.map((du) => (
+                <option key={du.id} value={du.id}>
+                  {du.tenchibo.length > 40
+                    ? `${du.tenchibo.substring(0, 40)}...`
+                    : du.tenchibo}
+                </option>
+              ))}
             </Form.Select>
-            <div
+
+            {/* Đảng bộ - chỉ hiển thị nếu chọn Đảng ủy cụ thể */}
+            {selectedDangUyId && selectedDangUyId !== "alldanguy" && (
+              <Form.Select
+                value={selectedDangBoId}
+                onChange={handleDangBoChange}
+                style={{ width: "150px" }}
+              >
+                <option value="alldangbo">Tất cả Đảng bộ</option>
+                {dangBoList.map((db) => (
+                  <option key={db.id} value={db.id}>
+                    {db.tenchibo.length > 100
+                      ? `${db.tenchibo.substring(0, 100)}...`
+                      : db.tenchibo}
+                  </option>
+                ))}
+              </Form.Select>
+            )}
+
+            {/* Chi bộ - chỉ hiển thị nếu chọn Đảng bộ cụ thể */}
+            {selectedDangBoId && selectedDangBoId !== "alldangbo" && (
+              <Form.Select
+                value={selectedChiBoId}
+                onChange={handleChiBoChange}
+                style={{ width: "150px" }}
+              >
+                <option value="allchibo">Tất cả Chi bộ</option>
+                {chiBoList.map((cb) => (
+                  <option key={cb.id} value={cb.id}>
+                    {cb.tenchibo}
+                  </option>
+                ))}
+              </Form.Select>
+            )}
+
+            {/* Chọn Đảng viên - chỉ hiển thị nếu chọn Chi bộ cụ thể */}
+            {selectedChiBoId && selectedChiBoId !== "allchibo" && (
+              <Form.Select
+                value={selectedDangVien?.id || ""}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  const dv = dangVienList.find((item) => item.id == selectedId);
+                  handleDangVienSelect(dv || null);
+                }}
+                style={{ width: "200px" }}
+              >
+                <option value="">Chọn Đảng viên</option>
+                {dangVienList.map((dangVien) => (
+                  <option key={dangVien.id} value={dangVien.id}>
+                    {dangVien.hoten}
+                  </option>
+                ))}
+              </Form.Select>
+            )}
+
+            {/* Chọn loại tìm kiếm - chỉ hiển thị khi đã chọn Đảng viên */}
+            {selectedDangVien && (
+              <Form.Select
+                value={searchType}
+                onChange={(e) => setSearchType(e.target.value)}
+                style={{ width: "150px" }}
+              >
+                <option value="all">Tất cả hồ sơ</option>
+                <option value="approved">Hồ sơ đã duyệt</option>
+              </Form.Select>
+            )}
+
+            {/* <div
               className="d-flex"
               style={{ width: "100%", maxWidth: "400px" }}
             >
@@ -429,7 +621,8 @@ const HoSoDangVien = () => {
                 onChange={handleSearchChange}
                 disabled={!selectedDangVien}
               />
-            </div>
+            </div> */}
+
             <button
               className="btn btn-success custom-sm-btn-hoso"
               onClick={openAddModal}
@@ -451,7 +644,7 @@ const HoSoDangVien = () => {
         {error && <div className="alert alert-danger">{error}</div>}
 
         {/* HoSo table */}
-        {!selectedDangVien ? (
+        {/* {!selectedDangVien ? (
           <div className="text-center py-4 text-muted">
             Vui lòng chọn Đảng viên để xem danh sách hồ sơ
           </div>
@@ -596,107 +789,263 @@ const HoSoDangVien = () => {
             )}
           </>
         )}
+      </div> */}
+
+        {/* HoSo table */}
+        {!selectedDangVien ? (
+          <div className="text-center py-4 text-muted">
+            {!selectedDangUyId
+              ? "Vui lòng chọn Đảng ủy để bắt đầu"
+              : !selectedDangBoId
+              ? "Vui lòng chọn Đảng bộ"
+              : !selectedChiBoId
+              ? "Vui lòng chọn Chi bộ"
+              : "Vui lòng chọn Đảng viên để xem danh sách hồ sơ"}
+          </div>
+        ) : hoSoList.length === 0 ? (
+          <div className="text-center py-4 text-muted">
+            Không có hồ sơ {searchType === "approved" ? "đã duyệt" : ""} của
+            Đảng viên <strong>{selectedDangVien.hoten}</strong>
+          </div>
+        ) : (
+          <>
+            <div className="table-responsive mb-4">
+              <table className="table table-hover">
+                <thead className="table-light">
+                  <tr>
+                    <th style={{ width: "5%" }}>STT</th>
+                    <th style={{ width: "15%" }}>Tập hồ sơ</th>
+                    <th style={{ width: "20%" }}>Loại hồ sơ</th>
+                    <th style={{ width: "15%" }}>Trạng thái</th>
+                    <th style={{ width: "15%" }}>Thời gian tạo</th>
+                    <th style={{ width: "15%" }}>Người phê duyệt</th>
+                    <th style={{ width: "15%" }}>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((item, index) => (
+                    <tr key={index}>
+                      <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                      <td>
+                        {item.taphoso === "tap1"
+                          ? "Tập 1"
+                          : item.taphoso === "tap2"
+                          ? "Tập 2"
+                          : "Tập 3"}
+                      </td>
+                      <td>{item.loaihoso}</td>
+                      <td>
+                        <Badge
+                          bg={
+                            item.trangthai === "approved"
+                              ? "success"
+                              : item.trangthai === "rejected"
+                              ? "danger"
+                              : "warning"
+                          }
+                        >
+                          {item.trangthai === "approved"
+                            ? "Đã duyệt"
+                            : item.trangthai === "rejected"
+                            ? "Từ chối"
+                            : "Chờ duyệt"}
+                        </Badge>
+                      </td>
+                      <td>{item.thoigiantao}</td>
+                      <td>{item.nguoipheduyet || "Chưa phê duyệt"}</td>
+                      <td>
+                        <div className="d-flex gap-1">
+                          <button
+                            className="btn btn-sm btn-outline-info"
+                            onClick={() => fetchHoSoDetail(item.id)}
+                            title="Xem chi tiết"
+                          >
+                            <i className="fas fa-eye"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-primary btn-outline-primary-detail"
+                            onClick={() => openEditModal(item)}
+                            title="Chỉnh sửa"
+                          >
+                            <i className="fas fa-edit"></i>
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDeleteHoSo(item.id)}
+                            title="Xóa"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="mt-auto p-3 bg-light border-top">
+                <nav aria-label="Page navigation">
+                  <ul className="pagination justify-content-center mb-0">
+                    <li
+                      className={`page-item ${
+                        currentPage === 1 ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        disabled={currentPage === 1}
+                      >
+                        « Trước
+                      </button>
+                    </li>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <li
+                          key={page}
+                          className={`page-item ${
+                            page === currentPage ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      )
+                    )}
+                    <li
+                      className={`page-item ${
+                        currentPage === totalPages ? "disabled" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
+                        disabled={currentPage === totalPages}
+                      >
+                        Tiếp »
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
-{/* Detail HoSo Modal */}
-<Modal
-    show={showDetailModal}
-    onHide={() => setShowDetailModal(false)}
-    size="lg"
-  >
-    <Modal.Header closeButton>
-      <Modal.Title>Chi tiết Hồ Sơ</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      {hoSoDetail ? (
-        <div>
-          <Row className="mb-3">
-            <Col md={6}>
-              <h6>Tập hồ sơ:</h6>
-              <p>{hoSoDetail.taphoso === "tap1"
-                  ? "Tập 1"
-                  : hoSoDetail.taphoso === "tap2"
-                  ? "Tập 2"
-                  : "Tập 3"}</p>
-            </Col>
-            <Col md={6}>
-              <h6>Loại hồ sơ:</h6>
-              <p>{hoSoDetail.loaihoso}</p>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col md={12}>
-              <h6>File hồ sơ:</h6>
-              {hoSoDetail.fileUrl && (
-                <p>
-                  <a
-                    onClick={() => handleDownloadFile(hoSoDetail.fileUrl)}
-                    style={{ cursor: 'pointer', color: 'blue' }}
+      {/* Detail HoSo Modal */}
+      <Modal
+        show={showDetailModal}
+        onHide={() => setShowDetailModal(false)}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Chi tiết Hồ Sơ</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {hoSoDetail ? (
+            <div>
+              <Row className="mb-3">
+                <Col md={6}>
+                  <h6>Tập hồ sơ:</h6>
+                  <p>
+                    {hoSoDetail.taphoso === "tap1"
+                      ? "Tập 1"
+                      : hoSoDetail.taphoso === "tap2"
+                      ? "Tập 2"
+                      : "Tập 3"}
+                  </p>
+                </Col>
+                <Col md={6}>
+                  <h6>Loại hồ sơ:</h6>
+                  <p>{hoSoDetail.loaihoso}</p>
+                </Col>
+              </Row>
+              <Row className="mb-3">
+                <Col md={12}>
+                  <h6>File hồ sơ:</h6>
+                  {hoSoDetail.fileUrl && (
+                    <p>
+                      <a
+                        onClick={() => handleDownloadFile(hoSoDetail.fileUrl)}
+                        style={{ cursor: "pointer", color: "blue" }}
+                      >
+                        {hoSoDetail.fileUrl}
+                      </a>
+                    </p>
+                  )}
+                </Col>
+              </Row>
+              <Row className="mb-3">
+                <Col md={12}>
+                  <h6>Ghi chú:</h6>
+                  <p>{hoSoDetail.ghichu || "Không có ghi chú"}</p>
+                </Col>
+              </Row>
+              <Row className="mb-3">
+                <Col md={6}>
+                  <h6>Trạng thái:</h6>
+                  <Badge
+                    bg={
+                      hoSoDetail.trangthai === "approved"
+                        ? "success"
+                        : hoSoDetail.trangthai === "rejected"
+                        ? "danger"
+                        : "warning"
+                    }
                   >
-                    {hoSoDetail.fileUrl}
-                  </a>
-                </p>
+                    {hoSoDetail.trangthai === "approved"
+                      ? "Đã duyệt"
+                      : hoSoDetail.trangthai === "rejected"
+                      ? "Từ chối"
+                      : "Chờ duyệt"}
+                  </Badge>
+                </Col>
+                <Col md={6}>
+                  <h6>Thời gian tạo:</h6>
+                  <p>{hoSoDetail.thoigiantao}</p>
+                </Col>
+              </Row>
+              {hoSoDetail.trangthai === "approved" && (
+                <Row className="mb-3">
+                  <Col md={6}>
+                    <h6>Người phê duyệt:</h6>
+                    <p>{hoSoDetail.nguoipheduyet}</p>
+                  </Col>
+                  <Col md={6}>
+                    <h6>Thời gian phê duyệt:</h6>
+                    <p>{hoSoDetail.thoigianpheduyet}</p>
+                  </Col>
+                </Row>
               )}
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col md={12}>
-              <h6>Ghi chú:</h6>
-              <p>{hoSoDetail.ghichu || "Không có ghi chú"}</p>
-            </Col>
-          </Row>
-          <Row className="mb-3">
-            <Col md={6}>
-              <h6>Trạng thái:</h6>
-              <Badge
-                bg={
-                  hoSoDetail.trangthai === "approved"
-                    ? "success"
-                    : hoSoDetail.trangthai === "rejected"
-                    ? "danger"
-                    : "warning"
-                }
-              >
-                {hoSoDetail.trangthai === "approved"
-                  ? "Đã duyệt"
-                  : hoSoDetail.trangthai === "rejected"
-                  ? "Từ chối"
-                  : "Chờ duyệt"}
-              </Badge>
-            </Col>
-            <Col md={6}>
-              <h6>Thời gian tạo:</h6>
-              <p>{hoSoDetail.thoigiantao}</p>
-            </Col>
-          </Row>
-          {hoSoDetail.trangthai === "approved" && (
-            <Row className="mb-3">
-              <Col md={6}>
-                <h6>Người phê duyệt:</h6>
-                <p>{hoSoDetail.nguoipheduyet}</p>
-              </Col>
-              <Col md={6}>
-                <h6>Thời gian phê duyệt:</h6>
-                <p>{hoSoDetail.thoigianpheduyet}</p>
-              </Col>
-            </Row>
+              <div className="mt-3">
+                <h6>Đảng viên: {selectedDangVien?.hoten}</h6>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <Spinner animation="border" variant="primary" />
+            </div>
           )}
-          <div className="mt-3">
-            <h6>Đảng viên: {selectedDangVien?.hoten}</h6>
-          </div>
-        </div>
-      ) : (
-        <div className="text-center py-4">
-          <Spinner animation="border" variant="primary" />
-        </div>
-      )}
-    </Modal.Body>
-    <Modal.Footer>
-      <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
-        Đóng
-      </Button>
-    </Modal.Footer>
-  </Modal>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Add HoSo Modal */}
       <Modal
