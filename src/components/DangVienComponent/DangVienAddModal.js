@@ -5,43 +5,20 @@ import DangVienForm from "./DangVienForm";
 const DangVienAddModal = ({
   show,
   onHide,
+  formData,
+  validationErrors,
   chiBoList,
+  handleInputChange,
   handleAddDangVien,
   loading,
+  validateForm,
+  setFormData,
 }) => {
-  const [formData, setFormData] = useState({
-    hoten: "",
-    ngaysinh: "",
-    gioitinh: "",
-    chiboId: "",
-    quequan: "",
-    dantoc: "",
-    trinhdovanhoa: "",
-    noihiennay: "",
-    ngayvaodang: "",
-    ngaychinhthuc: "",
-    nguoigioithieu1: "",
-    nguoigioithieu2: "",
-    chucvuchinhquyen: "",
-    chucvuchibo: "",
-    chucvudanguy: "",
-    chucvudoanthe: "",
-    chucdanh: "",
-    noisinhhoatdang: "",
-    chuyennmon: "",
-    trinhdongoaingu: "",
-    trinhdochinhtri: "",
-    trangthaidangvien: "",
-  });
-
-  const [validationErrors, setValidationErrors] = useState({});
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleSubmit = () => {
+    if (!validateForm()) {
+      return;
+    }
+    handleAddDangVien();
   };
 
   return (
@@ -64,7 +41,7 @@ const DangVienAddModal = ({
         </Button>
         <Button
           variant="primary"
-          onClick={handleAddDangVien}
+          onClick={handleSubmit}
           disabled={loading}
         >
           {loading ? "Đang xử lý..." : "Thêm mới"}

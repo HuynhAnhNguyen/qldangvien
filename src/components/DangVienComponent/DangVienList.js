@@ -622,6 +622,8 @@ const handleExportExcel = (dangVien) => {
           handleInputChange={handleInputChange}
           handleAddDangVien={handleAddDangVien}
           loading={loading}
+          validateForm={validateForm}
+          setFormData={setFormData}
         />
 
         <DangVienEditModal

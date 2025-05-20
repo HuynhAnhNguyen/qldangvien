@@ -80,27 +80,6 @@ const DangVienForm = ({
             </Form.Control.Feedback>
           </Form.Group>
         </Col>
-        {/* <Col md={6}>
-          <Form.Group>
-            <Form.Label>Chi bộ <span className="text-danger">*</span></Form.Label>
-            <Form.Select
-              name="chiboId"
-              value={formData.chiboId}
-              onChange={handleInputChange}
-              isInvalid={!!validationErrors.chiboId}
-            >
-              <option value="">Chọn chi bộ</option>
-              {chiBoList.map((chiBo) => (
-                <option key={chiBo.id} value={chiBo.id}>
-                  {chiBo.tenchibo}
-                </option>
-              ))}
-            </Form.Select>
-            <Form.Control.Feedback type="invalid">
-              {validationErrors.chiboId}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Col> */}
         <Col md={6}>
           <Form.Group>
             <Form.Label>Chi bộ <span className="text-danger">*</span></Form.Label>
@@ -305,24 +284,6 @@ const DangVienForm = ({
             />
           </Form.Group>
         </Col>
-        {/* <Col md={6}>
-          <Form.Group>
-            <Form.Label>Nơi sinh hoạt Đảng</Form.Label>
-            <Form.Control
-              type="text"
-              name="noisinhhoatdang"
-              value={formData.noisinhhoatdang}
-              onChange={handleInputChange}
-            />
-            <Form.Control
-              type="text"
-              name="noisinhhoatdang"
-              value={formData.noisinhhoatdang}
-              onChange={handleInputChange}
-              disabled
-            />
-          </Form.Group>
-        </Col> */}
         <Col md={6}>
           <Form.Group>
             <Form.Label>Nơi sinh hoạt Đảng</Form.Label>
