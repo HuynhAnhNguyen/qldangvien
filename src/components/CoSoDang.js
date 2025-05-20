@@ -1456,7 +1456,8 @@ const CoSoDang = () => {
     <div className="container-fluid p-0 position-relative d-flex flex-column min-vh-100">
       <div className="p-4 flex-grow-1">
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
-          <h1 className="h3 mb-3 mb-md-0">Danh sách cơ sở Đảng</h1>
+          <h1 className="h3 mb-3 mb-md-0"></h1>
+          {/* <h1 className="h3 mb-3 mb-md-0">Danh sách cơ sở Đảng</h1> */}
           <div className="d-flex gap-2 align-items-center">
             {/* Đảng ủy - luôn hiển thị */}
             <Form.Select

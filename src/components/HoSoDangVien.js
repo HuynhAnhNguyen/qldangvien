@@ -499,7 +499,8 @@ const HoSoDangVien = () => {
       {/* Main content */}
       <div className="p-4 flex-grow-1">
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
-          <h1 className="h3 mb-3 mb-md-0">Quản lý Hồ Sơ Đảng Viên</h1>
+          {/* <h1 className="h3 mb-3 mb-md-0">Quản lý Hồ Sơ Đảng Viên</h1> */}
+           <h1 className="h3 mb-3 mb-md-0"></h1>
           <div className="d-flex gap-2 align-items-center">
             {/* <Form.Select
               value={searchType}
