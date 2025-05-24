@@ -157,6 +157,13 @@ const CoSoDang = () => {
         setDangUyList(dangUyResponse.data || []);
         setDangBoList([]);
         setChiBoList([]);
+
+        if (dangUyResponse.data.length > 0) {
+        const firstDangUyId = dangUyResponse.data[0].id;
+        setSelectedDangUyId(firstDangUyId);
+        await loadDangBoByDangUy(firstDangUyId); // gọi load tiếp Đảng bộ nếu cần
+    }
+
       } else {
         throw new Error(
           dangUyResponse.message || "Không thể tải danh sách đảng ủy"
