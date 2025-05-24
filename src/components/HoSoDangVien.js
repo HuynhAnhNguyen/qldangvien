@@ -57,6 +57,11 @@ const HoSoDangVien = () => {
       const data = await fetchDanguy(token);
       if (data.resultCode === 0) {
         setDangUyList(Array.isArray(data.data) ? data.data : []);
+        if (data.data.length > 0) {
+        const firstDangUyId = data.data[0].id;
+        setSelectedDangUyId(firstDangUyId);
+        await loadDangBo(firstDangUyId); // gọi load tiếp Đảng bộ nếu cần
+    }
       } else {
         throw new Error(data.message || "Không thể tải danh sách Đảng ủy");
       }
@@ -72,6 +77,11 @@ const HoSoDangVien = () => {
       const data = await fetchDangBoByDangUyId(token, dangUyId);
       if (data.resultCode === 0) {
         setDangBoList(Array.isArray(data.data) ? data.data : []);
+        if (data.data.length > 0) {
+        const firstDangBoId = data.data[0].id;
+        setSelectedDangBoId(firstDangBoId);
+        await loadChiBo(firstDangBoId); // gọi load tiếp Đảng bộ nếu cần
+    }
       } else {
         throw new Error(data.message || "Không thể tải danh sách Đảng bộ");
       }
@@ -87,6 +97,11 @@ const HoSoDangVien = () => {
       const data = await fetchChiBoByDangBoId(token, dangBoId);
       if (data.resultCode === 0) {
         setChiBoList(Array.isArray(data.data) ? data.data : []);
+        if (data.data.length > 0) {
+        const firstChiboId = data.data[0].id;
+        setSelectedChiBoId(firstChiboId);
+        await loadDangVien(firstChiboId); // gọi load tiếp Đảng bộ nếu cần
+    }
       } else {
         throw new Error(data.message || "Không thể tải danh sách Chi bộ");
       }
@@ -124,6 +139,12 @@ const HoSoDangVien = () => {
       const data = await fetchDangVienByChiBo(token, chiBoId);
       if (data.resultCode === 0) {
         setDangVienList(Array.isArray(data.data) ? data.data : []);
+         if (data.data.length > 0) {
+        const firstDangvienId = data.data[0];
+        setSelectedDangVien(firstDangvienId);
+        handleDangVienSelect(firstDangvienId||null); // gọi load tiếp Đảng bộ nếu cần
+        await loadHoSo(firstDangvienId);
+    }
       } else {
         throw new Error(data.message || "Không thể tải danh sách Đảng viên");
       }
