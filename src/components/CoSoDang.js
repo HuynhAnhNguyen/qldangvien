@@ -185,6 +185,11 @@ const CoSoDang = () => {
       if (response.resultCode === 0) {
         setDangBoList(response.data || []);
         setChiBoList([]);
+        if (response.data.length > 0) {
+        const firstDangUyId = response.data[0].id;
+        setSelectedDangBoId(firstDangUyId);
+        await loadChiBoByDangBo(firstDangUyId); // gọi load tiếp Đảng bộ nếu cần
+    }
       } else {
         throw new Error(response.message || "Không thể tải danh sách đảng bộ");
       }
