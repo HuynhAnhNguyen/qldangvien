@@ -234,7 +234,7 @@ const IndexAdmin = () => {
       </div>
 
       {/* Chatbot Widget */}
-      <ChatBot />
+      {/* <ChatBot /> */}
     </div>
   );
 };

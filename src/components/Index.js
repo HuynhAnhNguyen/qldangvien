@@ -412,7 +412,7 @@ const Index = () => {
       </div>
 
       {/* Chatbot Widget */}
-      <ChatBot />
+      {/* <ChatBot /> */}
     </div>
   );
 };
