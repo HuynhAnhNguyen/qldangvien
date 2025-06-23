@@ -581,7 +581,7 @@ const PheDuyet = () => {
                           (item.tieude || "N/A")}
                       </td>
                       <td>
-                        {new Date(item.thoigianguipheduyet).toLocaleString()}
+                        {item.thoigianguipheduyet.split('.')[0]}
                       </td>
                       <td>
                         <Badge

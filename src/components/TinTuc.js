@@ -261,7 +261,7 @@ const TinTuc = () => {
                   </td>
                   <td>{item.tieude}</td>
                   <td>{item.mota}</td>
-                  <td>{new Date(item.createdAt).toLocaleDateString()}</td>
+                  <td>{item.createdAt.split('.')[0]}</td>
                   <td>
                     <div className="d-flex gap-1">
                       <button
