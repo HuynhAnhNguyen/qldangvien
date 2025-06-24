@@ -54,7 +54,7 @@ const HoSoDangVienTabContent = ({ hoSoList, onDownload, loading }) => {
                 <td>
                   {" "}
                   {item.thoigiantao
-                    ? new Date(item.thoigiantao).toLocaleString()
+                    ? item.thoigiantao.split('.')[0]
                     : "Không có"}
                 </td>
 

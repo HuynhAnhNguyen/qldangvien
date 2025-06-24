@@ -67,7 +67,7 @@ const KyDangPhiTable = ({
                     {/* <td>{item.thoigiantao}</td> */}
                     <td>
                       {item.thoigiantao
-                        ? new Date(item.thoigiantao).toLocaleString()
+                        ? item.thoigiantao.split('.')[0]
                         : "Chưa xác nhận"}
                     </td>
                     <td>

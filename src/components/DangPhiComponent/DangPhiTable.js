@@ -97,7 +97,7 @@ const DangPhiTable = ({
                     {/* <td>{item.thoigianxacnhan || "Chưa xác nhận"}</td> */}
                     <td>
                       {item.thoigianxacnhan
-                        ? new Date(item.thoigianxacnhan).toLocaleString()
+                        ? item.thoigianxacnhan.split('.')[0]
                         : "Chưa xác nhận"}
                     </td>
                     <td>

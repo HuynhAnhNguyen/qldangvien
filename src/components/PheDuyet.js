@@ -1131,7 +1131,7 @@ const PheDuyet = () => {
                       <tr>
                         <th>Thời gian tạo</th>
                         <td>
-                          {new Date(detailData.thoigiantao).toLocaleString()}
+                          {detailData.thoigiantao.split('.')[0]}
                         </td>
                       </tr>
                       <tr>
