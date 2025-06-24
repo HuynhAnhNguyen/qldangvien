@@ -337,7 +337,7 @@ const Index = () => {
                         Xem chi tiết
                       </button>
                       <small className="text-muted" style={{ fontSize: "11px" }}>
-                        Đăng ngày: {new Date(newsItem.thoigianpheduyet).toLocaleString()}
+                        Đăng ngày: {newsItem.thoigianpheduyet.split('.')[0]}
                       </small>
                     </div>
                   </div>
